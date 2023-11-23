@@ -1,6 +1,8 @@
 import pygame
 
+from src.programs.grid import Grid
+
 class Sudoku:
     
     def __init__(self):
-        pass
+        self.grid = Grid()
