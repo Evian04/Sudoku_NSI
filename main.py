@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 
-from src.programes.game import Game
+from src.programs.game import Game
 
 screen_size = (1080, 720)
 pygame.display.set_caption("Sudoku")
