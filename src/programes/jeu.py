@@ -4,5 +4,5 @@ import pygame
 class Game:
     
     def __init__(self):
-        pass
+        pygame.init()
 
