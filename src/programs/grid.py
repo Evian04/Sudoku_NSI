@@ -1,3 +1,5 @@
+from tkinter.filedialog import askopenfilename
+
 class Grid:
     
     """
@@ -32,6 +34,12 @@ class Grid:
             raise ValueError(f"Grid.get_cell() : The `y` argument must be between 0 and 8 (value : {y})")
         
         return self.content[x][y]
+
+    def set_content(self, new_content: list[list[str]]):
+        
+        """
+        Met 
+        """
     
     def set_cell(self, x: int, y: int, value: str):
         
