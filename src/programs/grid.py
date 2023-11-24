@@ -20,7 +20,7 @@ class Grid:
     
     def get_cell_value(self, x: int, y: int) -> int:
         """
-        Renvois la valeur de la case de coordonnées (x, y)
+        Renvoi la valeur de la case de coordonnées (x, y)
         """
         
         if type(x) != int:
