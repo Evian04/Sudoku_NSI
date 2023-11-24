@@ -9,18 +9,7 @@ class Game:
         self.background_color = (0, 0, 0)
         self.sudoku = Sudoku(self)
         
-        self.grid_image = pygame.transform.scale(pygame.image.load("src/graphics/grid.png"), (self.screen.get_height(), self.screen.get_height()))
-        self.grid_image_rect = self.grid_image.get_rect()
-        self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
-        
-        self.all_rect = [[
-            pygame.Rect(
-                self.grid_image_rect.x + self.grid_image_rect.width / 9 * x,
-                self.grid_image_rect.y + self.grid_image_rect.height / 9 * y,
-                self.grid_image_rect.width / 9,
-                self.grid_image_rect.height / 9
-            )
-        for y in range(9)] for x in range(9)]
+        self.update_rect()
         
     def update(self, all_events: list[pygame.event.Event]):
         """
@@ -63,6 +52,9 @@ class Game:
                     for y in range(9):
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
                             self.sudoku.select_cell(x, y)
+                            
+            if event.type == pygame.WINDOWRESIZED:
+                self.update_rect()
     
     def display_elements(self):
         
@@ -70,3 +62,18 @@ class Game:
 
         if self.sudoku.selected_cell != [-1, -1]:
             pygame.draw.rect(self.screen, (80, 80, 80), self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]])
+            
+    def update_rect(self):
+        
+        self.grid_image = pygame.transform.scale(pygame.image.load("src/graphics/grid.png"), (self.screen.get_height(), self.screen.get_height()))
+        self.grid_image_rect = self.grid_image.get_rect()
+        self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
+        
+        self.all_rect = [[
+            pygame.Rect(
+                self.grid_image_rect.x + self.grid_image_rect.width / 9 * x,
+                self.grid_image_rect.y + self.grid_image_rect.height / 9 * y,
+                self.grid_image_rect.width / 9,
+                self.grid_image_rect.height / 9
+            )
+        for y in range(9)] for x in range(9)]
