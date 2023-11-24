@@ -2,7 +2,9 @@ import pygame.font
 
 
 class Cell:
-    
+    """
+    classe Cell(ule), contient les données relatives aux cellules (valeur, etat, etc...)
+    """
     def __init__(self, value: int, state: str):
         if type(value) != int:
             raise TypeError(f"The `value` argument must be an integer (type : {type(value)})")
@@ -17,7 +19,7 @@ class Cell:
     
     def get_value(self) -> int:
         """
-        Renvois la valeur de la case
+        Renvoi la valeur de la case
         """
         
         return self.value
