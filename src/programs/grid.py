@@ -1,6 +1,5 @@
 from tkinter.filedialog import askopenfilename
 
-
 class Grid:
     """
     La class `Grid` permet de stocker et de gérer le contenu de la grille du sudoku

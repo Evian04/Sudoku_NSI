@@ -10,10 +10,16 @@ class Game:
         
         self.grid_image = pygame.image.load("src/graphics/grid.png")
         
-        self.sudoku = Sudoku()
+        self.sudoku = Sudoku(self)
         
         self.display_elements()
     
     def display_elements(self):
         
         self.screen.blit(self.grid_image, self.grid_image.get_rect())
+    
+    def update(self):
+        """
+        
+        :return:
+        """
