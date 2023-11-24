@@ -77,6 +77,3 @@ class Grid:
             raise ValueError(f"Grid.set_cell() : the cell state must be in 'unlocked' state (state : {self.content[x][y].get_state()}")
             
         self.content[x][y].put_value(value)
-        
-    
-    

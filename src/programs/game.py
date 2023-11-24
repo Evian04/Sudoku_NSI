@@ -2,7 +2,6 @@ import pygame
 
 from src.programs.sudoku import Sudoku
 
-
 class Game:
     
     def __init__(self, screen: pygame.Surface):
@@ -18,7 +17,16 @@ class Game:
             pygame.K_6: 6,
             pygame.K_7: 7,
             pygame.K_8: 8,
-            pygame.K_9: 9
+            pygame.K_9: 9,
+            pygame.K_KP_1: 1,
+            pygame.K_KP_2: 2,
+            pygame.K_KP_3: 3,
+            pygame.K_KP_4: 4,
+            pygame.K_KP_5: 5,
+            pygame.K_KP_6: 6,
+            pygame.K_KP_7: 7,
+            pygame.K_KP_8: 8,
+            pygame.K_KP_9: 9,
         }
         self.update_rect()
     
@@ -61,10 +69,15 @@ class Game:
                 if event.key in self.key_mapping:
                     if self.sudoku.selected_cell != [-1, -1]:
                         selected_cell = self.sudoku.selected_cell
-                        value = self.key_mapping[
-                            event.key]  # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
-                        self.sudoku.grid.set_cell(selected_cell[0], selected_cell[1],
-                                                  value)  # modifie la valeur de la cellule selectionnée
+                        # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
+                        value = self.key_mapping[event.key]
+                        
+                        # modifie la valeur de la cellule selectionnée
+                        self.sudoku.grid.set_cell(
+                            selected_cell[0],
+                            selected_cell[1],
+                            value
+                        )
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for x in range(9):
@@ -81,9 +94,12 @@ class Game:
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
         
-        if self.sudoku.selected_cell != [-1, -1]:  # carré de seléction
-            pygame.draw.rect(self.screen, (80, 80, 80),
-                             self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]])
+        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
+            pygame.draw.rect(
+                self.screen,
+                (80, 80, 80),
+                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
+            )
         
         for y in range(len(self.sudoku.grid.content)):  # texte pour afficher les valeurs des cellules
             for x in range(len(self.sudoku.grid.content[y])):

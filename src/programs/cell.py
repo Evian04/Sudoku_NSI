@@ -12,10 +12,9 @@ class Cell:
         if value < 0 or value > 9:
             raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
         
-        self.value = value  # entre 0 et 9 (0 = case vide)
-        self.set_state(state)  # valeurs possibles: unlocked, locked, superlocked
         self.font_size = 30
-        self.set_text(text='0', color=(0, 0, 0))
+        self.put_value(value)  # entre 0 et 9 (0 = case vide)
+        self.set_state(state)  # valeurs possibles: "unlocked", "locked", "superlocked"
     
     def get_value(self) -> int:
         """
@@ -42,14 +41,18 @@ class Cell:
         if value < 0 or value > 9:
             raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
         
-            
         self.value = value
-        self.set_text(str(self.value), (0, 0, 0))
+        
+        if self.value != 0:
+            self.set_text(str(self.value), (0, 0, 0))
+            
+        else:
+            self.set_text("", (0, 0, 0))
 
     
     def set_state(self, state: str):
         """
-        Met l'état de la case sur`state`
+        Met l'état de la case sur `state`
         """
         
         if type(state) != str:
@@ -64,7 +67,6 @@ class Cell:
         """
         Permet de créer un texte pour afficher la valeur de la cellule
         :param text: texte à afficher
-        :param font_size: taille de la police
         :param color: couleur du texte (RGB)
         """
         font = pygame.font.SysFont('Calibri', self.font_size)  # création d'une police pour afficher les chiffres
