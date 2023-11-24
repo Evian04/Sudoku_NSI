@@ -60,10 +60,9 @@ class Game:
                 if event.key in self.key_mapping:
                     if self.sudoku.selected_cell != [-1, -1]:
                         selected_cell = self.sudoku.selected_cell
-                        value = self.key_mapping[event.key]  # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à une valeur)
+                        value = self.key_mapping[event.key]  # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
                         self.sudoku.grid.set_cell(selected_cell[0], selected_cell[1], value)  # modifie la valeur de la cellule selectionnée
                         
-                    
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for x in range(9):
                     for y in range(9):

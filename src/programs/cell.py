@@ -13,8 +13,8 @@ class Cell:
         if not state in ["unlocked", "locked", "superlocked"]:
             raise ValueError(f"The `state` argument must be \"unlocked\", \"locked\" or \"superlock\" (value : {state})")
         
-        self.value = value # entre 0 et 9 (0 = case vide)
-        self.state = state # valeurs possibles: unlocked, locked, superlocked
+        self.value = value  # entre 0 et 9 (0 = case vide)
+        self.state = state  # valeurs possibles: unlocked, locked, superlocked
     
     def get_value(self) -> int:
         """
@@ -25,7 +25,7 @@ class Cell:
     
     def get_state(self) -> int:
         """
-        Renvois l'état de la case
+        Renvoi l'état de la case
         """
         
         return self.state

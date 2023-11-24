@@ -59,7 +59,7 @@ class Grid:
         if type(y) != int:
             raise TypeError(f"Grid.set_cell() : The `y` argument must be an intger (type : {type(y)})")
         
-        if type(value) != str:
+        if type(value) != int:
             raise TypeError(f"Grid.set_cell() : The `value` argument must be a string (type : {type(value)})")
         
         if x < 0 or x >= 9:
@@ -68,7 +68,13 @@ class Grid:
         if y < 0 or y >= 9:
             raise ValueError(f"Grid.set_cell() : The `y` argument must be between 0 and 8 (value : {y})")
         
-        if int(value) > 0 or int(value) < 9:
+        if int(value) <= 0 or int(value) > 9:
             raise ValueError(f"Grid.set_cell() : The `value` argument must contains a integer between 0 and 9 (value : {value})")
         
+        if self.content[x][y].get_state() != 'unlocked':
+            raise ValueError(f"Grid.set_cell() : the cell state must be in 'unlocked' state (state : {self.content[x][y].get_state()}")
+            
         self.content[x][y].put_value(value)
+        
+    
+    
