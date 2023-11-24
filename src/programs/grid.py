@@ -6,14 +6,14 @@ class Grid:
     La class `Grid` permet de stocker et de gérer le contenu de la grille du sudoku
     """
     
-    def __init__(self, content: list[list[str]] = list()):
+    def __init__(self, content: list[list[int]] = list()):
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu
             self.content = content.copy()
             
         else:
             # Sinon créer une grille vierge
-            self.content = [["0" for y in range(9)] for x in range(9)]
+            self.content = [[0 for y in range(9)] for x in range(9)]
         
     def get_cell(self, x: int, y: int) -> str:
         
@@ -41,7 +41,7 @@ class Grid:
         Met 
         """
     
-    def set_cell(self, x: int, y: int, value: str):
+    def set_cell(self, x: int, y: int, value: int):
         
         """
         Met la case de coordonnées (x, y) à la valeur `value`
@@ -53,8 +53,8 @@ class Grid:
         if type(y) != int:
             raise TypeError(f"Grid.set_cell() : The `y` argument must be an intger (type : {type(y)})")
         
-        if type(value) != str:
-            raise TypeError(f"Grid.set_cell() : The `value` argument must be a string (type : {type(value)})")
+        if type(value) != int:
+            raise TypeError(f"Grid.set_cell() : The `value` argument must be a integer (type : {type(value)})")
         
         if x < 0 or x >= 9:
             raise ValueError(f"Grid.set_cell() : The `x` argument must be between 0 and 8 (value : {x})")
@@ -62,7 +62,7 @@ class Grid:
         if y < 0 or y >= 9:
             raise ValueError(f"Grid.set_cell() : The `y` argument must be between 0 and 8 (value : {y})")
         
-        if not value.isdigit() or int(value) > 0 or int(value) < 9:
-            raise ValueError(f"Grid.set_cell() : The `value` argument must contains a integer between 0 and 9 (value : {value})")
+        if value > 0 or value < 9:
+            raise ValueError(f"Grid.set_cell() : The `value` argument must be between 0 and 9 (value : {value})")
         
         self.content[x][y] = value

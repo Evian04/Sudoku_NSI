@@ -19,6 +19,8 @@ while running:
     # Mettre à jour le jeu
     game.update(all_events)
     
+    pygame.display.flip()
+    
     for event in all_events:
         
         if event.type == pygame.QUIT:
