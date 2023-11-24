@@ -14,7 +14,17 @@ class Sudoku:
         Selectionne la case de coordonnées (x, y)
         """
         
-        # TEST
+        if type(x) != int:
+            raise TypeError(f"The `x` argument must be an integer (type : {type(x)})")
+        
+        if type(y) != int:
+            raise TypeError(f"The `y` argument must be an integer (type : {type(y)})")
+        
+        if x < 0 or x > 8:
+            raise ValueError(f"The `x` argument must be between 0 and 8")
+        
+        if y < 0 or y > 8:
+            raise ValueError(f"The `y` argument must be between 0 and 8")
         
         self.selected_cell = [x, y]
         
