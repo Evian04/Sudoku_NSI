@@ -12,14 +12,14 @@ class Game:
         
         self.sudoku = Sudoku(self)
         
+    def update(self, all_events):
+        """
+        
+        :param all_events:
+        :return:
+        """
         self.display_elements()
     
     def display_elements(self):
         
         self.screen.blit(self.grid_image, self.grid_image.get_rect())
-    
-    def update(self):
-        """
-        
-        :return:
-        """
