@@ -8,7 +8,7 @@ class Sudoku:
         self.game = game
         self.grid = Grid()
     
-    def set_grid(self, new_grid)
+    def set_grid(self, new_grid): pass
         
     def lock_cell(self, x: int, y: int): pass
     
