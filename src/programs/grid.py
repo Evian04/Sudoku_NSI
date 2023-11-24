@@ -14,9 +14,9 @@ class Grid:
         
         else:
             # Sinon créer une grille vierge
-            self.content = [[0 for y in range(9)] for x in range(9)]
+            self.content = [[Cell(0, "unlocked") for y in range(9)] for x in range(9)]
     
-    def get_cell(self, x: int, y: int) -> int:
+    def get_cell_value(self, x: int, y: int) -> int:
         
         """
         Renvois la valeur de la case de coordonnées (x, y)
@@ -34,7 +34,7 @@ class Grid:
         if y < 0 or y >= 9:
             raise ValueError(f"Grid.get_cell() : The `y` argument must be between 0 and 8 (value : {y})")
         
-        return self.content[x][y]
+        return self.content[x][y].get_value()
     
     def set_content(self, new_content: list[list[str]]):
         
