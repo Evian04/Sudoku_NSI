@@ -17,7 +17,6 @@ class Cell:
         self.state = state # valeurs possibles: unlocked, locked, superlocked
     
     def get_value(self) -> int:
-        
         """
         Renvois la valeur de la case
         """
@@ -25,7 +24,6 @@ class Cell:
         return self.value
     
     def get_state(self) -> int:
-        
         """
         Renvois l'état de la case
         """
@@ -33,7 +31,6 @@ class Cell:
         return self.state
     
     def put_value(self, value: int):
-        
         """
         Met la valeur de la case à `value`
         """
@@ -47,7 +44,6 @@ class Cell:
         self.value = value
     
     def set_state(self, state: str):
-        
         """
         Met l'état de la case sur`state`
         """

@@ -17,7 +17,6 @@ class Grid:
             self.content = [[Cell(0, "unlocked") for y in range(9)] for x in range(9)]
     
     def get_cell_value(self, x: int, y: int) -> int:
-        
         """
         Renvois la valeur de la case de coordonnées (x, y)
         """
@@ -37,7 +36,6 @@ class Grid:
         return self.content[x][y].get_value()
     
     def set_content(self, new_content: list[list[str]]):
-        
         """
         Remplace le contenu de la grille par `new content`
         """
@@ -51,7 +49,6 @@ class Grid:
         self.content = new_content
     
     def set_cell(self, x: int, y: int, value: int):
-        
         """
         Met la case de coordonnées (x, y) à la valeur `value`
         """
