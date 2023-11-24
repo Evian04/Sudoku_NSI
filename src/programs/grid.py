@@ -6,16 +6,16 @@ class Grid:
     La class `Grid` permet de stocker et de gérer le contenu de la grille du sudoku
     """
     
-    def __init__(self, content: list[list[str]] = list()):
+    def __init__(self, content: list[list[int]] = list()):
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu
             self.content = content.copy()
         
         else:
             # Sinon créer une grille vierge
-            self.content = [["0" for y in range(9)] for x in range(9)]
+            self.content = [[0 for y in range(9)] for x in range(9)]
     
-    def get_cell(self, x: int, y: int) -> str:
+    def get_cell(self, x: int, y: int) -> int:
         
         """
         Renvois la valeur de la case de coordonnées (x, y)
