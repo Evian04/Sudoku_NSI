@@ -19,7 +19,7 @@ class Cell:
     
     def get_value(self) -> int:
         """
-        Renvois la valeur de la case
+        Renvoi la valeur de la case
         """
         
         return self.value
