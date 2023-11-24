@@ -88,7 +88,12 @@ class Game:
             
     def update_rect(self):
         
-        self.grid_image = pygame.transform.scale(pygame.image.load("src/graphics/grid.png"), (self.screen.get_height(), self.screen.get_height()))
+        if self.screen.get_width() >= self.screen.get_height():
+            self.grid_image = pygame.transform.scale(pygame.image.load("src/graphics/grid.png"), (self.screen.get_height(), self.screen.get_height()))
+        
+        else:
+            self.grid_image = pygame.transform.scale(pygame.image.load("src/graphics/grid.png"), (self.screen.get_width(), self.screen.get_width()))
+        
         self.grid_image_rect = self.grid_image.get_rect()
         self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
         
