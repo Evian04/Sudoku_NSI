@@ -7,7 +7,6 @@ class Sudoku:
     def __init__(self, game):
         self.game = game
         self.grid = Grid()
-        
         self.selected_cell = [-1, -1] # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
     
     def select_cell(self, x: int, y: int):

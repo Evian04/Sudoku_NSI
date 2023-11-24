@@ -15,6 +15,8 @@ class Grid:
         else:
             # Sinon créer une grille vierge
             self.content = [[Cell(0, "unlocked") for y in range(9)] for x in range(9)]
+        
+        
     
     def get_cell_value(self, x: int, y: int) -> int:
         """
