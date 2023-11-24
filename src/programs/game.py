@@ -8,7 +8,17 @@ class Game:
         self.screen = screen
         self.background_color = (0, 0, 0)
         self.sudoku = Sudoku(self)
-        
+        self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier les valeurs des cellules
+            pygame.K_1: 1,
+            pygame.K_2: 2,
+            pygame.K_3: 3,
+            pygame.K_4: 4,
+            pygame.K_5: 5,
+            pygame.K_6: 6,
+            pygame.K_7: 7,
+            pygame.K_8: 8,
+            pygame.K_9: 9
+        }
         self.update_rect()
         
     def update(self, all_events: list[pygame.event.Event]):
@@ -47,6 +57,13 @@ class Game:
                         if self.sudoku.selected_cell[1] < 8:
                             self.sudoku.selected_cell[1] += 1
             
+                if event.key in self.key_mapping:
+                    if self.sudoku.selected_cell != [-1, -1]:
+                        selected_cell = self.sudoku.selected_cell
+                        value = self.key_mapping[event.key]  # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à une valeur)
+                        self.sudoku.grid.set_cell(selected_cell[0], selected_cell[1], value)  # modifie la valeur de la cellule selectionnée
+                        
+                    
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for x in range(9):
                     for y in range(9):
