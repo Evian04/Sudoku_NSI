@@ -15,7 +15,7 @@ class Grid:
             # Sinon créer une grille vierge
             self.content = [[0 for y in range(9)] for x in range(9)]
     
-    def get_cell(self, x: int, y: int) -> str:
+    def get_cell(self, x: int, y: int) -> int:
         
         """
         Renvois la valeur de la case de coordonnées (x, y)
