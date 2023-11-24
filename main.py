@@ -18,6 +18,7 @@ while running:
     # Mettre à jour le jeu
     game.update(all_events)
     
+    # Mettre à jour l'écran
     pygame.display.flip()
     
     for event in all_events:

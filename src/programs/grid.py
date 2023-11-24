@@ -1,11 +1,13 @@
 from tkinter.filedialog import askopenfilename
 
+from src.programs.cell import Cell
+
 class Grid:
     """
     La class `Grid` permet de stocker et de gérer le contenu de la grille du sudoku
     """
     
-    def __init__(self, content: list[list[int]] = list()):
+    def __init__(self, content: list[list[Cell]] = list()):
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu
             self.content = content.copy()
