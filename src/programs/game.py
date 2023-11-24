@@ -10,3 +10,5 @@ class Game:
         self.sudoku = Sudoku()
         
     def update(self, all_events: pygame.event.Event): pass
+    
+    def display_elements(self): pass
