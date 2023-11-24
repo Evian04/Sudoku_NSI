@@ -39,8 +39,16 @@ class Grid:
     def set_content(self, new_content: list[list[str]]):
         
         """
-        Met 
+        Remplace le contenu de la grille par `new content`
         """
+        
+        if type(new_content) != list:
+            raise TypeError(f"Grid.set_content() : The `new_content` argument must be a list (type : {type(new_content)})")
+        
+        if len(new_content) != 9:
+            raise ValueError(f"Grid.set_content() : The `new_content` argument must have a length of 9 (length : {len(new_content)})")
+        
+        self.content = new_content
     
     def set_cell(self, x: int, y: int, value: int):
         
@@ -66,4 +74,4 @@ class Grid:
         if not value.isdigit() or int(value) > 0 or int(value) < 9:
             raise ValueError(f"Grid.set_cell() : The `value` argument must contains a integer between 0 and 9 (value : {value})")
         
-        self.content[x][y] = value
+        self.content[x][y].put_value(value)
