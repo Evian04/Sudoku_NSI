@@ -7,7 +7,7 @@ from src.programs.game import Game
 screen_size = (1080, 720)
 pygame.display.set_caption("Sudoku")
 screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE)
-
+#
 game = Game(screen)
 
 running = True
