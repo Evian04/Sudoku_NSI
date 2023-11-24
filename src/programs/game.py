@@ -1,6 +1,6 @@
 import pygame
 
-from sudoku import Sudoku
+from src.programs.sudoku import Sudoku
 
 class Game:
     
