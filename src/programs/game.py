@@ -93,8 +93,19 @@ class Game:
         """
         Calcul de la taille et des rectangles des cellules
         """
-        self.grid_image = pygame.transform.scale(pygame.image.load("src/graphics/grid.png"),
-                                                 (self.screen.get_height(), self.screen.get_height()))
+        
+        if self.screen.get_width() >= self.screen.get_height():
+            self.grid_image = pygame.transform.scale(
+                pygame.image.load("src/graphics/grid.png"),
+                (self.screen.get_height(), self.screen.get_height())
+            )
+            
+        else:
+            self.grid_image = pygame.transform.scale(
+                pygame.image.load("src/graphics/grid.png"),
+                (self.screen.get_width(), self.screen.get_width())
+            )
+            
         self.grid_image_rect = self.grid_image.get_rect()
         self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
         
@@ -104,4 +115,5 @@ class Game:
                 self.grid_image_rect.y + self.grid_image_rect.height / 9 * y,
                 self.grid_image_rect.width / 9,
                 self.grid_image_rect.height / 9
-            for y in range(9)] for x in range(9)]
+            )
+        for y in range(9)] for x in range(9)]
