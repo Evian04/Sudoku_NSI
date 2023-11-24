@@ -11,8 +11,7 @@ class Cell:
             raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
         
         self.value = value  # entre 0 et 9 (0 = case vide)
-        self.state = self.set_state(state)  # valeurs possibles: unlocked, locked, superlocked
-        self.text = None
+        self.set_state(state)  # valeurs possibles: unlocked, locked, superlocked
         self.font_size = 30
         self.set_text(text='0', color=(0, 0, 0))
     
