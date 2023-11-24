@@ -1,11 +1,9 @@
 class Cell:
     
     def __init__(self):
-        self.x = int()
-        self.y = int()
-        self.state = 'unlock' # possible values: unlock, lock, super_lock
-        
-        
+        self.value = int()  # entre 0 et 9 (0 = case vide)
+        self.state = 'unlocked'  # valeurs possibles: unlocked, locked, superlocked
+    
     def get_value(self) -> int: pass
     
     def get_state(self) -> int: pass
