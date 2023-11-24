@@ -10,7 +10,7 @@ class Game:
         
         self.grid_image = pygame.image.load("src/graphics/grid.png")
         
-    def update(self, all_events: pygame.event.Event):
+        self.sudoku = Sudoku()
         
         self.display_elements()
     
