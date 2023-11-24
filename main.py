@@ -6,7 +6,7 @@ from src.programs.game import Game
 # Mise en place de la fenêtre
 screen_size = (1080, 720)
 pygame.display.set_caption("Sudoku")
-screen = pygame.display.set_mode(screen_size)
+screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE)
 
 game = Game(screen)
 
