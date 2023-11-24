@@ -79,11 +79,6 @@ class Game:
         if self.sudoku.selected_cell != [-1, -1]:
             pygame.draw.rect(self.screen, (80, 80, 80), self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]])
         
-        """ police = pygame.font.SysFont('Arial', 15)
-        texte = police.render("CCC", True, (255,255,255))
-
-        self.screen.blit(texte, (10,10))
-        """
         
         for y in range(len(self.sudoku.grid.content)):
             for x in range(len(self.sudoku.grid.content[y])):
