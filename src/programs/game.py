@@ -112,12 +112,18 @@ class Game:
                 (200, 200, 200),
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
+        
+        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
+            pygame.draw.rect(
+                self.screen,
+                (120, 120, 120),
+                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
+            )
 
         for x in range(9):  # affichage des cases verrouillées
             for y in range(9):
                 if self.sudoku.grid.content[x][y].state == "locked":  # affichage case locked (cadenas)
-                    # code cellule 'locked'
-                    pass
+                    self.screen.blit(self.padlock_image, self.all_rect[x][y])
         
                 elif self.sudoku.grid.content[x][y].state == "superlocked":  # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
@@ -130,12 +136,6 @@ class Game:
                         (120, 120, 120),
                         rect
                     )
-        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
-            pygame.draw.rect(
-                self.screen,
-                (80, 80, 80),
-                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
-            )
 
         for y in range(len(self.sudoku.grid.content)):
             for x in range(len(self.sudoku.grid.content[y])):
