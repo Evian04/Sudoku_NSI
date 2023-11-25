@@ -157,7 +157,7 @@ class Sudoku:
         # VERIFIER SOUS-GRILLE (zone en 3x3 intermédiaire)
         # code à faire
         
-        return list()
+        return True
     
     def generate_grid(self):
         """
