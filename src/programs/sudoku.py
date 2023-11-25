@@ -10,7 +10,8 @@ class Sudoku:
         self.game = game
         self.grid = Grid()
         self.selected_cell = [-1, -1]  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
-    
+        self.lign_number = 9
+        self.column_number = 9
     def select_cell(self, x: int, y: int):
         """
         Selectionne la case de coordonnées (x, y)

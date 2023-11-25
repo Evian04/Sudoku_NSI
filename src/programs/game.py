@@ -114,19 +114,10 @@ class Game:
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
 
-        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
-            pygame.draw.rect(
-                self.screen,
-                (120, 120, 120),
-                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
-            )
-
-        for x in range(9):  # affichage des cases verrouillées
-            for y in range(9):
-                if self.sudoku.grid.content[x][y].state == "locked":  # affichage case locked (cadenas)
-                    self.screen.blit(self.padlock_image, self.all_rect[x][y])
-        
-                elif self.sudoku.grid.content[x][y].state == "superlocked":  # affichage case superlocked (case grisée)
+        for x in range(self.sudoku.lign_number):
+            for y in range(self.sudoku.column_number):
+                if self.sudoku.grid.content[x][y].state == "superlocked":
+                    # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
                     rect.width -= 6
                     rect.height -= 6
@@ -137,13 +128,25 @@ class Game:
                         (200, 200, 200),
                         rect
                     )
-        
-        for y in range(len(self.sudoku.grid.content)):
-            for x in range(len(self.sudoku.grid.content[y])):
+        # affichage de la sélection (carré)
+        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
+            pygame.draw.rect(
+                self.screen,
+                (120, 120, 120),
+                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
+            )
+
+        for x in range(self.sudoku.lign_number):  # affichage des cases verrouillées
+            for y in range(self.sudoku.column_number):
+                # affichage case locked (affichage du cadenas)
+                if self.sudoku.grid.content[x][y].state == "locked":
+                    self.screen.blit(self.padlock_image, self.all_rect[x][y])
+                
+                # affichage du texte (numéro) pour chaque case
                 self.screen.blit(
                     self.sudoku.grid.content[x][y].text.get_text(),
                     self.all_rect[x][y].center
-                )  # texte pour afficher les valeurs des cellules
+                )
     
     def update_rect(self):
         """
