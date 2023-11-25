@@ -43,7 +43,6 @@ class Text:
         if text: self.text = text
         
         self.text_label = self.font.render(self.text, True, self.color)  # création du texte (self.text est une Surface)
-        print(self.text_label.get_rect().size)
     
     def get_text(self):
         """
