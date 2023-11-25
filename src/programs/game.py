@@ -113,13 +113,6 @@ class Game:
         Permet de placer les éléments à afficher sur le brouillon de l'écran
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
-        
-        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
-            pygame.draw.rect(
-                self.screen,
-                (200, 200, 200),
-                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
-            )
 
         for x in range(9):  # affichage des cases verrouillées
             for y in range(9):
@@ -134,10 +127,17 @@ class Game:
                     rect.y += 3
                     pygame.draw.rect(
                         self.screen,
-                        (120, 120, 120),
+                        (200, 200, 200),
                         rect
                     )
 
+        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
+            pygame.draw.rect(
+                self.screen,
+                (120, 120, 120),
+                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
+            )
+        
         for y in range(len(self.sudoku.grid.content)):
             for x in range(len(self.sudoku.grid.content[y])):
                 self.screen.blit(self.sudoku.grid.content[x][y].text.get_text(),
