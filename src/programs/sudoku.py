@@ -73,15 +73,31 @@ class Sudoku:
         if not os.path.exists(output_filepath):
             raise ValueError(f"file '{output_filepath}' does not exist")
     
-    def lock_cell(self, x: int, y: int):
+    def lock_selected_cell(self):
         """
-        Verrouille la case (x, y), la valeur de la case ne pourra plus être modifiée
+        Verrouille la case sélectionnée, la valeur de la case ne pourra plus être modifiée
         """
+        
+        if self.selected_cell == [-1, -1]:
+            raise ValueError("You must select a cell in order to lock it")
+        
+        if self.grid.get_cell_state(self.selected_cell[0], self.selected_cell[1]) == "superlocked":
+            raise ValueError("You cannot lock a cell that is superlocked")
+        
+        self.grid.content[self.selected_cell[0]][self.selected_cell[1]].state = "locked"
     
-    def unlock_cell(self, x: int, y: int):
+    def unlock_selected_cell(self):
         """
-        Déverrouille la case (x, y), la valeur de la case pourra de nouveau être modifiée
+        Déverrouille la case sélectionnée, la valeur de la case pourra de nouveau être modifiée
         """
+        
+        if self.selected_cell == [-1, -1]:
+            raise ValueError("You must select a cell in order to unlock it")
+        
+        if self.grid.get_cell_state(self.selected_cell[0], self.selected_cell[1]) == "superlocked":
+            raise ValueError("You cannot unlock a cell that is superlocked")
+        
+        self.grid.content[self.selected_cell[0]][self.selected_cell[1]].state = "unlocked"
     
     def verify_grid(self) -> list[tuple[int, int]]:
         """

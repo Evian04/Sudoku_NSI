@@ -33,6 +33,25 @@ class Grid:
         
         return self.content[x][y].get_value()
     
+    def get_cell_state(self, x: int, y: int) -> int:
+        """
+        Renvoi la valeur de la case de coordonnées (x, y)
+        """
+        
+        if type(x) != int:
+            raise TypeError(f"The `x` argument must be an intger (type : {type(x)})")
+        
+        if type(y) != int:
+            raise TypeError(f"The `y` argument must be an intger (type : {type(y)})")
+        
+        if x < 0 or x >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 8 (value : {x})")
+        
+        if y < 0 or y >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 8 (value : {y})")
+        
+        return self.content[x][y].get_state()
+    
     def set_content(self, new_values: list[list[int]], new_states: list[list[str]]):
         """
         Remplace le contenu de la grille par `new content`

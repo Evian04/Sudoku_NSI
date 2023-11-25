@@ -68,9 +68,18 @@ class Game:
                         if self.sudoku.selected_cell[1] < 8:
                             self.sudoku.selected_cell[1] += 1
                 
+                if event.key == pygame.K_l:
+                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell[0], self.sudoku.selected_cell[1]) != "superlocked":
+                        self.sudoku.lock_selected_cell()
+                
+                if event.key == pygame.K_u:
+                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell[0], self.sudoku.selected_cell[1]) != "superlocked":
+                        self.sudoku.unlock_selected_cell()
+                
                 if event.key in self.key_mapping:
-                    if self.sudoku.selected_cell != [-1, -1]:
-                        selected_cell = self.sudoku.selected_cell
+                    selected_cell = self.sudoku.selected_cell
+                    if selected_cell != [-1, -1] and self.sudoku.grid.get_cell_state(selected_cell[0], selected_cell[1]) == "unlocked":
+                        
                         # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
                         value = self.key_mapping[event.key]
                         
