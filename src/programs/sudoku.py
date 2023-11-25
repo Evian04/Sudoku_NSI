@@ -1,5 +1,4 @@
 import os.path
-
 import pygame
 from tkinter.filedialog import askopenfilename
 from src.programs.grid import Grid
@@ -44,7 +43,10 @@ class Sudoku:
         """
         
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
-        file_path = askopenfilename(initialdir="src/save_folder", filetypes=[("Sudoku file", "*.sdk")])
+        file_path = askopenfilename(initialdir="src/save_folder", initialfile="model.sdk", filetypes=[("Sudoku file", "*.sdk")])
+        if not file_path:
+            print("No file selected, Empty grid...")
+            return False
         
         with open(file_path, "rt") as file:
             file_content = file.read()
