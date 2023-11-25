@@ -10,6 +10,10 @@ pygame.display.set_caption("Sudoku")
 screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE)
 
 game = Game(screen)
+
+# Provisoir
+game.sudoku.load_grid()
+
 running = True
 while running:
     

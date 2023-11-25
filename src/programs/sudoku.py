@@ -1,6 +1,7 @@
 import os.path
 
 import pygame
+from tkinter.filedialog import askopenfilename
 
 from src.programs.grid import Grid
 
@@ -38,12 +39,27 @@ class Sudoku:
         
         self.selected_cell = [-1, -1]
     
-    def load_grid(self, new_grid):
+    def load_grid(self):
         """
-        /!\ charge une grille à partir d'un fichier ? Pourquoi new_grid ?
+        Charge une grille à partir d'un fichier
         """
+        
+        # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
+        file_path = askopenfilename(initialdir = "src/save_folder", filetypes = [("Sudoku file", "*.sdk")])
+        
+        with open(file_path, "rt") as file:
+            file_content = file.read()
+            
+        file_content = file_content.split("\n\n")
+        
+        cell_values = [[int(value) for value in line] for line in file_content[0].split("\n")]
+        
+        convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
+        cell_states = [[convert_state[state] for state in line] for line in file_content[1].split("\n")]
+        
+        self.grid.set_content(cell_values, cell_states)
     
-    def save_grid(self, output_filepath:str):
+    def save_grid(self, output_filepath: str):
         """
         /!\ Enregistre la grille actuelle dans un fichier Avec ou sans les valeurs saisies par utilisateur ?
         :param output_filepath:
@@ -61,7 +77,6 @@ class Sudoku:
     def unlock_cell(self, x: int, y: int):
         """
         Déverrouille la case (x, y), la valeur de la case pourra de nouveau être modifiée
-
         """
     
     def verify_grid(self) -> list[tuple[int, int]]:
