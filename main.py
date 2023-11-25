@@ -11,7 +11,7 @@ screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE)
 
 game = Game(screen)
 
-# Provisoir
+# Provisoire
 game.sudoku.load_grid()
 
 running = True

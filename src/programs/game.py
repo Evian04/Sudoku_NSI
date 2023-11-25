@@ -142,7 +142,7 @@ class Game:
                 if self.sudoku.grid.content[x][y].state == "locked":
                     self.screen.blit(self.padlock_image, self.all_rect[x][y])
                 
-                # affichage du texte (numéro) pour chaque case
+                # affichage du texte (numéro) pour chaque cellule
                 self.screen.blit(
                     self.sudoku.grid.content[x][y].text.get_text(),
                     self.all_rect[x][y].center
