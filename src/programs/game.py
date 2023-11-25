@@ -187,6 +187,6 @@ class Game:
             )
             for y in range(9)] for x in range(9)]
 
-        for y in range(9):
+        for y in range(9):  # recalcule et réattribue les valeurs de la teille des textes
             for x in range(9):
                 self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
