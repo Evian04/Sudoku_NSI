@@ -152,7 +152,11 @@ class Sudoku:
             for number_to_verify in numbers_to_verify:
                 if line.count(number_to_verify) > 1:
                     print(f"error line {i}, number '{number_to_verify}' {line.count(number_to_verify)} times")
-
+        
+        
+        # VERIFIER SOUS-GRILLE (zone en 3x3 intermédiaire)
+        # code à faire
+        
         return list()
     
     def generate_grid(self):
