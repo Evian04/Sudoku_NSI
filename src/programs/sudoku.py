@@ -2,7 +2,6 @@ import os.path
 
 import pygame
 from tkinter.filedialog import askopenfilename
-
 from src.programs.grid import Grid
 
 
@@ -45,18 +44,21 @@ class Sudoku:
         """
         
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
-        file_path = askopenfilename(initialdir = "src/save_folder", filetypes = [("Sudoku file", "*.sdk")])
+        file_path = askopenfilename(initialdir="src/save_folder", filetypes=[("Sudoku file", "*.sdk")])
         
         with open(file_path, "rt") as file:
             file_content = file.read()
-            
+        
         file_content = file_content.split("\n\n")
         
         cell_values = [[int(value) for value in line] for line in file_content[0].split("\n")]
         
-        convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
+        """convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
         cell_states = [[convert_state[state] for state in line] for line in file_content[1].split("\n")]
-        
+        """
+        cell_states = [['superlocked' if int(value) > 0 else 'unlocked'
+                        # double boucle imbriquée qui attribue l'état 'unlocked' si la valeur est > à 0 (0 = case vide)
+                        for value in line] for line in file_content[0].split("\n")]
         self.grid.set_content(cell_values, cell_states)
     
     def save_grid(self, output_filepath: str):
@@ -67,7 +69,6 @@ class Sudoku:
         """
         if not os.path.exists(output_filepath):
             raise ValueError(f"file '{output_filepath}' does not exist")
-        
     
     def lock_cell(self, x: int, y: int):
         """
@@ -91,6 +92,7 @@ class Sudoku:
         Génère une grille de sudoku à résoudre
         :return: grid
         """
+    
     def solve_grid(self):
         """
         Résout le Sudoku, ne tient pas compte des valeurs entrée pas l'utilisateur, seulement les cases présentes originalement

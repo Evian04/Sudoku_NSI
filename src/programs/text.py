@@ -40,7 +40,7 @@ class Text:
         Permet de créer un texte pour afficher la valeur de la cellule
         :param text: texte à afficher
         """
-        if text: self.text = text
+        if text is not None: self.text = text
         
         self.text_label = self.font.render(self.text, True, self.color)  # création du texte (self.text est une Surface)
     

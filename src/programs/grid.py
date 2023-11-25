@@ -33,7 +33,7 @@ class Grid:
         
         return self.content[x][y].get_value()
     
-    def set_content(self, new_values: list[list[str]], new_states: list[list[str]]):
+    def set_content(self, new_values: list[list[int]], new_states: list[list[str]]):
         """
         Remplace le contenu de la grille par `new content`
         """
@@ -52,6 +52,7 @@ class Grid:
         
         for x in range(9):
             for y in range(9):
+                
                 self.content[x][y] = Cell(new_values[x][y], new_states[x][y])
     
     def set_cell(self, x: int, y: int, value: int):
@@ -77,7 +78,7 @@ class Grid:
         if int(value) < 0 or int(value) > 9:
             raise ValueError(f"The `value` argument must contains a integer between 0 and 9 (value : {value})")
         
-        if self.content[x][y].get_state() != 'unlocked':
-            raise ValueError(f"The cell state must be in 'unlocked' state (state : {self.content[x][y].get_state()}")
+        if self.content[x][y].get_state() == 'unlocked':
+            self.content[x][y].put_value(value)
             
-        self.content[x][y].put_value(value)
+        else: print(f'Grid.set_cell: cell ({x},{y}) is locked or superlocked')
