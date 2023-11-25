@@ -2,6 +2,7 @@ import pygame
 
 from src.programs.sudoku import Sudoku
 
+
 class Game:
     
     def __init__(self, screen: pygame.Surface):
@@ -9,26 +10,26 @@ class Game:
         self.background_color = (0, 0, 0)
         self.sudoku = Sudoku(self)
         self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier les valeurs des cellules
-            pygame.K_1: 1,
-            pygame.K_2: 2,
-            pygame.K_3: 3,
-            pygame.K_4: 4,
-            pygame.K_5: 5,
-            pygame.K_6: 6,
-            pygame.K_7: 7,
-            pygame.K_8: 8,
-            pygame.K_9: 9,
-            pygame.K_KP_1: 1,
-            pygame.K_KP_2: 2,
-            pygame.K_KP_3: 3,
-            pygame.K_KP_4: 4,
-            pygame.K_KP_5: 5,
-            pygame.K_KP_6: 6,
-            pygame.K_KP_7: 7,
-            pygame.K_KP_8: 8,
-            pygame.K_KP_9: 9,
+            pygame.K_1:         1,
+            pygame.K_2:         2,
+            pygame.K_3:         3,
+            pygame.K_4:         4,
+            pygame.K_5:         5,
+            pygame.K_6:         6,
+            pygame.K_7:         7,
+            pygame.K_8:         8,
+            pygame.K_9:         9,
+            pygame.K_KP_1:      1,
+            pygame.K_KP_2:      2,
+            pygame.K_KP_3:      3,
+            pygame.K_KP_4:      4,
+            pygame.K_KP_5:      5,
+            pygame.K_KP_6:      6,
+            pygame.K_KP_7:      7,
+            pygame.K_KP_8:      8,
+            pygame.K_KP_9:      9,
             pygame.K_BACKSPACE: 0,  # 0 correspond à une case vide (supprime la valeur  de la case)
-            pygame.K_DELETE: 0
+            pygame.K_DELETE:    0
         }
         self.update_rect()
     
@@ -103,7 +104,8 @@ class Game:
         
         for y in range(len(self.sudoku.grid.content)):  # texte pour afficher les valeurs des cellules
             for x in range(len(self.sudoku.grid.content[y])):
-                self.screen.blit(self.sudoku.grid.content[x][y].text, self.all_rect[x][y].center)
+                self.sudoku.grid.content[x][y].text.set_text()
+                self.screen.blit(self.sudoku.grid.content[x][y].text.get_text(), self.all_rect[x][y].center)
     
     def update_rect(self):
         """
@@ -115,13 +117,13 @@ class Game:
                 pygame.image.load("src/graphics/grid.png"),
                 (self.screen.get_height(), self.screen.get_height())
             )
-            
+        
         else:
             self.grid_image = pygame.transform.scale(
                 pygame.image.load("src/graphics/grid.png"),
                 (self.screen.get_width(), self.screen.get_width())
             )
-            
+        
         self.grid_image_rect = self.grid_image.get_rect()
         self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
         
@@ -132,4 +134,8 @@ class Game:
                 self.grid_image_rect.width / 9,
                 self.grid_image_rect.height / 9
             )
-        for y in range(9)] for x in range(9)]
+            for y in range(9)] for x in range(9)]
+        
+        [[self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))
+            # 0.375 est le rapport entre la taille d'un carré et la taille de la police
+            for y in range(9)] for x in range(9)]

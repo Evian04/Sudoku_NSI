@@ -1,18 +1,18 @@
-import pygame.font
-
-
+from  src.programs.text import Text
 class Cell:
     """
     classe Cell(ule), contient les données relatives aux cellules (valeur, etat, etc...)
     """
     def __init__(self, value: int, state: str):
+        
         if type(value) != int:
             raise TypeError(f"The `value` argument must be an integer (type : {type(value)})")
         
         if value < 0 or value > 9:
             raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
         
-        self.font_size = 30
+        self.text = Text('', 'Arial', 30, (0, 0, 0))  # crée l'objet texte
+        self.state = None
         self.put_value(value)  # entre 0 et 9 (0 = case vide)
         self.set_state(state)  # valeurs possibles: "unlocked", "locked", "superlocked"
     
@@ -44,10 +44,10 @@ class Cell:
         self.value = value
         
         if self.value != 0:
-            self.set_text(str(self.value), (0, 0, 0))
+            self.text.set_text(str(self.value))
             
         else:
-            self.set_text("", (0, 0, 0))
+            self.text.set_text("")
 
     
     def set_state(self, state: str):
@@ -62,13 +62,3 @@ class Cell:
             raise ValueError(f"""The `state` argument must be "unlocked", "locked" or "superlock" (value : {state})""")
         
         self.state = state
-    
-    def set_text(self, text: str, color: tuple[int, int, int]) -> None:
-        """
-        Permet de créer un texte pour afficher la valeur de la cellule
-        :param text: texte à afficher
-        :param color: couleur du texte (RGB)
-        """
-        font = pygame.font.SysFont('Calibri', self.font_size)  # création d'une police pour afficher les chiffres
-        self.text = font.render(text, True, color)  # création du texte (self.text est une Surface)
-        
