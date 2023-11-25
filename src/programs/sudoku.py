@@ -1,6 +1,6 @@
 import os.path
 import pygame
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 from src.programs.grid import Grid
 
 
@@ -12,6 +12,7 @@ class Sudoku:
         self.selected_cell = [-1, -1]  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
         self.lign_number = 9
         self.column_number = 9
+    
     def select_cell(self, x: int, y: int):
         """
         Selectionne la case de coordonnées (x, y)
@@ -44,9 +45,10 @@ class Sudoku:
         """
         
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
-        file_path = askopenfilename(initialdir="src/save_folder", initialfile="model.sdk", filetypes=[("Sudoku file", "*.sdk")])
+        file_path = askopenfilename(initialdir="src/save_folder", initialfile="model.sdk",
+                                    filetypes=[("Sudoku file", "*.sdk")])
         if not file_path:
-            print("No file selected, Empty grid...")
+            print("No file selected for opening, Empty grid...")
             return False
         
         with open(file_path, "rt") as file:
@@ -66,14 +68,26 @@ class Sudoku:
         
         self.grid.set_content(cell_values, cell_states)
     
-    def save_grid(self, output_filepath: str):
+    def save_grid(self):
         """
         /!\ Enregistre la grille actuelle dans un fichier Avec ou sans les valeurs saisies par utilisateur ?
-        :param output_filepath:
-        :return: new grid
         """
-        if not os.path.exists(output_filepath):
-            raise ValueError(f"file '{output_filepath}' does not exist")
+        filepath = asksaveasfilename(initialdir="src/save_folder/", initialfile='saved_sudoku.sdk',
+                                     filetypes=[("Sudoku file", "*.sdk")])
+        if not filepath:
+            print('No file selected for saving')
+            return False
+
+        # convertit toutes les valeurs des cellules en string
+        double_list_content = [[str(cell.value) for cell in lign]
+                               for lign in self.grid.content]
+        # convertit la double liste en liste simple (une string par ligne)
+        list_content = ["".join(lign) for lign in double_list_content]
+        #convertit la liste en une string
+        str_content = "\n".join(list_content)
+        
+        with open(filepath,"w") as file:
+            file.write(str_content)
     
     def lock_selected_cell(self):
         """

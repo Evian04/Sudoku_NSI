@@ -13,6 +13,8 @@ game = Game(screen)
 
 # Provisoire
 game.sudoku.load_grid()
+#game.sudoku.save_grid()
+
 
 running = True
 while running:
