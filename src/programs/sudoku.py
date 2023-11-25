@@ -62,6 +62,7 @@ class Sudoku:
         cell_states = [['superlocked' if int(value) > 0 else 'unlocked'
                         # double boucle imbriquée qui attribue l'état 'unlocked' si la valeur est > à 0 (0 = case vide)
                         for value in line] for line in file_content[0].split("\n")]
+        
         self.grid.set_content(cell_values, cell_states)
     
     def save_grid(self, output_filepath: str):

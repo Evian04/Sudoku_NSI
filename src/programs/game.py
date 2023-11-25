@@ -112,13 +112,6 @@ class Game:
                 (200, 200, 200),
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
-        
-        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
-            pygame.draw.rect(
-                self.screen,
-                (120, 120, 120),
-                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
-            )
 
         for x in range(9):  # affichage des cases verrouillées
             for y in range(9):
