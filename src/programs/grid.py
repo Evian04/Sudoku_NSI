@@ -70,7 +70,7 @@ class Grid:
         if y < 0 or y >= 9:
             raise ValueError(f"Grid.set_cell() : The `y` argument must be between 0 and 8 (value : {y})")
         
-        if int(value) <= 0 or int(value) > 9:
+        if int(value) < 0 or int(value) > 9:
             raise ValueError(f"Grid.set_cell() : The `value` argument must contains a integer between 0 and 9 (value : {value})")
         
         if self.content[x][y].get_state() != 'unlocked':

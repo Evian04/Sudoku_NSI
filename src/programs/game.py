@@ -27,6 +27,8 @@ class Game:
             pygame.K_KP_7: 7,
             pygame.K_KP_8: 8,
             pygame.K_KP_9: 9,
+            pygame.K_BACKSPACE: 0,  # 0 correspond à une case vide (supprime la valeur  de la case)
+            pygame.K_DELETE: 0
         }
         self.update_rect()
     
@@ -40,9 +42,7 @@ class Game:
         self.display_elements()
         
         for event in all_events:
-            
             if event.type == pygame.KEYDOWN:
-                
                 if event.key == pygame.K_ESCAPE:
                     self.sudoku.deselect_cell()
                 

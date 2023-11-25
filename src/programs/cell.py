@@ -23,7 +23,7 @@ class Cell:
         
         return self.value
     
-    def get_state(self) -> int:
+    def get_state(self) -> str:
         """
         Renvoi l'état de la case
         """
