@@ -67,16 +67,15 @@ class Text:
         
         self.color = color
         
-    def set_text(self, text: str = ""):
+    def set_text(self, text: str = None):
         """
         Permet de créer un texte pour afficher la valeur de la cellule
         :param text: texte à afficher
         """
+        if text is not None: self.text = text
         
-        if type(text) != str:
-            raise TypeError(f"The `text` argument must be a string (type : {type(text)})")
-        
-        if text != "": self.text = text
+        if type(self.text) != str:
+            raise TypeError(f"The `text` argument must be a string (type : {type(self.text)})")
         
         self.text_label = self.font.render(self.text, True, self.color)  # création du texte (self.text est une Surface)
     

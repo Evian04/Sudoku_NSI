@@ -115,8 +115,8 @@ class Game:
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
 
-        for x in range(self.sudoku.line_number):
-            for y in range(self.sudoku.column_number):
+        for x in range(self.sudoku.column_number):
+            for y in range(self.sudoku.line_number):
                 if self.sudoku.grid.content[x][y].state == "superlocked":
                     # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
@@ -137,8 +137,8 @@ class Game:
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
 
-        for x in range(self.sudoku.line_number):  # affichage des cases verrouillées
-            for y in range(self.sudoku.column_number):
+        for x in range(self.sudoku.column_number):  # affichage des cases verrouillées
+            for y in range(self.sudoku.line_number):
                 # affichage case locked (affichage du cadenas)
                 if self.sudoku.grid.content[x][y].state == "locked":
                     self.screen.blit(self.padlock_image, self.all_rect[x][y])

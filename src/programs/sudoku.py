@@ -133,19 +133,26 @@ class Sudoku:
         :return: liste des positions (x, y) où les valeurs sont incorrectes
         """
         print("verify")
-        # vérifier les colonnes
-        columns = [column for column in self.grid.get_all_values()]
+        
         numbers_to_verify = list(range(1, self.column_number))
+
+        # VERIFIER LES COLONNES
+        #recupérer les colonnes
+        columns = [column for column in self.grid.get_all_values()]
         for i, column in enumerate(columns):
             for number_to_verify in numbers_to_verify:
-                """print("line",line)
-                print("number to verify", number_to_verify)
-                print("-"*50)"""
                 if column.count(number_to_verify) > 1:
-                    print(f"error column {i}, number {number_to_verify}")
-            #print("_"*100)
+                    print(f"error line {i}, number '{number_to_verify}' {column.count(number_to_verify)} times")
+
         
-        
+        # VERIFIER LES LIGNES
+        # opération complexe pour récupérer une liste des lignes
+        lines = [[line[i] for line in self.grid.get_all_values()] for i in range(len(self.grid.get_all_values()[0]))]
+        for i, line in enumerate(lines):
+            for number_to_verify in numbers_to_verify:
+                if line.count(number_to_verify) > 1:
+                    print(f"error line {i}, number '{number_to_verify}' {line.count(number_to_verify)} times")
+
         return list()
     
     def generate_grid(self):
