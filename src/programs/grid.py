@@ -61,19 +61,19 @@ class Grid:
         """
         
         if type(x) != int:
-            raise TypeError(f"The `x` argument must be an intger (type : {type(x)})")
+            raise TypeError(f"The `x` argument must be an integer (type : {type(x)})")
         
         if type(y) != int:
-            raise TypeError(f"The `y` argument must be an intger (type : {type(y)})")
+            raise TypeError(f"The `y` argument must be an integer (type : {type(y)})")
         
         if type(value) != int:
             raise TypeError(f"The `value` argument must be a string (type : {type(value)})")
         
         if x < 0 or x >= 9:
-            raise ValueError(f"The `x` argument must be between 0 and 8 (value : {x})")
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {x})")
         
         if y < 0 or y >= 9:
-            raise ValueError(f"The `y` argument must be between 0 and 8 (value : {y})")
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {y})")
         
         if int(value) < 0 or int(value) > 9:
             raise ValueError(f"The `value` argument must contains a integer between 0 and 9 (value : {value})")
