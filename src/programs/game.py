@@ -79,6 +79,16 @@ class Game:
                         self.sudoku.unlock_selected_cell()
                         print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was unlocked')
 
+                if event.key == pygame.K_c:
+                    duplicate_cells = self.sudoku.verify_grid()
+                    print(duplicate_cells)
+                    for x in range(9):
+                        for y in range(9):
+                            if (x, y) in duplicate_cells:
+                                self.sudoku.grid.content[x][y].text.set_color((255, 0, 0))
+                                
+                            else:
+                                self.sudoku.grid.content[x][y].text.set_color((0, 0, 0))
                 
                 if event.key in self.key_mapping:
                     selected_cell = self.sudoku.selected_cell
@@ -89,12 +99,9 @@ class Game:
                             value = self.key_mapping[event.key]
                             
                             # modifie la valeur de la cellule selectionnée
-                            self.sudoku.grid.set_cell(
-                                selected_cell[0],
-                                selected_cell[1],
-                                value
-                            )
-                            self.sudoku.verify_grid()
+                            self.sudoku.set_selected_cell_value(value)
+                            self.sudoku.set_selected_cell_color((0, 0, 0))
+                            
                         elif self.sudoku.grid.get_cell_state(selected_cell[0], selected_cell[1]) == "locked":
                             print(f"grid.update(): cell {tuple(selected_cell)} is locked (press 'U' to Unlock)")
                         else: print(f"grid.update(): cell {tuple(selected_cell)} is superlocked")
@@ -115,8 +122,8 @@ class Game:
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
 
-        for x in range(self.sudoku.column_number):
-            for y in range(self.sudoku.line_number):
+        for x in range(9):
+            for y in range(9):
                 if self.sudoku.grid.content[x][y].state == "superlocked":
                     # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
@@ -137,8 +144,8 @@ class Game:
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
 
-        for x in range(self.sudoku.column_number):  # affichage des cases verrouillées
-            for y in range(self.sudoku.line_number):
+        for x in range(9):  # affichage des cases verrouillées
+            for y in range(9):
                 # affichage case locked (affichage du cadenas)
                 if self.sudoku.grid.content[x][y].state == "locked":
                     self.screen.blit(self.padlock_image, self.all_rect[x][y])

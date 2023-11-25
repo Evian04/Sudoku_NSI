@@ -1,8 +1,9 @@
 from  src.programs.text import Text
 class Cell:
     """
-    classe Cell(ule), contient les données relatives aux cellules (valeur, etat, etc...)
+    La classe Cell contient les données relatives aux cases (valeur, état, etc...)
     """
+    
     def __init__(self, value: int, state: str):
         
         if type(value) != int:
@@ -29,6 +30,13 @@ class Cell:
         """
         
         return self.state
+
+    def get_text(self) -> Text:
+        """
+        Renvois le text de la case
+        """
+        
+        return self.text
     
     def put_value(self, value: int):
         """
@@ -62,3 +70,16 @@ class Cell:
             raise ValueError(f"""The `state` argument must be "unlocked", "locked" or "superlock" (value : {state})""")
         
         self.state = state
+        
+    def set_color(self, color: tuple[int, int, int]):
+        """
+        Met la couleur de la case à `color`
+        """
+        
+        if type(color) != tuple:
+            raise TypeError(f"The `color` argument must be a tuple (type : {type(color)})")
+        
+        if len(color) != 3:
+            raise ValueError(f"The `color` argument must have a length of 3 (length : {color})")
+        
+        self.text.set_color(color)

@@ -74,7 +74,7 @@ class Grid:
             for y in range(9):
                 self.content[x][y] = Cell(new_values[x][y], new_states[x][y])
     
-    def set_cell(self, x: int, y: int, value: int):
+    def set_cell_value(self, x: int, y: int, value: int):
         """
         Met la case de coordonnées (x, y) à la valeur `value`
         """
@@ -102,10 +102,36 @@ class Grid:
         
         else:
             print(f'Grid.set_cell: cell ({x},{y}) is locked or superlocked')
+            
+    def set_cell_color(self, x: int, y: int, color: tuple[int, int, int]):
+        """
+        Met la couleur de la case de coordonnées (x, y) à `color`
+        """
+        
+        if type(x) != int:
+            raise TypeError(f"The `x` argument must be an integer (type : {type(x)})")
+        
+        if type(y) != int:
+            raise TypeError(f"The `y` argument must be an integer (type : {type(y)})")
+        
+        if type(color) != tuple:
+            raise TypeError(f"The `color` argument must be a tuple (type : {type(color)})")
+        
+        if x < 0 or x >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {x})")
+        
+        if y < 0 or y >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {y})")
+        
+        if len(color) != 3:
+            raise ValueError(f"The `color` argument must have a length of 3 (length : {color})")
+        
+        self.content[x][y].set_color(color)
     
     def get_all_values(self) -> list[list[int]]:
         """
         Retourne une double liste de toutes les valeurs (identique à self.content, mais remplace les cellules pas les valeurs des cellules)
         :return:
         """
+        
         return [[cell.value for cell in line] for line in self.content]

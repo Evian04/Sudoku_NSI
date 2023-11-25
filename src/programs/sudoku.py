@@ -10,8 +10,6 @@ class Sudoku:
         self.game = game
         self.grid = Grid()
         self.selected_cell = [-1, -1]  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
-        self.line_number = 9
-        self.column_number = 9
     
     def select_cell(self, x: int, y: int):
         """
@@ -38,6 +36,35 @@ class Sudoku:
         """
         
         self.selected_cell = [-1, -1]
+        
+    def set_selected_cell_value(self, value: int):
+        """
+        Met la valeur de la case sélectionnée à `value`
+        """
+        
+        if type(value) != int:
+            raise TypeError(f"The `value` argument must be an integer (type : {type(value)})")
+        
+        if value < 0 or value > 9:
+            raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
+        
+        if self.selected_cell == [-1, -1]:
+            raise ValueError("You must select a cell in order to set its value")
+        
+        self.grid.set_cell_value(self.selected_cell[0], self.selected_cell[1], value)
+        
+    def set_selected_cell_color(self, color: tuple[int, int, int]):
+        """
+        Met la couleur de la case sélectionnée à `color`
+        """
+        
+        if type(color) != tuple:
+            raise TypeError(f"The `color` argument must be a tuple (type : {type(color)})")
+        
+        if len(color) != 3:
+            raise ValueError(f"The `color` argument must have a length of 3 (length : {len(color)})")
+        
+        self.grid.set_cell_color(self.selected_cell[0], self.selected_cell[1], color)
     
     def load_grid(self):
         """
@@ -49,7 +76,7 @@ class Sudoku:
                                     filetypes=[("Sudoku file", "*.sdk")])
         if not file_path:
             print("No file selected for opening, Empty grid...")
-            return False
+            return
         
         with open(file_path, "rt") as file:
             file_content = file.read()
@@ -129,35 +156,36 @@ class Sudoku:
     
     def verify_grid(self) -> list[tuple[int, int]]:
         """
-        Vérifie que les règles du sudoku sont respectées (pas 2 fois le même nombre sur la linee, sur la colonne, etc...)
+        Vérifie que les règles du sudoku sont respectées (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
         :return: liste des positions (x, y) où les valeurs sont incorrectes
         """
         print("verify")
         
-        numbers_to_verify = list(range(1, self.column_number))
-
-        # VERIFIER LES COLONNES
-        #recupérer les colonnes
-        columns = [column for column in self.grid.get_all_values()]
-        for i, column in enumerate(columns):
-            for number_to_verify in numbers_to_verify:
-                if column.count(number_to_verify) > 1:
-                    print(f"error line {i}, number '{number_to_verify}' {column.count(number_to_verify)} times")
-
+        duplicate_cells = []
         
-        # VERIFIER LES LIGNES
-        # opération complexe pour récupérer une liste des lignes
-        lines = [[line[i] for line in self.grid.get_all_values()] for i in range(len(self.grid.get_all_values()[0]))]
-        for i, line in enumerate(lines):
-            for number_to_verify in numbers_to_verify:
-                if line.count(number_to_verify) > 1:
-                    print(f"error line {i}, number '{number_to_verify}' {line.count(number_to_verify)} times")
+        content_as_lines = self.grid.get_all_values()
+        content_as_columns = [[content_as_lines[y][x] for y in range(9)] for x in range(9)]
+        content_as_squares = [[content_as_lines[(x // 3) * 3 + y // 3][(x % 3) * 3 + y % 3] for y in range(9)] for x in range(9)]
         
+        for x in range(9):
+            for n in range(1, 10):
+                
+                if content_as_lines[x].count(n) > 1:
+                    for y in range(9):
+                        if content_as_lines[x][y] == n and not (x, y) in duplicate_cells:
+                            duplicate_cells.append((x, y))
+                            
+                if content_as_columns[x].count(n) > 1:
+                    for y in range(9):
+                        if content_as_columns[x][y] == n and not (y, x) in duplicate_cells:
+                            duplicate_cells.append((y, x))
+                            
+                if content_as_columns[x].count(n) > 1:
+                    for y in range(9):
+                        if content_as_squares[x][y] == n and not ((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3) in duplicate_cells:
+                            duplicate_cells.append(((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3))
         
-        # VERIFIER SOUS-GRILLE (zone en 3x3 intermédiaire)
-        # code à faire
-        
-        return list()
+        return duplicate_cells
     
     def generate_grid(self):
         """
