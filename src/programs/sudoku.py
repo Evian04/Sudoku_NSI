@@ -57,6 +57,7 @@ class Sudoku:
         
         """convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
         cell_states = [[convert_state[state] for state in line] for line in file_content[1].split("\n")]
+        # /!\ ce choix là ? ^^^
         """
         cell_states = [['superlocked' if int(value) > 0 else 'unlocked'
                         # double boucle imbriquée qui attribue l'état 'unlocked' si la valeur est > à 0 (0 = case vide)
