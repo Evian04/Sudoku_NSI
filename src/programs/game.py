@@ -104,28 +104,30 @@ class Game:
         Permet de placer les éléments à afficher sur le brouillon de l'écran
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
-
-        for y in range(len(self.sudoku.grid.content)):  # affichage des cases verrouillées
-            for x in range(len(self.sudoku.grid.content[y])):
-                if self.sudoku.grid.content[x][y].state == "locked":  # affichage case locked (cadenas)
-                    # code cellule 'locked'
-                    pass
         
-                elif self.sudoku.grid.content[x][y].state == "superlocked":  # affichage case superlocked (case grisée)
-                    rect = self.all_rect[x][y].copy()
-                    rect.width -= 3
-                    rect.height -= 3
-                    pygame.draw.rect(
-                        self.screen,
-                        (200, 200, 200),
-                        rect
-                    )
         if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
             pygame.draw.rect(
                 self.screen,
-                (80, 80, 80),
+                (200, 200, 200),
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
+
+        for x in range(9):  # affichage des cases verrouillées
+            for y in range(9):
+                if self.sudoku.grid.content[x][y].state == "locked":  # affichage case locked (cadenas)
+                    self.screen.blit(self.padlock_image, self.all_rect[x][y])
+        
+                elif self.sudoku.grid.content[x][y].state == "superlocked":  # affichage case superlocked (case grisée)
+                    rect = self.all_rect[x][y].copy()
+                    rect.width -= 6
+                    rect.height -= 6
+                    rect.x += 3
+                    rect.y += 3
+                    pygame.draw.rect(
+                        self.screen,
+                        (120, 120, 120),
+                        rect
+                    )
 
         for y in range(len(self.sudoku.grid.content)):
             for x in range(len(self.sudoku.grid.content[y])):
@@ -138,20 +140,28 @@ class Game:
         Calcul de la taille et des rectangles des cellules
         """
         
+        self.grid_image = pygame.image.load("src/graphics/grid.png")
+        
         if self.screen.get_width() >= self.screen.get_height():
             self.grid_image = pygame.transform.scale(
-                pygame.image.load("src/graphics/grid.png"),
+                self.grid_image,
                 (self.screen.get_height(), self.screen.get_height())
             )
             
         else:
             self.grid_image = pygame.transform.scale(
-                pygame.image.load("src/graphics/grid.png"),
+                self.grid_image,
                 (self.screen.get_width(), self.screen.get_width())
             )
             
         self.grid_image_rect = self.grid_image.get_rect()
         self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
+        
+        self.padlock_image = pygame.image.load("src/graphics/padlock.png")
+        self.padlock_image = pygame.transform.scale(
+            self.padlock_image,
+            (self.grid_image_rect.width / 9 / 4, self.grid_image_rect.height / 9 / 4)
+        )
         
         self.all_rect = [[
             pygame.Rect(
