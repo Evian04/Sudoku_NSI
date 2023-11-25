@@ -18,7 +18,8 @@ class Text:
         :param font_size: taille de la police (pixel de hauteur)
         """
         self.font_size = font_size
-        self.set_font()
+        self.set_font()  # redefini la police apres modification de la taille
+        self.set_text()  # redefini le texte apres modification de la police
         
     def set_font(self, font_name: str = None):
         """
