@@ -1,5 +1,6 @@
 from src.programs.cell import Cell
 
+
 class Grid:
     """
     La class `Grid` permet de stocker et de gérer le contenu de la grille du sudoku
@@ -33,7 +34,7 @@ class Grid:
         
         return self.content[x][y].get_value()
     
-    def get_cell_state(self, x: int, y: int) -> int:
+    def get_cell_state(self, x: int, y: int) -> str:
         """
         Renvoi la valeur de la case de coordonnées (x, y)
         """
@@ -71,7 +72,6 @@ class Grid:
         
         for x in range(9):
             for y in range(9):
-                
                 self.content[x][y] = Cell(new_values[x][y], new_states[x][y])
     
     def set_cell(self, x: int, y: int, value: int):
@@ -99,5 +99,13 @@ class Grid:
         
         if self.content[x][y].get_state() == 'unlocked':
             self.content[x][y].put_value(value)
-            
-        else: print(f'Grid.set_cell: cell ({x},{y}) is locked or superlocked')
+        
+        else:
+            print(f'Grid.set_cell: cell ({x},{y}) is locked or superlocked')
+    
+    def get_all_values(self) -> list[list[int]]:
+        """
+        Retourne une double liste de toutes les valeurs (identique à self.content, mais remplace les cellules pas les valeurs des cellules)
+        :return:
+        """
+        return [[cell.value for cell in line] for line in self.content]

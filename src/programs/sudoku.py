@@ -120,6 +120,20 @@ class Sudoku:
         Vérifie que les règles du sudoku sont respectées (pas 2 fois le même nombre sur la linee, sur la colonne, etc...)
         :return: liste des positions (x, y) où les valeurs sont incorrectes
         """
+        print("verify")
+        # vérifier les colonnes
+        columns = [column for column in self.grid.get_all_values()]
+        numbers_to_verify = list(range(1, self.column_number))
+        for i, column in enumerate(columns):
+            for number_to_verify in numbers_to_verify:
+                """print("line",line)
+                print("number to verify", number_to_verify)
+                print("-"*50)"""
+                if column.count(number_to_verify) > 1:
+                    print(f"error column {i}, number {number_to_verify}")
+            #print("_"*100)
+        
+        
         return list()
     
     def generate_grid(self):
