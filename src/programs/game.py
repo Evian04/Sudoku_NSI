@@ -28,7 +28,9 @@ class Game:
             pygame.K_KP_8: 8,
             pygame.K_KP_9: 9,
             pygame.K_BACKSPACE: 0,  # 0 correspond à une case vide (supprime la valeur  de la case)
-            pygame.K_DELETE: 0
+            pygame.K_DELETE: 0,
+            pygame.K_0: 0,
+            pygame.K_KP_0: 0
         }
         self.update_rect()
     
