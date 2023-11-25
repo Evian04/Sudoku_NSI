@@ -29,7 +29,6 @@ class Game:
             pygame.K_KP_9:      9,
             pygame.K_BACKSPACE: 0,  # 0 correspond à une case vide (supprime la valeur  de la case)
             pygame.K_DELETE:    0,
-            pygame.K_DELETE:    0,
             pygame.K_0:         0,
             pygame.K_KP_0:      0
         }
@@ -104,9 +103,9 @@ class Game:
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
         
-        for y in range(len(self.sudoku.grid.content)):  # texte pour afficher les valeurs des cellules
+        for y in range(len(self.sudoku.grid.content)):
             for x in range(len(self.sudoku.grid.content[y])):
-                self.screen.blit(self.sudoku.grid.content[x][y].text, self.all_rect[x][y].center)
+                self.screen.blit(self.sudoku.grid.content[x][y].text.get_text(), self.all_rect[x][y].center)  # texte pour afficher les valeurs des cellules
     
     def update_rect(self):
         """
