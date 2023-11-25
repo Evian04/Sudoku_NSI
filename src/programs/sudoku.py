@@ -10,7 +10,7 @@ class Sudoku:
         self.game = game
         self.grid = Grid()
         self.selected_cell = [-1, -1]  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
-        self.lign_number = 9
+        self.line_number = 9
         self.column_number = 9
     
     def select_cell(self, x: int, y: int):
@@ -79,10 +79,10 @@ class Sudoku:
             return False
 
         # convertit toutes les valeurs des cellules en string
-        double_list_content = [[str(cell.value) for cell in lign]
-                               for lign in self.grid.content]
-        # convertit la double liste en liste simple (une string par ligne)
-        list_content = ["".join(lign) for lign in double_list_content]
+        double_list_content = [[str(cell.value) for cell in line]
+                               for line in self.grid.content]
+        # convertit la double liste en liste simple (une string par linee)
+        list_content = ["".join(line) for line in double_list_content]
         #convertit la liste en une string
         str_content = "\n".join(list_content)
         
@@ -117,7 +117,7 @@ class Sudoku:
     
     def verify_grid(self) -> list[tuple[int, int]]:
         """
-        Vérifie que les règles du sudoku sont respectées (pas 2 fois le même nombre sur la ligne, sur la colonne, etc...)
+        Vérifie que les règles du sudoku sont respectées (pas 2 fois le même nombre sur la linee, sur la colonne, etc...)
         :return: liste des positions (x, y) où les valeurs sont incorrectes
         """
         return list()
