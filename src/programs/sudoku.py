@@ -58,14 +58,14 @@ class Sudoku:
         
         cell_values = [[int(value) for value in line] for line in file_content[0].split("\n")]
         
-        """convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
-        cell_states = [[convert_state[state] for state in line] for line in file_content[1].split("\n")]
+        convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
+        cell_states = [[convert_state.get(state, 0) for state in line] for line in file_content[1].split("\n")]
         # /!\ ce choix là ? ^^^
-        """
-        cell_states = [['superlocked' if int(value) > 0 else 'unlocked'
+        
+        """cell_states = [['superlocked' if int(value) > 0 else 'unlocked'
                         # double boucle imbriquée qui attribue l'état 'unlocked' si la valeur est > à 0 (0 = case vide)
                         for value in line] for line in file_content[0].split("\n")]
-        
+        """
         self.grid.set_content(cell_values, cell_states)
     
     def save_grid(self):
@@ -77,15 +77,27 @@ class Sudoku:
         if not filepath:
             print('No file selected for saving')
             return False
-
+        
+        # VALEURS CELLULES:
         # convertit toutes les valeurs des cellules en string
-        double_list_content = [[str(cell.value) for cell in line]
+        double_list_values = [[str(cell.value) for cell in line]
                                for line in self.grid.content]
         # convertit la double liste en liste simple (une string par linee)
-        list_content = ["".join(line) for line in double_list_content]
+        list_values = ["".join(line) for line in double_list_values]
         #convertit la liste en une string
-        str_content = "\n".join(list_content)
+        str_content = "\n".join(list_values)
+
+        # ETATS CELLULES:
+        convert_state = {"unlocked": "0", "locked": "1", "superlocked": "2"}
         
+        # convertit toutes les valeurs des celules en string avec le dictionnaire de conversion
+        double_list_state = [[convert_state[cell.state] for cell in line]
+                               for line in self.grid.content]
+        # convertit la double liste en liste simple (une string par ligne)
+        list_state = ["".join(line) for line in double_list_state]
+        
+        # additionne les deux (valuers, états)
+        str_content += "\n\n" + "\n".join(list_state)  # "\n\n" pour séparer les valeurs grille de leur correspondance avec les êtats des cases
         with open(filepath,"w") as file:
             file.write(str_content)
     
