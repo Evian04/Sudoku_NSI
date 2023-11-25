@@ -95,18 +95,35 @@ class Game:
         Permet de placer les éléments à afficher sur le brouillon de l'écran
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
+
+        for y in range(len(self.sudoku.grid.content)):  # affichage des cases verrouillées
+            for x in range(len(self.sudoku.grid.content[y])):
+                if self.sudoku.grid.content[x][y].state == "locked":  # affichage case locked (cadenas)
+                    # code cellule 'locked'
+                    pass
         
+                elif self.sudoku.grid.content[x][y].state == "superlocked":  # affichage case superlocked (case grisée)
+                    rect = self.all_rect[x][y].copy()
+                    rect.width -= 3
+                    rect.height -= 3
+                    pygame.draw.rect(
+                        self.screen,
+                        (200, 200, 200),
+                        rect
+                    )
         if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
             pygame.draw.rect(
                 self.screen,
                 (80, 80, 80),
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
-        
+
         for y in range(len(self.sudoku.grid.content)):
             for x in range(len(self.sudoku.grid.content[y])):
                 self.screen.blit(self.sudoku.grid.content[x][y].text.get_text(), self.all_rect[x][y].center)  # texte pour afficher les valeurs des cellules
-    
+             
+
+            
     def update_rect(self):
         """
         Calcul de la taille et des rectangles des cellules
