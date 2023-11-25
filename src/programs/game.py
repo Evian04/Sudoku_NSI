@@ -2,6 +2,7 @@ import pygame
 
 from src.programs.sudoku import Sudoku
 
+
 class Game:
     
     def __init__(self, screen: pygame.Surface):
@@ -115,7 +116,8 @@ class Game:
         for x in range(9):  # affichage des cases verrouillées
             for y in range(9):
                 if self.sudoku.grid.content[x][y].state == "locked":  # affichage case locked (cadenas)
-                    self.screen.blit(self.padlock_image, self.all_rect[x][y])
+                    # code cellule 'locked'
+                    pass
         
                 elif self.sudoku.grid.content[x][y].state == "superlocked":  # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
@@ -128,13 +130,18 @@ class Game:
                         (120, 120, 120),
                         rect
                     )
+        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
+            pygame.draw.rect(
+                self.screen,
+                (80, 80, 80),
+                self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
+            )
 
         for y in range(len(self.sudoku.grid.content)):
             for x in range(len(self.sudoku.grid.content[y])):
-                self.screen.blit(self.sudoku.grid.content[x][y].text.get_text(), self.all_rect[x][y].center)  # texte pour afficher les valeurs des cellules
-             
-
-            
+                self.screen.blit(self.sudoku.grid.content[x][y].text.get_text(),
+                                 self.all_rect[x][y].center)  # texte pour afficher les valeurs des cellules
+    
     def update_rect(self):
         """
         Calcul de la taille et des rectangles des cellules
@@ -147,13 +154,13 @@ class Game:
                 self.grid_image,
                 (self.screen.get_height(), self.screen.get_height())
             )
-            
+        
         else:
             self.grid_image = pygame.transform.scale(
                 self.grid_image,
                 (self.screen.get_width(), self.screen.get_width())
             )
-            
+        
         self.grid_image_rect = self.grid_image.get_rect()
         self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
         
@@ -170,4 +177,8 @@ class Game:
                 self.grid_image_rect.width / 9,
                 self.grid_image_rect.height / 9
             )
-        for y in range(9)] for x in range(9)]
+            for y in range(9)] for x in range(9)]
+
+        for y in range(9):
+            for x in range(9):
+                self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
