@@ -72,24 +72,32 @@ class Game:
                 if event.key == pygame.K_l:
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell[0], self.sudoku.selected_cell[1]) != "superlocked":
                         self.sudoku.lock_selected_cell()
+                        print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was locked')
                 
                 if event.key == pygame.K_u:
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell[0], self.sudoku.selected_cell[1]) != "superlocked":
                         self.sudoku.unlock_selected_cell()
+                        print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was unlocked')
+
                 
                 if event.key in self.key_mapping:
                     selected_cell = self.sudoku.selected_cell
-                    if selected_cell != [-1, -1] and self.sudoku.grid.get_cell_state(selected_cell[0], selected_cell[1]) == "unlocked":
+                    if selected_cell != [-1, -1]:
+                        if self.sudoku.grid.get_cell_state(selected_cell[0], selected_cell[1]) == "unlocked":
                         
-                        # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
-                        value = self.key_mapping[event.key]
-                        
-                        # modifie la valeur de la cellule selectionnée
-                        self.sudoku.grid.set_cell(
-                            selected_cell[0],
-                            selected_cell[1],
-                            value
-                        )
+                            # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
+                            value = self.key_mapping[event.key]
+                            
+                            # modifie la valeur de la cellule selectionnée
+                            self.sudoku.grid.set_cell(
+                                selected_cell[0],
+                                selected_cell[1],
+                                value
+                            )
+                        elif self.sudoku.grid.get_cell_state(selected_cell[0], selected_cell[1]) == "locked":
+                            print(f"grid.update(): cell {tuple(selected_cell)} is locked (press 'U' to Unlock)")
+                        else: print(f"grid.update(): cell {tuple(selected_cell)} is superlocked")
+
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for x in range(9):
@@ -172,6 +180,6 @@ class Game:
             )
             for y in range(9)] for x in range(9)]
 
-        for y in range(9):
+        for y in range(9):  # recalcule et réattribue les valeurs de la teille des textes
             for x in range(9):
                 self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
