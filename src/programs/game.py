@@ -82,8 +82,8 @@ class Game:
                 if event.key == pygame.K_c:
                     duplicate_cells = self.sudoku.verify_grid()
                     print(duplicate_cells)
-                    for x in range(9):
-                        for y in range(9):
+                    for x in range(self.sudoku.column_number):
+                        for y in range(self.sudoku.line_number):
                             if (x, y) in duplicate_cells:
                                 self.sudoku.grid.content[x][y].text.set_color((255, 0, 0))
                                 
@@ -108,8 +108,8 @@ class Game:
 
             
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for x in range(9):
-                    for y in range(9):
+                for x in range(self.sudoku.column_number):
+                    for y in range(self.sudoku.line_number):
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
                             self.sudoku.select_cell(x, y)
             
@@ -122,8 +122,8 @@ class Game:
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
 
-        for x in range(9):
-            for y in range(9):
+        for x in range(self.sudoku.column_number):
+            for y in range(self.sudoku.line_number):
                 if self.sudoku.grid.content[x][y].state == "superlocked":
                     # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
@@ -144,8 +144,8 @@ class Game:
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
 
-        for x in range(9):  # affichage des cases verrouillées
-            for y in range(9):
+        for x in range(self.sudoku.column_number):  # affichage des cases verrouillées
+            for y in range(self.sudoku.line_number):
                 # affichage case locked (affichage du cadenas)
                 if self.sudoku.grid.content[x][y].state == "locked":
                     self.screen.blit(self.padlock_image, self.all_rect[x][y])
@@ -191,8 +191,8 @@ class Game:
                 self.grid_image_rect.width / 9,
                 self.grid_image_rect.height / 9
             )
-            for y in range(9)] for x in range(9)]
+            for y in range(self.sudoku.line_number)] for x in range(self.sudoku.column_number)]
 
-        for y in range(9):  # recalcule et réattribue les valeurs de la teille des textes
-            for x in range(9):
+        for x in range(self.sudoku.column_number):  # recalcule et réattribue les valeurs de la taille des textes
+            for y in range(self.sudoku.line_number):
                 self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
