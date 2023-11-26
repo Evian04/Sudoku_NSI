@@ -160,32 +160,29 @@ class Sudoku:
         Vérifie que les règles du sudoku sont respectées (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
         :return: liste des positions (x, y) où les valeurs sont incorrectes
         """
-        print("verify")
-        
         duplicate_cells = []
         
-        content_as_lines = self.grid.get_all_values()
-        content_as_columns = [[content_as_lines[y][x] for y in range(9)] for x in range(9)]
-        content_as_squares = [[content_as_lines[(x // 3) * 3 + y // 3][(x % 3) * 3 + y % 3] for y in range(9)] for x in range(9)]
-        
-        for x in range(self.column_number):
-            for n in range(1, 10): # nombres à vérifier
+        content_as_lines = self.grid.get_all_values()  # récupère le conntenu des lignes
+        content_as_columns = [[content_as_lines[y][x] for y in range(9)] for x in range(9)]  # récupère le contenu des colonnes
+        content_as_squares = [[content_as_lines[(x // 3) * 3 + y // 3][(x % 3) * 3 + y % 3] for y in range(9)] for x in range(9)]  # récupère le contneu des sous grilles (carrés)
+        for x in range(self.column_number):  # balaye x (colonnes)
+            for n in range(1, 9 + 1):  # nombres à vérifier
                 
                 # vérification lignes
                 if content_as_lines[x].count(n) > 1:
-                    for y in range(9):
+                    for y in range(self.line_number):
                         if content_as_lines[x][y] == n and not (x, y) in duplicate_cells:
                             duplicate_cells.append((x, y))
                 
                 # vérification colonnes
                 if content_as_columns[x].count(n) > 1:
-                    for y in range(9):
-                        if content_as_columns[x][y] == n and not (y, x) in duplicate_cells:
+                    for y in range(self.line_number):
+                        if content_as_columns[x][y] == n and not (y, x) in duplicate_cells:  # (y,x) parce que les valuers des colonnes sont inversées par rapport à celle de slignes
                             duplicate_cells.append((y, x))
                             
                 # vérification sous-grilles (carrés)
-                if content_as_columns[x].count(n) > 1:
-                    for y in range(9):
+                if content_as_squares[x].count(n) > 1:
+                    for y in range(len(content_as_squares[x])):
                         if content_as_squares[x][y] == n and not ((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3) in duplicate_cells:
                             duplicate_cells.append(((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3))
         
