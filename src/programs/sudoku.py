@@ -168,19 +168,22 @@ class Sudoku:
         content_as_columns = [[content_as_lines[y][x] for y in range(9)] for x in range(9)]
         content_as_squares = [[content_as_lines[(x // 3) * 3 + y // 3][(x % 3) * 3 + y % 3] for y in range(9)] for x in range(9)]
         
-        for x in range(9):
-            for n in range(1, 10):
+        for x in range(self.column_number):
+            for n in range(1, 10): # nombres à vérifier
                 
+                # vérification lignes
                 if content_as_lines[x].count(n) > 1:
                     for y in range(9):
                         if content_as_lines[x][y] == n and not (x, y) in duplicate_cells:
                             duplicate_cells.append((x, y))
-                            
+                
+                # vérification colonnes
                 if content_as_columns[x].count(n) > 1:
                     for y in range(9):
                         if content_as_columns[x][y] == n and not (y, x) in duplicate_cells:
                             duplicate_cells.append((y, x))
                             
+                # vérification sous-grilles (carrés)
                 if content_as_columns[x].count(n) > 1:
                     for y in range(9):
                         if content_as_squares[x][y] == n and not ((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3) in duplicate_cells:
