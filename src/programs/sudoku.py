@@ -10,8 +10,6 @@ class Sudoku:
         self.game = game
         self.grid = Grid()
         self.selected_cell = [-1, -1]  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
-        self.line_number = 9
-        self.column_number = 9
     def select_cell(self, x: int, y: int):
         """
         Selectionne la case de coordonnées (x, y)
@@ -155,42 +153,80 @@ class Sudoku:
         
         self.grid.content[self.selected_cell[0]][self.selected_cell[1]].state = "unlocked"
     
-    def verify_grid(self) -> list[tuple[int, int]]:
+    def verify_grid(self):
         """
-        Vérifie que les règles du sudoku sont respectées (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
-        :return: liste des positions (x, y) où les valeurs sont incorrectes
+        Vérifie que les règles du sudoku sont respectées sur toute la grille (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
+        Ajoute les couleurs sur le texte
         """
-        duplicate_cells = []
         
-        content_as_lines = self.grid.get_all_values()  # récupère le conntenu des lignes
+        content_as_lines = self.grid.get_all_values()  # récupère le contenu des lignes
         content_as_columns = [[content_as_lines[y][x] for y in range(9)] for x in range(9)]  # récupère le contenu des colonnes
         content_as_squares = [[content_as_lines[(x // 3) * 3 + y // 3][(x % 3) * 3 + y % 3] for y in range(9)] for x in range(9)]  # récupère le contneu des sous grilles (carrés)
-        for x in range(self.column_number):  # balaye x (colonnes)
+        
+        for x in range(self.grid.column_number):  # balaye x (colonnes)
             for n in range(1, 9 + 1):  # nombres à vérifier
-                
+                self.grid.duplicate_cells = list()
                 # vérification lignes
                 if content_as_lines[x].count(n) > 1:
-                    for y in range(self.line_number):
-                        if content_as_lines[x][y] == n and not (x, y) in duplicate_cells:
-                            duplicate_cells.append((x, y))
+                    for y in range(self.grid.line_number):
+                        if content_as_lines[x][y] == n and not (x, y) in self.grid.duplicate_cells:
+                            self.grid.duplicate_cells.append((x, y))
                 
                 # vérification colonnes
                 if content_as_columns[x].count(n) > 1:
-                    for y in range(self.line_number):
-                        if content_as_columns[x][y] == n and not (y, x) in duplicate_cells:  # (y,x) parce que les valuers des colonnes sont inversées par rapport à celle de slignes
-                            duplicate_cells.append((y, x))
+                    for y in range(self.grid.line_number):
+                        if content_as_columns[x][y] == n and not (y, x) in self.grid.duplicate_cells:  # (y,x) parce que les valuers des colonnes sont inversées par rapport à celle de slignes
+                            self.grid.duplicate_cells.append((y, x))
                             
                 # vérification sous-grilles (carrés)
                 if content_as_squares[x].count(n) > 1:
                     for y in range(len(content_as_squares[x])):
-                        if content_as_squares[x][y] == n and not ((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3) in duplicate_cells:
-                            duplicate_cells.append(((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3))
+                        if content_as_squares[x][y] == n and not ((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3) in self.grid.duplicate_cells:
+                            self.grid.duplicate_cells.append(((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3))
         
-        return duplicate_cells
-    
-    def verify_cell(self, x:int, y:int) -> list[tuple[int, int]]:
-        line = self.grid.content[x]
-        print(line)
+        # Affichage des couleurs sur le texte
+        for x in range(self.grid.column_number):
+            for y in range(self.grid.line_number):
+                if (x, y) in self.grid.duplicate_cells:
+                    self.grid.content[x][y].text.set_color((255, 0, 0))
+        
+                else:
+                    self.grid.content[x][y].text.set_color((0, 0, 0))
+
+    def verify_cell(self, x_cell:int, y_cell:int):
+        """
+        Vérifie que les règles du sudoku sont respectées sur la colonne, la ligne et le carré de la cellule (x, y) (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
+        Ajoute les couleurs sur le texte
+        """
+        line = self.grid.get_cell_line(y_cell)
+        column = self.grid.get_cell_column(x_cell)
+        square = self.grid.get_cell_square(x_cell, y_cell)
+        # vérifier ligne
+        for nb in range(1, 9 + 1):
+            
+            if [self.grid.content[x][y].value for x, y in line].count(nb) > 1:
+                for x, y in line:
+                    if self.grid.content[x][y].value == nb and not (x, y) in self.grid.duplicate_cells:
+                        self.grid.duplicate_cells.append((x, y))
+            
+            if [self.grid.content[x][y].value for x, y in column].count(nb) > 1:
+                for x, y in column:
+                    if self.grid.content[x][y].value == nb and not (x, y) in self.grid.duplicate_cells:
+                        self.grid.duplicate_cells.append((x, y))
+            
+            if [self.grid.content[x][y].value for x, y in square].count(nb) > 1:
+                for x, y in square:
+                    if self.grid.content[x][y].value == nb and not (x, y) in self.grid.duplicate_cells:
+                        self.grid.duplicate_cells.append((x, y))
+
+        # Affichage des couleurs sur le texte
+        for x in range(self.grid.column_number):
+            for y in range(self.grid.line_number):
+                if (x, y) in self.grid.duplicate_cells:
+                    self.grid.content[x][y].text.set_color((255, 0, 0))
+
+                else:
+                    self.grid.content[x][y].text.set_color((0, 0, 0))
         
     def generate_grid(self):
         """

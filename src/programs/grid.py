@@ -6,7 +6,7 @@ class Grid:
     La class `Grid` permet de stocker et de gérer le contenu de la grille du sudoku
     """
     
-    def __init__(self, content: list[list[Cell]] = list()):
+    def __init__(self, content: list[list[Cell]] = None):
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu
             self.content = content.copy()
@@ -14,7 +14,10 @@ class Grid:
         else:
             # Sinon créer une grille vierge
             self.content = [[Cell(0, "unlocked") for y in range(9)] for x in range(9)]
-    
+
+        self.line_number = 9
+        self.column_number = 9
+        self.duplicate_cells: list[tuple[int, int]] = list()
     def get_cell_value(self, x: int, y: int) -> int:
         """
         Renvoi la valeur de la case de coordonnées (x, y)
@@ -135,3 +138,45 @@ class Grid:
         """
         
         return [[cell.value for cell in line] for line in self.content]
+    def get_lines(self) -> list[list[tuple[int, int]]]:
+        """
+        retourne la liste des lignes avec les coordonnées de chaque cellule
+        :return: liste de lignes de coordonnées
+        """
+        return [[(x,y) for x in range(self.column_number)] for y in range(self.line_number)]
+    
+    def get_columns(self) -> list[list[tuple[int, int]]]:
+        """
+        retourne la liste des lignes avec les coordonnées de chaque cellule
+        :return: liste de colonnes de coordonnées
+        """
+        return [[(x, y) for y in range(9)] for x in range(9)]
+    
+    def get_squares(self):
+        """
+        retourne la liste des carrés avec les coordonnées de chaque cellule
+        :return: liste de carrés de coordonnées
+        """
+        return [[((x // 3) * 3 + y // 3,(x % 3) * 3 + y % 3) for y in range(9)] for x in range(9)]  # récupère le contneu des sous grilles (carrés)
+        
+    def get_cell_column(self, x: int) -> list[tuple[int, int]]:
+        """
+        retourne la colonne de la cellule spécifié
+        :return: liste des coordonnées des cellules de la colonne
+        """
+        return [(x, y) for y in range(len(self.content[x]))]
+    
+    def get_cell_line(self,y: int) -> list[tuple[int, int]]:
+        """
+        retourne la ligne de la cellule spécifié
+        :return: liste des coordonnées des cellules de la ligne
+        """
+        return [(x, y) for x in range(len(self.content))]
+    
+    def get_cell_square(self, x: int, y: int) -> list[tuple[int, int]]:
+        """
+        retourne la ligne de la cellule spécifié
+        :return: liste des coordonnées des cellules de la ligne
+        """
+        square = [(x_square, y_square) for x_square in range(x // 3, x // 3 + 3) for y_square in range(y // 3, y // 3 + 3)]
+        return square
