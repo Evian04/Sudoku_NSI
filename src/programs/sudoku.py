@@ -188,6 +188,10 @@ class Sudoku:
         
         return duplicate_cells
     
+    def verify_cell(self, x:int, y:int) -> list[tuple[int, int]]:
+        line = self.grid.content[x]
+        print(line)
+        
     def generate_grid(self):
         """
         Génère une grille de sudoku à résoudre
