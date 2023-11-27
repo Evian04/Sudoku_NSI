@@ -18,43 +18,44 @@ class Grid:
         self.line_number = 9
         self.column_number = 9
         self.duplicate_cells: list[tuple[int, int]] = list()
-    def get_cell_value(self, x: int, y: int) -> int:
+
+    def get_cell_value(self, coordinates: tuple[int, int]) -> int:
         """
         Renvoi la valeur de la case de coordonnées (x, y)
         """
         
-        if type(x) != int:
-            raise TypeError(f"The `x` argument must be an intger (type : {type(x)})")
+        if type(coordinates[0]) != int:
+            raise TypeError(f"The `x` argument must be an intger (type : {type(coordinates[0])})")
         
-        if type(y) != int:
-            raise TypeError(f"The `y` argument must be an intger (type : {type(y)})")
+        if type(coordinates[1]) != int:
+            raise TypeError(f"The `y` argument must be an intger (type : {type(coordinates[1])})")
         
-        if x < 0 or x >= 9:
-            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {x})")
+        if coordinates[0] < 0 or coordinates[0] >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {coordinates[0]})")
         
-        if y < 0 or y >= 9:
-            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {y})")
+        if coordinates[1] < 0 or coordinates[1] >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {coordinates[1]})")
         
-        return self.content[x][y].get_value()
+        return self.content[coordinates[0]][coordinates[1]].get_value()
     
-    def get_cell_state(self, x: int, y: int) -> str:
+    def get_cell_state(self, coordinates: tuple[int, int]) -> str:
         """
         Renvoi la valeur de la case de coordonnées (x, y)
         """
         
-        if type(x) != int:
-            raise TypeError(f"The `x` argument must be an intger (type : {type(x)})")
+        if type(coordinates[0]) != int:
+            raise TypeError(f"The `x` argument must be an intger (type : {type(coordinates[0])})")
         
-        if type(y) != int:
-            raise TypeError(f"The `y` argument must be an intger (type : {type(y)})")
+        if type(coordinates[1]) != int:
+            raise TypeError(f"The `y` argument must be an intger (type : {type(coordinates[1])})")
         
-        if x < 0 or x >= 9:
-            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {x})")
+        if coordinates[0] < 0 or coordinates[0] >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {coordinates[0]})")
         
-        if y < 0 or y >= 9:
-            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {y})")
+        if coordinates[1] < 0 or coordinates[1] >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {coordinates[1]})")
         
-        return self.content[x][y].get_state()
+        return self.content[coordinates[0]][coordinates[1]].get_state()
     
     def set_content(self, new_values: list[list[int]], new_states: list[list[str]]):
         """
@@ -77,59 +78,59 @@ class Grid:
             for y in range(9):
                 self.content[x][y] = Cell(new_values[x][y], new_states[x][y])
     
-    def set_cell_value(self, x: int, y: int, value: int):
+    def set_cell_value(self, coordinates: tuple[int, int], value: int):
         """
         Met la case de coordonnées (x, y) à la valeur `value`
         """
         
-        if type(x) != int:
-            raise TypeError(f"The `x` argument must be an integer (type : {type(x)})")
+        if type(coordinates[0]) != int:
+            raise TypeError(f"The `x` argument must be an integer (type : {coordinates[0]})")
         
-        if type(y) != int:
-            raise TypeError(f"The `y` argument must be an integer (type : {type(y)})")
+        if type(coordinates[1]) != int:
+            raise TypeError(f"The `y` argument must be an integer (type : {type(coordinates[1])})")
         
         if type(value) != int:
             raise TypeError(f"The `value` argument must be a string (type : {type(value)})")
         
-        if x < 0 or x >= 9:
-            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {x})")
+        if coordinates[0] < 0 or coordinates[0] >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {coordinates[0]})")
         
-        if y < 0 or y >= 9:
-            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {y})")
+        if coordinates[1] < 0 or coordinates[1] >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {coordinates[1]})")
         
         if int(value) < 0 or int(value) > 9:
             raise ValueError(f"The `value` argument must contains a integer between 0 and 9 (value : {value})")
         
-        if self.content[x][y].get_state() == 'unlocked':
-            self.content[x][y].put_value(value)
+        if self.content[coordinates[0]][coordinates[1]].get_state() == 'unlocked':
+            self.content[coordinates[0]][coordinates[1]].put_value(value)
         
         else:
-            print(f'Grid.set_cell: cell ({x},{y}) is locked or superlocked')
+            print(f'Grid.set_cell: cell {coordinates[1]} is locked or superlocked')
             
-    def set_cell_color(self, x: int, y: int, color: tuple[int, int, int]):
+    def set_cell_color(self, coordinates: tuple[int, int], color: tuple[int, int, int]):
         """
         Met la couleur de la case de coordonnées (x, y) à `color`
         """
         
-        if type(x) != int:
-            raise TypeError(f"The `x` argument must be an integer (type : {type(x)})")
+        if type(coordinates[0]) != int:
+            raise TypeError(f"The `x` argument must be an integer (type : {type(coordinates[0])})")
         
-        if type(y) != int:
-            raise TypeError(f"The `y` argument must be an integer (type : {type(y)})")
+        if type(coordinates[1]) != int:
+            raise TypeError(f"The `y` argument must be an integer (type : {type(coordinates[1])})")
         
         if type(color) != tuple:
             raise TypeError(f"The `color` argument must be a tuple (type : {type(color)})")
         
-        if x < 0 or x >= 9:
-            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {x})")
+        if coordinates[0] < 0 or coordinates[0] >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {coordinates[0]})")
         
-        if y < 0 or y >= 9:
-            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {y})")
+        if coordinates[1] < 0 or coordinates[1] >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {coordinates[1]})")
         
         if len(color) != 3:
             raise ValueError(f"The `color` argument must have a length of 3 (length : {color})")
         
-        self.content[x][y].set_color(color)
+        self.content[coordinates[0]][coordinates[1]].set_color(color)
     
     def get_all_values(self) -> list[list[int]]:
         """
@@ -138,6 +139,7 @@ class Grid:
         """
         
         return [[cell.value for cell in line] for line in self.content]
+    
     def get_lines(self) -> list[list[tuple[int, int]]]:
         """
         retourne la liste des lignes avec les coordonnées de chaque cellule
@@ -158,25 +160,120 @@ class Grid:
         :return: liste de carrés de coordonnées
         """
         return [[((x // 3) * 3 + y // 3,(x % 3) * 3 + y % 3) for y in range(9)] for x in range(9)]  # récupère le contneu des sous grilles (carrés)
+    
+    def get_cell_line(self, coordinates: tuple[int, int]) -> list[tuple[int, int]]:
+        """
+        retourne la ligne de la cellule spécifié
+        :return: liste des coordonnées des cellules de la ligne
+        """
         
-    def get_cell_column(self, x: int) -> list[tuple[int, int]]:
+        if type(coordinates[1]) != int:
+            raise TypeError(f"The `y` argument must be an intger (type : {type(coordinates[1])})")
+        
+        if coordinates[1] < 0 or coordinates[1] >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {coordinates[1]})")
+        
+        return [(x, coordinates[1]) for x in range(9)]
+        
+    def get_cell_column(self, coordinates: tuple[int, int]) -> list[tuple[int, int]]:
         """
         retourne la colonne de la cellule spécifié
         :return: liste des coordonnées des cellules de la colonne
         """
-        return [(x, y) for y in range(len(self.content[x]))]
+        
+        if type(coordinates[0]) != int:
+            raise TypeError(f"The `x` argument must be an intger (type : {type(coordinates[0])})")
+        
+        if coordinates[0] < 0 or coordinates[0] >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {coordinates[0]})")
+        
+        return [(coordinates[0], y) for y in range(9)]
     
-    def get_cell_line(self,y: int) -> list[tuple[int, int]]:
+    def get_cell_square(self, coordinates: tuple[int, int]) -> list[tuple[int, int]]:
         """
         retourne la ligne de la cellule spécifié
-        :return: liste des coordonnées des cellules de la ligne
+        :return: liste des coordonnées des cellules du carré
         """
-        return [(x, y) for x in range(len(self.content))]
-    
-    def get_cell_square(self, x: int, y: int) -> list[tuple[int, int]]:
-        """
-        retourne la ligne de la cellule spécifié
-        :return: liste des coordonnées des cellules de la ligne
-        """
-        square = [(x_square, y_square) for x_square in range(x // 3, x // 3 + 3) for y_square in range(y // 3, y // 3 + 3)]
+        
+        if type(coordinates[0]) != int:
+            raise TypeError(f"The `x` argument must be an intger (type : {type(coordinates[0])})")
+        
+        if type(coordinates[1]) != int:
+            raise TypeError(f"The `y` argument must be an intger (type : {type(coordinates[1])})")
+        
+        if coordinates[0] < 0 or coordinates[0] >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {coordinates[0]})")
+        
+        if coordinates[1] < 0 or coordinates[1] >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {coordinates[1]})")
+        
+        square = [
+            (x_square, y_square) for x_square in range(coordinates[0] // 3, coordinates[0] // 3 + 3) for y_square in range(coordinates[1] // 3, coordinates[1] // 3 + 3)
+        ]
+        
         return square
+    
+    def get_all_empty_cells(self) -> list[tuple[int, int]]:
+        """
+        Renvois la liste des coordonnées des cases vides de la grille
+        """
+        
+        all_empty_cells = []
+        
+        # Pour toutes les cases de la grille
+        for x in range(9):
+            for y in range(9):
+                if self.get_cell_value((x, y)) == 0: # Si la valeur de la case est zéro
+                    all_empty_cells.append((x, y))   # Ajouter à la liste des cases vides les coordonnées (x, y)
+                    
+        return all_empty_cells
+
+    def get_first_empty_cell(self) -> tuple[int, int]:
+        """
+        Renvois les coordonnées de la première case vide
+        """
+        
+        # Pour toutes les cases de la grille
+        for x in range(9):
+            for y in range(9):
+                if self.get_cell_value((x, y)) == 0: # Dès qu'un case vide est rencontrée
+                    return (x, y)                    # Renvoyer les coordonnées (x, y)
+    
+    def get_possible_values(self, coordinates: tuple[int, int]) -> list[int]:
+        """
+        Renvois les valeurs possibles (1 à 9) de la case en fonctions des autres chiffres de la même ligne, colomne ou carré
+        """
+        
+        if type(coordinates[0]) != int:
+            raise TypeError(f"The `x` argument must be an intger (type : {type(coordinates[0])})")
+        
+        if type(coordinates[1]) != int:
+            raise TypeError(f"The `y` argument must be an intger (type : {type(coordinates[1])})")
+        
+        if coordinates[0] < 0 or coordinates[0] >= 9:
+            raise ValueError(f"The `x` argument must be between 0 and 9 (value : {coordinates[0]})")
+        
+        if coordinates[1] < 0 or coordinates[1] >= 9:
+            raise ValueError(f"The `y` argument must be between 0 and 9 (value : {coordinates[1]})")
+        
+        if self.get_cell_value(coordinates) != 0:
+            raise ValueError(f"The cell {coordinates} isn't empty")
+        
+        possible_values = [n + 1 for n in range(9)]
+        
+        for cell_position in self.get_cell_line(coordinates):
+            cell_value = self.get_cell_value(cell_position)
+            if cell_value in possible_values:
+                possible_values.remove(cell_value)
+        
+        for cell_position in self.get_cell_column(coordinates):
+            cell_value = self.get_cell_value(cell_position)
+            if cell_value in possible_values:
+                possible_values.remove(cell_value)
+        
+        for cell_position in self.get_cell_square(coordinates):
+            cell_value = self.get_cell_value(cell_position)
+            if cell_value in possible_values:
+                possible_values.remove(cell_value)
+                
+        return possible_values

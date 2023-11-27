@@ -1,7 +1,10 @@
 import os.path
+
 import pygame
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+
 from src.programs.grid import Grid
+from src.programs.test_errors import test_errors
 
 
 class Sudoku:
@@ -10,24 +13,15 @@ class Sudoku:
         self.game = game
         self.grid = Grid()
         self.selected_cell = [-1, -1]  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
-    def select_cell(self, x: int, y: int):
+        
+    def select_cell(self, coordinates: tuple[int, int]):
         """
         Selectionne la case de coordonnées (x, y)
         """
         
-        if type(x) != int:
-            raise TypeError(f"The `x` argument must be an integer (type : {type(x)})")
+        test_errors(coords = coordinates)
         
-        if type(y) != int:
-            raise TypeError(f"The `y` argument must be an integer (type : {type(y)})")
-        
-        if x < 0 or x > 8:
-            raise ValueError(f"The `x` argument must be between 0 and 8")
-        
-        if y < 0 or y > 8:
-            raise ValueError(f"The `y` argument must be between 0 and 8")
-        
-        self.selected_cell = [x, y]
+        self.selected_cell = [coordinates[0], coordinates[1]]
     
     def deselect_cell(self):
         """
@@ -41,11 +35,7 @@ class Sudoku:
         Met la valeur de la case sélectionnée à `value`
         """
         
-        if type(value) != int:
-            raise TypeError(f"The `value` argument must be an integer (type : {type(value)})")
-        
-        if value < 0 or value > 9:
-            raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
+        test_errors(val = value)
         
         if self.selected_cell == [-1, -1]:
             raise ValueError("You must select a cell in order to set its value")
@@ -57,11 +47,7 @@ class Sudoku:
         Met la couleur de la case sélectionnée à `color`
         """
         
-        if type(color) != tuple:
-            raise TypeError(f"The `color` argument must be a tuple (type : {type(color)})")
-        
-        if len(color) != 3:
-            raise ValueError(f"The `color` argument must have a length of 3 (length : {len(color)})")
+        test_errors(col = color)
         
         self.grid.set_cell_color(self.selected_cell[0], self.selected_cell[1], color)
     
@@ -153,6 +139,11 @@ class Sudoku:
         
         self.grid.content[self.selected_cell[0]][self.selected_cell[1]].state = "unlocked"
     
+    def is_valid(self) -> bool:
+        """
+        Renvois True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
+        """
+    
     def verify_grid(self):
         """
         Vérifie que les règles du sudoku sont respectées sur toute la grille (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
@@ -193,14 +184,17 @@ class Sudoku:
                 else:
                     self.grid.content[x][y].text.set_color((0, 0, 0))
 
-    def verify_cell(self, x_cell:int, y_cell:int):
+    def verify_cell(self, coordinates: tuple[int, int]):
         """
         Vérifie que les règles du sudoku sont respectées sur la colonne, la ligne et le carré de la cellule (x, y) (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
         Ajoute les couleurs sur le texte
         """
-        line = self.grid.get_cell_line(y_cell)
-        column = self.grid.get_cell_column(x_cell)
-        square = self.grid.get_cell_square(x_cell, y_cell)
+        
+        test_errors(coords = coordinates)
+        
+        line = self.grid.get_cell_line(coordinates)
+        column = self.grid.get_cell_column(coordinates)
+        square = self.grid.get_cell_square(coordinates)
         # vérifier ligne
         for nb in range(1, 9 + 1):
             
@@ -239,3 +233,40 @@ class Sudoku:
         Résout le Sudoku, ne tient pas compte des valeurs entrée pas l'utilisateur, seulement les cases présentes originalement
         :return:
         """
+        
+        self.clear_inputs()
+        self.put_obvious_solutions()
+    
+    def clear_inputs(self):
+        """
+        Supprime toutes les valeurs entrées par l'utilisateur
+        Fonction appelée uniquement par sole_grid()
+        """
+        
+        for x in range(9):
+            for y in range(9):
+                
+                if self.grid.get_cell_state((x, y)) != "superlocked":
+                    self.grid.set_cell_value((x, y), 0)
+    
+    def put_obvious_solutions(self):
+        """
+        Met dans la grille les chiffres évidents (les case où il n'y a qu'un chiffre possible)
+        """
+        
+        while True:
+            is_algorithm_finished = True
+            
+            cells_to_check = self.grid.get_all_empty_cells()
+            
+            for cell_coordinates in cells_to_check:
+                cell_possible_values = self.grid.get_possible_values(cell_coordinates)
+                if len(cell_possible_values) == 1:
+                    self.grid.set_cell_value(cell_coordinates, cell_possible_values[0])
+                    is_algorithm_finished = False
+            
+            if is_algorithm_finished:
+                break
+    
+    def backtracking_solving(self):
+        pass
