@@ -251,7 +251,12 @@ class Sudoku:
         
         self.clear_inputs()
         self.put_obvious_solutions()
-        self.backtracking_solving()
+        
+        if self.backtracking_solving():
+            print("Sudoku solved successfully")
+            
+        else:
+            print("Cannot solve the sudoku")
     
     def clear_inputs(self):
         """
