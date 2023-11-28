@@ -1,4 +1,6 @@
-from  src.programs.text import Text
+from src.programs.text import Text
+from src.programs.test_errors import test_errors
+
 class Cell:
     """
     La classe Cell contient les données relatives aux cases (valeur, état, etc...)
@@ -6,15 +8,11 @@ class Cell:
     
     def __init__(self, value: int, state: str):
         
-        if type(value) != int:
-            raise TypeError(f"The `value` argument must be an integer (type : {type(value)})")
+        test_errors(value = value, state = state)
         
-        if value < 0 or value > 9:
-            raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
-        
-        self.text = Text('', 'Arial', 30, (0, 0, 0))  # crée l'objet texte
+        self.text = Text("", "Arial", 30, (0, 0, 0))  # crée l'objet texte
         self.state = None
-        self.put_value(value)  # entre 0 et 9 (0 = case vide)
+        self.set_value(value)  # entre 0 et 9 (0 = case vide)
         self.set_state(state)  # valeurs possibles: "unlocked", "locked", "superlocked"
     
     def get_value(self) -> int:
@@ -38,16 +36,12 @@ class Cell:
         
         return self.text
     
-    def put_value(self, value: int):
+    def set_value(self, value: int):
         """
         Met la valeur de la case à `value`
         """
         
-        if type(value) != int:
-            raise TypeError(f"The `value` argument must be an integer (type : {type(value)})")
-        
-        if value < 0 or value > 9:
-            raise ValueError(f"The `value` argument must be between 0 and 9 (value : {value})")
+        test_errors(value = value)
         
         self.value = value
         
@@ -57,17 +51,12 @@ class Cell:
         else:
             self.text.set_text("")
 
-    
     def set_state(self, state: str):
         """
         Met l'état de la case sur `state`
         """
         
-        if type(state) != str:
-            raise TypeError(f"The `state` argument must be a string (type : {type(state)})")
-        
-        if not state in ["unlocked", "locked", "superlocked"]:
-            raise ValueError(f"""The `state` argument must be "unlocked", "locked" or "superlock" (value : {state})""")
+        test_errors(state = state)
         
         self.state = state
         
@@ -76,10 +65,6 @@ class Cell:
         Met la couleur de la case à `color`
         """
         
-        if type(color) != tuple:
-            raise TypeError(f"The `color` argument must be a tuple (type : {type(color)})")
-        
-        if len(color) != 3:
-            raise ValueError(f"The `color` argument must have a length of 3 (length : {color})")
+        test_errors(color = color)
         
         self.text.set_color(color)

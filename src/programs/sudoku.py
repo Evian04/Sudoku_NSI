@@ -19,7 +19,7 @@ class Sudoku:
         Selectionne la case de coordonnées (x, y)
         """
         
-        test_errors(coords = coordinates)
+        test_errors(coordinates = coordinates)
         
         self.selected_cell = [coordinates[0], coordinates[1]]
     
@@ -29,27 +29,30 @@ class Sudoku:
         """
         
         self.selected_cell = [-1, -1]
-        
+    
+    def get_selected_cell(self) -> tuple[int, int]:
+        return tuple(self.selected_cell)
+    
     def set_selected_cell_value(self, value: int):
         """
         Met la valeur de la case sélectionnée à `value`
         """
         
-        test_errors(val = value)
+        test_errors(value = value)
         
         if self.selected_cell == [-1, -1]:
             raise ValueError("You must select a cell in order to set its value")
         
-        self.grid.set_cell_value(self.selected_cell[0], self.selected_cell[1], value)
+        self.grid.set_cell_value(self.get_selected_cell(), value)
         
     def set_selected_cell_color(self, color: tuple[int, int, int]):
         """
         Met la couleur de la case sélectionnée à `color`
         """
         
-        test_errors(col = color)
+        test_errors(color = color)
         
-        self.grid.set_cell_color(self.selected_cell[0], self.selected_cell[1], color)
+        self.grid.set_cell_color(self.get_selected_cell(), color)
     
     def load_grid(self):
         """
@@ -57,8 +60,11 @@ class Sudoku:
         """
         
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
-        file_path = askopenfilename(initialdir="src/save_folder", initialfile="model.sdk",
-                                    filetypes=[("Sudoku file", "*.sdk")])
+        file_path = askopenfilename(
+            initialdir="src/save_folder",
+            initialfile="model.sdk",
+            filetypes=[("Sudoku file", "*.sdk")]
+        )
         if not file_path:
             print("No file selected for opening, Empty grid...")
             return
@@ -121,7 +127,7 @@ class Sudoku:
         if self.selected_cell == [-1, -1]:
             raise ValueError("You must select a cell in order to lock it")
         
-        if self.grid.get_cell_state(self.selected_cell[0], self.selected_cell[1]) == "superlocked":
+        if self.grid.get_cell_state(self.get_selected_cell()) == "superlocked":
             raise ValueError("You cannot lock a cell that is superlocked")
         
         self.grid.content[self.selected_cell[0]][self.selected_cell[1]].state = "locked"
@@ -143,6 +149,15 @@ class Sudoku:
         """
         Renvois True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
         """
+        
+        for grid_format in [self.grid.get_lines(), self.grid.get_columns(), self.grid.get_squares()]:
+            for x in range(9):
+                for y in range(9):
+                    
+                    if grid_format[x].count(grid_format[x][y]) > 1:
+                        return False
+        
+        return True
     
     def verify_grid(self):
         """
@@ -190,7 +205,7 @@ class Sudoku:
         Ajoute les couleurs sur le texte
         """
         
-        test_errors(coords = coordinates)
+        test_errors(coordinates = coordinates)
         
         line = self.grid.get_cell_line(coordinates)
         column = self.grid.get_cell_column(coordinates)
@@ -236,6 +251,7 @@ class Sudoku:
         
         self.clear_inputs()
         self.put_obvious_solutions()
+        self.backtracking_solving()
     
     def clear_inputs(self):
         """
@@ -268,5 +284,31 @@ class Sudoku:
             if is_algorithm_finished:
                 break
     
-    def backtracking_solving(self):
-        pass
+    def backtracking_solving(self) -> bool:
+        """
+        Fonction récursive qui résout le Sudoku en testant toutes les possibilités
+        Renvois True si la grille courante est possible à résoudre, et False si elle ne l'est pas
+        """
+        
+        
+        if self.grid.is_full():
+            # Si la grille est remplie, renvoyer True si elle est résolue, et False si la résolution n'est pas valide
+            return self.is_valid()
+        
+        # Récupérer les coordonnées de la première case vide
+        first_empty_cell = self.grid.get_first_empty_cell()
+        
+        # Boucler sur l'ensemble des valeurs possible pour cette case
+        for value in self.grid.get_possible_values(first_empty_cell):
+            # Mettre la valeur à l'emplacement de la case
+            self.grid.set_cell_value(first_empty_cell, value)
+            
+            # Si la grille est résolue, renvoyer True
+            if self.backtracking_solving():
+                return True
+            
+            # Sinon, enlever la valeur, qui n'est donc pas la bonne
+            self.grid.set_cell_value(first_empty_cell, 0)
+        
+        # Si aucune des valeurs possibles de la case ne marche, renvoyer False
+        return False

@@ -1,5 +1,6 @@
 import pygame.font
 
+from src.programs.test_errors import test_errors
 
 class Text:
     
@@ -18,11 +19,7 @@ class Text:
         if type(font_size) != int:
             raise TypeError(f"The `font_size` argument must be an integer (type : {type(font_size)})")
         
-        if type(color) != tuple:
-            raise TypeError(f"The `color` argument must be a tuple (type : {type(color)})")
-        
-        if len(color) != 3:
-            raise ValueError(f"The `color` argument must have a length of 3 (length : {len(color)})")
+        test_errors(col = color)
         
         self.font = None  # défini par self.set_font()
         self.text_label = None  # défini par self.set_text()

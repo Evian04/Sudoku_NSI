@@ -70,23 +70,22 @@ class Game:
                             self.sudoku.selected_cell[1] += 1
                 
                 if event.key == pygame.K_l:
-                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell[0], self.sudoku.selected_cell[1]) != "superlocked":
+                    if self.sudoku.grid.get_cell_state(self.sudoku.get_selected_cell()) != "superlocked":
                         self.sudoku.lock_selected_cell()
                         print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was locked')
                 
                 if event.key == pygame.K_u:
-                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell[0], self.sudoku.selected_cell[1]) != "superlocked":
+                    if self.sudoku.grid.get_cell_state(self.sudoku.get_selected_cell()) != "superlocked":
                         self.sudoku.unlock_selected_cell()
                         print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was unlocked')
 
-                if event.key == pygame.K_c:
-                    self.sudoku.verify_grid()
-                    self.verify()  # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
-                    
+                if event.key == pygame.K_s:
+                    self.sudoku.solve_grid()
+
                 if event.key in self.key_mapping:
-                    selected_cell = self.sudoku.selected_cell
+                    selected_cell = self.sudoku.get_selected_cell()
                     if selected_cell != [-1, -1]: # si une cellule est selectionnée
-                        if self.sudoku.grid.get_cell_state(selected_cell[0], selected_cell[1]) == "unlocked":
+                        if self.sudoku.grid.get_cell_state(selected_cell) == "unlocked":
                         
                             # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
                             value = self.key_mapping[event.key]
@@ -94,10 +93,10 @@ class Game:
                             # modifie la valeur de la cellule selectionnée
                             self.sudoku.set_selected_cell_value(value)
                             self.sudoku.set_selected_cell_color((0, 0, 0))
-                            self.sudoku.verify_cell(selected_cell[0], selected_cell[1])
+                            self.sudoku.verify_cell(selected_cell)
                             #self.verify()  # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
                             
-                        elif self.sudoku.grid.get_cell_state(selected_cell[0], selected_cell[1]) == "locked":
+                        elif self.sudoku.grid.get_cell_state(selected_cell) == "locked":
                             print(f"grid.update(): cell {tuple(selected_cell)} is locked (press 'U' to Unlock)")
                         else: print(f"grid.update(): cell {tuple(selected_cell)} is superlocked")
                 
@@ -106,7 +105,7 @@ class Game:
                 for x in range(self.sudoku.grid.column_number):
                     for y in range(self.sudoku.grid.line_number):
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
-                            self.sudoku.select_cell(x, y)
+                            self.sudoku.select_cell((x, y))
             
             if event.type == pygame.WINDOWRESIZED:
                 self.update_rect()
