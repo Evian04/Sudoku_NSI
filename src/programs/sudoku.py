@@ -12,7 +12,7 @@ class Sudoku:
     def __init__(self, game):
         self.game = game
         self.grid = Grid()
-        self.selected_cell = [-1, -1]  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
+        self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, [-1, -1] si aucune case
         
     def select_cell(self, coordinates: tuple[int, int]):
         """
@@ -21,17 +21,48 @@ class Sudoku:
         
         test_errors(coordinates = coordinates)
         
-        self.selected_cell = [coordinates[0], coordinates[1]]
+        self.selected_cell = coordinates
     
     def deselect_cell(self):
+        return tuple(self.selected_cell)
+    
+    def move_selected_cell(self, direction: str):
         """
-        Déselectionne la case sélectionnée
+        Déplace les coordonnées de la case sélctionnées vers la direction indiquée
         """
         
-        self.selected_cell = [-1, -1]
-    
-    def get_selected_cell(self) -> tuple[int, int]:
-        return tuple(self.selected_cell)
+        if type(direction) != str:
+            raise ValueError(f"The `direction` argument must be a string (type : {type(direction)})")
+        
+        match direction:
+            
+            case "left":
+                if self.selected_cell[0] == 0:
+                    return
+                
+                self.selected_cell = (self.selected_cell[0] - 1, self.selected_cell[1])
+            
+            case "right":
+                if self.selected_cell[0] == 8:
+                    return
+            
+                self.selected_cell = (self.selected_cell[0] + 1, self.selected_cell[1])
+            
+            case "up":
+                if self.selected_cell[1] == 0:
+                    return
+                
+                self.selected_cell = (self.selected_cell[0], self.selected_cell[1] - 1)
+            
+            case "down":
+                if self.selected_cell[1] == 8:
+                    return
+                
+                self.selected_cell = (self.selected_cell[0], self.selected_cell[1] + 1)
+                
+            case other:
+                raise ValueError(f'The `direction` argument must be "left", "right", "up" or "down" (value : {direction})')
+
     
     def set_selected_cell_value(self, value: int):
         """
@@ -43,7 +74,7 @@ class Sudoku:
         if self.selected_cell == [-1, -1]:
             raise ValueError("You must select a cell in order to set its value")
         
-        self.grid.set_cell_value(self.get_selected_cell(), value)
+        self.grid.set_cell_value(self.selected_cell, value)
         
     def set_selected_cell_color(self, color: tuple[int, int, int]):
         """
@@ -52,7 +83,7 @@ class Sudoku:
         
         test_errors(color = color)
         
-        self.grid.set_cell_color(self.get_selected_cell(), color)
+        self.grid.set_cell_color(self.selected_cell, color)
     
     def load_grid(self):
         """
@@ -127,10 +158,10 @@ class Sudoku:
         if self.selected_cell == [-1, -1]:
             raise ValueError("You must select a cell in order to lock it")
         
-        if self.grid.get_cell_state(self.get_selected_cell()) == "superlocked":
+        if self.grid.get_cell_state(self.selected_cell) == "superlocked":
             raise ValueError("You cannot lock a cell that is superlocked")
         
-        self.grid.content[self.selected_cell[0]][self.selected_cell[1]].state = "locked"
+        self.grid.set_cell_state(self.selected_cell, "locked")
     
     def unlock_selected_cell(self):
         """
@@ -143,14 +174,14 @@ class Sudoku:
         if self.grid.get_cell_state(self.selected_cell[0], self.selected_cell[1]) == "superlocked":
             raise ValueError("You cannot unlock a cell that is superlocked")
         
-        self.grid.content[self.selected_cell[0]][self.selected_cell[1]].state = "unlocked"
+        self.grid.set_cell_state(self.selected_cell, "unlocked")
     
     def is_valid(self) -> bool:
         """
         Renvois True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
         """
         
-        for grid_format in [self.grid.get_lines(), self.grid.get_columns(), self.grid.get_squares()]:
+        for grid_format in [self.grid.get_content_as(format) for format in ["lines", "columns", "squares"]]:
             for x in range(9):
                 for y in range(9):
                     
@@ -169,24 +200,24 @@ class Sudoku:
         content_as_columns = [[content_as_lines[y][x] for y in range(9)] for x in range(9)]  # récupère le contenu des colonnes
         content_as_squares = [[content_as_lines[(x // 3) * 3 + y // 3][(x % 3) * 3 + y % 3] for y in range(9)] for x in range(9)]  # récupère le contneu des sous grilles (carrés)
         
-        for x in range(self.grid.column_number):  # balaye x (colonnes)
+        for x in range(9):  # balaye x (colonnes)
             for n in range(1, 9 + 1):  # nombres à vérifier
                 self.grid.duplicate_cells = list()
                 # vérification lignes
                 if content_as_lines[x].count(n) > 1:
-                    for y in range(self.grid.line_number):
+                    for y in range(9):
                         if content_as_lines[x][y] == n and not (x, y) in self.grid.duplicate_cells:
                             self.grid.duplicate_cells.append((x, y))
                 
                 # vérification colonnes
                 if content_as_columns[x].count(n) > 1:
-                    for y in range(self.grid.line_number):
+                    for y in range(9):
                         if content_as_columns[x][y] == n and not (y, x) in self.grid.duplicate_cells:  # (y,x) parce que les valuers des colonnes sont inversées par rapport à celle de slignes
                             self.grid.duplicate_cells.append((y, x))
                             
                 # vérification sous-grilles (carrés)
                 if content_as_squares[x].count(n) > 1:
-                    for y in range(len(content_as_squares[x])):
+                    for y in range(9):
                         if content_as_squares[x][y] == n and not ((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3) in self.grid.duplicate_cells:
                             self.grid.duplicate_cells.append(((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3))
         
@@ -207,35 +238,23 @@ class Sudoku:
         
         test_errors(coordinates = coordinates)
         
-        line = self.grid.get_cell_line(coordinates)
-        column = self.grid.get_cell_column(coordinates)
-        square = self.grid.get_cell_square(coordinates)
-        # vérifier ligne
-        for nb in range(1, 9 + 1):
+        for n in range(1, 9 + 1):
+            for format in ["lines", "columns", "squares"]:
+                group = self.grid.get_coordinates_group(coordinates, format)
             
-            if [self.grid.content[x][y].value for x, y in line].count(nb) > 1:
-                for x, y in line:
-                    if self.grid.content[x][y].value == nb and not (x, y) in self.grid.duplicate_cells:
-                        self.grid.duplicate_cells.append((x, y))
-            
-            if [self.grid.content[x][y].value for x, y in column].count(nb) > 1:
-                for x, y in column:
-                    if self.grid.content[x][y].value == nb and not (x, y) in self.grid.duplicate_cells:
-                        self.grid.duplicate_cells.append((x, y))
-            
-            if [self.grid.content[x][y].value for x, y in square].count(nb) > 1:
-                for x, y in square:
-                    if self.grid.content[x][y].value == nb and not (x, y) in self.grid.duplicate_cells:
-                        self.grid.duplicate_cells.append((x, y))
+                if group.count(n) > 1:
+                    for x, y in group:
+                        if self.grid.get_cell_value((x, y)) == n and not (x, y) in self.grid.duplicate_cells:
+                            self.grid.duplicate_cells.append((x, y))
 
         # Affichage des couleurs sur le texte
-        for x in range(self.grid.column_number):
-            for y in range(self.grid.line_number):
+        for x in range(9):
+            for y in range(9):
                 if (x, y) in self.grid.duplicate_cells:
-                    self.grid.content[x][y].text.set_color((255, 0, 0))
+                    self.grid.set_cell_color((x, y), (255, 0, 0))
 
                 else:
-                    self.grid.content[x][y].text.set_color((0, 0, 0))
+                    self.grid.set_cell_color((x, y), (0, 0, 0))
         
     def generate_grid(self):
         """

@@ -50,32 +50,24 @@ class Game:
                     self.sudoku.deselect_cell()
                 
                 if event.key == pygame.K_LEFT:
-                    if self.sudoku.selected_cell != [-1, -1]:
-                        if self.sudoku.selected_cell[0] > 0:
-                            self.sudoku.selected_cell[0] -= 1
+                    self.sudoku.move_selected_cell("left")
                 
                 if event.key == pygame.K_RIGHT:
-                    if self.sudoku.selected_cell != [-1, -1]:
-                        if self.sudoku.selected_cell[0] < 8:
-                            self.sudoku.selected_cell[0] += 1
+                    self.sudoku.move_selected_cell("right")
                 
                 if event.key == pygame.K_UP:
-                    if self.sudoku.selected_cell != [-1, -1]:
-                        if self.sudoku.selected_cell[1] > 0:
-                            self.sudoku.selected_cell[1] -= 1
+                    self.sudoku.move_selected_cell("up")
                 
                 if event.key == pygame.K_DOWN:
-                    if self.sudoku.selected_cell != [-1, -1]:
-                        if self.sudoku.selected_cell[1] < 8:
-                            self.sudoku.selected_cell[1] += 1
+                    self.sudoku.move_selected_cell("down")
                 
                 if event.key == pygame.K_l:
-                    if self.sudoku.grid.get_cell_state(self.sudoku.get_selected_cell()) != "superlocked":
+                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) != "superlocked":
                         self.sudoku.lock_selected_cell()
                         print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was locked')
                 
                 if event.key == pygame.K_u:
-                    if self.sudoku.grid.get_cell_state(self.sudoku.get_selected_cell()) != "superlocked":
+                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) != "superlocked":
                         self.sudoku.unlock_selected_cell()
                         print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was unlocked')
 
@@ -83,7 +75,7 @@ class Game:
                     self.sudoku.solve_grid()
 
                 if event.key in self.key_mapping:
-                    selected_cell = self.sudoku.get_selected_cell()
+                    selected_cell = self.sudoku.selected_cell
                     if selected_cell != [-1, -1]: # si une cellule est selectionnée
                         if self.sudoku.grid.get_cell_state(selected_cell) == "unlocked":
                         

@@ -61,7 +61,16 @@ class Grid:
         
         else:
             print(f'Grid.set_cell: cell {coordinates[1]} is locked or superlocked')
-            
+
+    def set_cell_state(self, coordinates: tuple[int, int], state: str):
+        """
+        Met l'état de la case de coordonnées `coordinates` à `state`
+        """
+        
+        test_errors(coordinates = coordinates, state = state)
+        
+        self.content[coordinates[0]][coordinates[1]].set_state(state)
+    
     def set_cell_color(self, coordinates: tuple[int, int], color: tuple[int, int, int]):
         """
         Met la couleur de la case de coordonnées (x, y) à `color`
@@ -79,62 +88,63 @@ class Grid:
         
         return [[cell.value for cell in line] for line in self.content]
     
-    def get_lines(self) -> list[list[int]]:
+    def get_coordinates_as(self, coordinates: tuple[int, int], input_format: str, output_format: str) -> tuple[int, int]:
         """
-        retourne la liste des lignes avec la valeur de chaque cellule
-        :return: liste de lignes de coordonnées
+        Convertis les coordonnées passées en argument à un autre format
         """
-        return [[self.get_cell_value((x, y)) for y in range(9)] for x in range(9)]
+        
+        test_errors(coordinates = coordinates, format = input_format)
+        test_errors(format = output_format)
+        
+        match input_format:
+            
+            case "columns":
+                coordinates = (coordinates[1], coordinates[0])
+            
+            case "squares":
+                coordinates = ((coordinates[0] % 3) * 3 + coordinates[1] % 3, (coordinates[0] // 3 * 3 + coordinates[1] // 3))
+        
+        match output_format:
+            
+            case "lines":
+                return coordinates
+            
+            case "columns":
+                return (coordinates[1], coordinates[0])
+            
+            case "squares":
+                return ((coordinates[0] // 3) * 3 + coordinates[1] // 3, (coordinates[0] % 3) * 3 + coordinates[1] % 3)
     
-    def get_columns(self) -> list[list[int]]:
+    def get_content_as(self, format: str) -> list[list[int]]:
         """
-        retourne la liste des lignes avec la valeur de chaque cellule
-        :return: liste de colonnes de coordonnées
+        Renvois le contenu de la grille ligne par ligne, colonne par colonne ou carré par carré (argument `format`)
         """
         
-        return [[self.get_cell_value((x, y)) for y in range(9)] for x in range(9)]
+        return [[self.get_cell_value(self.get_coordinates_as((x, y), format, "lines")) for y in range(9)] for x in range(9)]
     
-    def get_squares(self):
+    def get_coordinates_group(self, coordinates: tuple[int, int], format: str) -> list[tuple[int, int]]:
         """
-        retourne la liste des carrés avec la valeur de chaque cellule
-        :return: liste de carrés de coordonnées
+        Renvois la liste des coordonnées des cases appartenant au même groupe que la case `coordinates`
+        l'argument `format` indique le type de groupe à prendre en compte (ligne, colonne ou carré)
         """
         
-        return [[self.get_cell_value(((x // 3) * 3 + y // 3, (x % 3) * 3 + y % 3)) for y in range(9)] for x in range(9)]
+        test_errors(coordinates = coordinates, format = format)
+        
+        formated_coordinates = self.get_coordinates_as(coordinates, "lines", format)
+        
+        return [self.get_coordinates_as((formated_coordinates[0], y), format, "lines") for y in range(9)]
     
-    def get_cell_line(self, coordinates: tuple[int, int]) -> list[tuple[int, int]]:
+    def get_cell_group(self, coordinates: tuple[int, int], format: str) -> list[int]:
         """
-        retourne la ligne de la cellule spécifié
-        :return: liste des coordonnées des cellules de la ligne
-        """
-        
-        test_errors(coordinates = coordinates)
-        
-        return [(x, coordinates[1]) for x in range(9)]
-        
-    def get_cell_column(self, coordinates: tuple[int, int]) -> list[tuple[int, int]]:
-        """
-        retourne la colonne de la cellule spécifié
-        :return: liste des coordonnées des cellules de la colonne
+        Renvois la liste des valeurs des cases appartenant au même groupe que la case `coordinates`
+        l'argument `format` indique le type de groupe à prendre en compte (ligne, colonne ou carré)
         """
         
-        test_errors(coordinates = coordinates)
+        test_errors(coordinates = coordinates, format = format)
         
-        return [(coordinates[0], y) for y in range(9)]
-    
-    def get_cell_square(self, coordinates: tuple[int, int]) -> list[tuple[int, int]]:
-        """
-        retourne la ligne de la cellule spécifié
-        :return: liste des coordonnées des cellules du carré
-        """
+        formated_coordinates = self.get_coordinates_as(coordinates, "lines", format)
         
-        test_errors(coordinates = coordinates)
-        
-        square = [
-            (x_square, y_square) for x_square in range(coordinates[0] // 3, coordinates[0] // 3 + 3) for y_square in range(coordinates[1] // 3, coordinates[1] // 3 + 3)
-        ]
-        
-        return square
+        return [self.get_cell_value(self.get_coordinates_as((formated_coordinates[0], y), format, "lines")) for y in range(9)]
     
     def get_all_empty_cells(self) -> list[tuple[int, int]]:
         """
@@ -159,7 +169,7 @@ class Grid:
         # Pour toutes les cases de la grille
         for x in range(9):
             for y in range(9):
-                if self.get_cell_value((x, y)) == 0: # Dès qu'un case vide est rencontrée
+                if self.get_cell_value((x, y)) == 0: # Dès qu'une case vide est rencontrée
                     return (x, y)                    # Renvoyer les coordonnées (x, y)
     
     def get_possible_values(self, coordinates: tuple[int, int]) -> list[int]:
@@ -171,20 +181,13 @@ class Grid:
         
         possible_values = [n + 1 for n in range(9)]
         
-        for cell_position in self.get_cell_line(coordinates):
-            cell_value = self.get_cell_value(cell_position)
-            if cell_value in possible_values:
-                possible_values.remove(cell_value)
-        
-        for cell_position in self.get_cell_column(coordinates):
-            cell_value = self.get_cell_value(cell_position)
-            if cell_value in possible_values:
-                possible_values.remove(cell_value)
-        
-        for cell_position in self.get_cell_square(coordinates):
-            cell_value = self.get_cell_value(cell_position)
-            if cell_value in possible_values:
-                possible_values.remove(cell_value)
+        # Pour tout les formats existants
+        for format in ["lines", "columns", "squares"]:
+            group = self.get_cell_group(coordinates, format)
+            
+            for cell_value in group:
+                if cell_value in possible_values:
+                    possible_values.remove(cell_value)
                 
         return possible_values
     

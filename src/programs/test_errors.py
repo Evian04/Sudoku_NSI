@@ -42,7 +42,16 @@ def test_errors(**arguments):
         
         if not state in ["unlocked", "locked", "superlocked"]:
             raise ValueError(f'The `state` argument must be  "unlocked", "locked" or "superlocked" (value : {state})')
+    
+    if "format" in arguments:
+        format = arguments["format"]
         
+        if type(format) != str:
+            raise TypeError(f"The `format` argument must be a string (type : {type(format)})")
+        
+        if not format in ["lines", "columns", "squares"]:
+            raise ValueError(f'The `format` argument must be "lines", "columns" or "squares" (value : {format})')
+    
     if "list_values" in arguments:
         list_values = arguments["list_values"]
         
