@@ -1,6 +1,3 @@
-import os.path
-
-import pygame
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 from src.programs.grid import Grid
@@ -25,10 +22,10 @@ class Sudoku:
     
     def deselect_cell(self):
         """
-        Renvois les coordonnées de la case sélectionnée
+        Dessélectionne la case sélectionnée
         """
         
-        return self.selected_cell
+        self.selected_cell = (-1, -1)
     
     def move_selected_cell(self, direction: str):
         """
@@ -112,12 +109,7 @@ class Sudoku:
         
         convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
         cell_states = [[convert_state.get(state, 0) for state in line] for line in file_content[1].split("\n")]
-        # /!\ ce choix là ? ^^^
         
-        """cell_states = [['superlocked' if int(value) > 0 else 'unlocked'
-                        # double boucle imbriquée qui attribue l'état 'unlocked' si la valeur est > à 0 (0 = case vide)
-                        for value in line] for line in file_content[0].split("\n")]
-        """
         self.grid.set_content(cell_values, cell_states)
     
     def save_grid(self):
