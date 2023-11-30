@@ -62,21 +62,17 @@ class Game:
                     self.sudoku.move_selected_cell("down")
                 
                 if event.key == pygame.K_l:
-                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) != "superlocked":
-                        self.sudoku.lock_selected_cell()
-                        print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was locked')
+                    self.sudoku.lock_selected_cell()
                 
                 if event.key == pygame.K_u:
-                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) != "superlocked":
-                        self.sudoku.unlock_selected_cell()
-                        print(f'game.update(): cell {tuple(self.sudoku.selected_cell)} was unlocked')
+                    self.sudoku.unlock_selected_cell()
 
                 if event.key == pygame.K_s:
                     self.sudoku.solve_grid()
 
                 if event.key in self.key_mapping:
                     selected_cell = self.sudoku.selected_cell
-                    if selected_cell != [-1, -1]: # si une cellule est selectionnée
+                    if selected_cell != (-1, -1): # si une cellule est selectionnée
                         if self.sudoku.grid.get_cell_state(selected_cell) == "unlocked":
                         
                             # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
@@ -84,9 +80,7 @@ class Game:
                             
                             # modifie la valeur de la cellule selectionnée
                             self.sudoku.set_selected_cell_value(value)
-                            self.sudoku.set_selected_cell_color((0, 0, 0))
-                            self.sudoku.verify_cell(selected_cell)
-                            #self.verify()  # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
+                            self.sudoku.verify_cell(selected_cell) # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
                             
                         elif self.sudoku.grid.get_cell_state(selected_cell) == "locked":
                             print(f"grid.update(): cell {tuple(selected_cell)} is locked (press 'U' to Unlock)")
@@ -123,7 +117,7 @@ class Game:
                         rect
                     )
         # affichage de la sélection (carré)
-        if self.sudoku.selected_cell != [-1, -1]:  # carré de sélection
+        if self.sudoku.selected_cell != (-1, -1):  # carré de sélection
             pygame.draw.rect(
                 self.screen,
                 (120, 120, 120),
