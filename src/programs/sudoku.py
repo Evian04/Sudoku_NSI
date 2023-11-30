@@ -24,7 +24,11 @@ class Sudoku:
         self.selected_cell = coordinates
     
     def deselect_cell(self):
-        return tuple(self.selected_cell)
+        """
+        Renvois les coordonnées de la case sélectionnée
+        """
+        
+        return self.selected_cell
     
     def move_selected_cell(self, direction: str):
         """
@@ -62,7 +66,6 @@ class Sudoku:
                 
             case other:
                 raise ValueError(f'The `direction` argument must be "left", "right", "up" or "down" (value : {direction})')
-
     
     def set_selected_cell_value(self, value: int):
         """
