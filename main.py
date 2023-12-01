@@ -16,8 +16,7 @@ game.sudoku.load_grid()
 #game.sudoku.save_grid()
 
 
-running = True
-while running:
+while True:
     
     # Récupérer les évènements de la fenêtre
     all_events = pygame.event.get()
@@ -25,12 +24,11 @@ while running:
     # Mettre à jour le jeu
     game.update(all_events)
     
+    # Si l'utilisateur ferme la fenêtre
+    if game.do_close_window:
+        # Arrêter le programme
+        pygame.quit()
+        break
+    
     # Mettre à jour l'écran
     pygame.display.flip()
-    
-    for event in all_events:
-        
-        if event.type == pygame.QUIT:
-            # Si l'un des évènements est de fermer la fenêtre, arréter le programme
-            pygame.quit()
-            running = False

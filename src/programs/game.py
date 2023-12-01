@@ -9,6 +9,8 @@ class Game:
         self.screen = screen
         self.background_color = (0, 0, 0)
         self.sudoku = Sudoku(self)
+        self.is_solving = False
+        self.do_close_window = False
         self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier les valeurs des cellules
             pygame.K_1:         1,
             pygame.K_2:         2,
@@ -45,6 +47,16 @@ class Game:
         self.display_elements()
         
         for event in all_events:
+            if event.type == pygame.QUIT:
+                self.do_close_window = True
+                return
+            
+            if event.type == pygame.WINDOWRESIZED:
+                self.update_rect()
+                
+            if self.is_solving:
+                continue
+            
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.sudoku.deselect_cell()
@@ -92,9 +104,6 @@ class Game:
                     for y in range(self.sudoku.grid.line_number):
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
                             self.sudoku.select_cell((x, y))
-            
-            if event.type == pygame.WINDOWRESIZED:
-                self.update_rect()
     
     def display_elements(self):
         """

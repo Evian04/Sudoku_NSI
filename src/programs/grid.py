@@ -120,7 +120,7 @@ class Grid:
         Renvois le contenu de la grille ligne par ligne, colonne par colonne ou carré par carré (argument `format`)
         """
         
-        return [[self.get_cell_value(self.get_coordinates_as((x, y), format, "line")) for y in range(9)] for x in range(9)]
+        return [[self.get_cell_value(self.get_coordinates_as((x, y), format, "lines")) for y in range(9)] for x in range(9)]
     
     def get_coordinates_group(self, coordinates: tuple[int, int], format: str) -> list[tuple[int, int]]:
         """

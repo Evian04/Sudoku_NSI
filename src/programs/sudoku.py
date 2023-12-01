@@ -1,4 +1,5 @@
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+import pygame
 
 from src.programs.grid import Grid
 from src.programs.test_errors import test_errors
@@ -112,7 +113,7 @@ class Sudoku:
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
         file_path = askopenfilename(
             initialdir="src/save_folder",
-            initialfile="model.sdk",
+            initialfile="model_2.sdk",
             filetypes=[("Sudoku file", "*.sdk")]
         )
         
@@ -248,6 +249,7 @@ class Sudoku:
         # Test de préconditions
         test_errors(coordinates = coordinates)
         
+        # Test les cases en double dans la grille
         for n in range(1, 10):
             for format in ["lines", "columns", "squares"]:
                 group_coordinates = self.grid.get_coordinates_group(coordinates, format)
@@ -271,6 +273,13 @@ class Sudoku:
 
                 else:
                     self.grid.set_cell_color((x, y), (0, 0, 0))
+                    
+        # Débuggage
+        if self.selected_cell in self.grid.duplicate_cells:
+            print("Conflit")
+            
+        else:
+            print("pas conflit")
         
     def generate_grid(self):
         """
@@ -330,6 +339,13 @@ class Sudoku:
         Renvois True si la grille courante est possible à résoudre, et False si elle ne l'est pas
         """
         
+        # Met à jour la fenêtre du jeu
+        #self.game.update(pygame.event.get())
+        
+        # Si l'utilisateur ferme la fenêtre
+        if self.game.do_close_window:
+            # Arrêter le programme
+            return False
         
         if self.grid.is_full():
             # Si la grille est remplie, renvoyer True si elle est résolue, et False si la résolution n'est pas valide
