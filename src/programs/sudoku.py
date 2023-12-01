@@ -128,13 +128,15 @@ class Sudoku:
         
         # Sépare les valeurs et les états des cases dans deux sous-listes
         file_content = file_content.split("\n\n")
-        
         # Formate la liste des valeurs au format list[list[int]]
-        list_values = [[int(value) for value in line] for line in file_content[0].split("\n")]
+        list_values = [[int(line[i]) for line in file_content[0].split("\n")]
+                       for i in range(len(file_content[0].split("\n")[0]))]
         
         # Formate la liste des états au format list[list[str]]
         convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
-        list_states = [[convert_state.get(state, 0) for state in line] for line in file_content[1].split("\n")]
+        list_states = [[convert_state.get(line[i], "0") for line in file_content[1].split("\n")]
+                       for i in
+                       range(len(file_content[1].split("\n")[0]))]
         
         # Test postconditions
         test_errors(list_values = list_values, list_states = list_states)
