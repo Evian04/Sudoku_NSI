@@ -273,13 +273,6 @@ class Sudoku:
 
                 else:
                     self.grid.set_cell_color((x, y), (0, 0, 0))
-                    
-        # Débuggage
-        if self.selected_cell in self.grid.duplicate_cells:
-            print("Conflit")
-            
-        else:
-            print("pas conflit")
         
     def generate_grid(self):
         """
