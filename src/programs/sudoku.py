@@ -242,28 +242,53 @@ class Sudoku:
 
     def verify_cell(self, coordinates: tuple[int, int]):
         """
-        Vérifie que les règles du sudoku sont respectées sur la colonne, la ligne et le carré de la cellule (x, y) (pas 2 fois le même nombre sur un même ligne, sur un même colonne, etc...)
-        Ajoute les couleurs sur le texte
+        Cette fonction est appelée à chaque fois que l'utilisateur met à jour la valeur d'une case
+        Si la nouvelle valeur de cette case est entre 1 et 9, la fonction vérifie si elle n'entre pas en conflit avec d'autres valeurs
+        Si la nouvelle valeur de cette case est 0, la fonction vérifie si cela annule de précédents conflits
         """
         
         # Test de préconditions
         test_errors(coordinates = coordinates)
         
-        # Test les cases en double dans la grille
-        for n in range(1, 10):
+        # Récupère la valeur de la case qui vient d'être mis à jour
+        selected_value = self.grid.get_cell_value(self.selected_cell)
+        
+        # Si l'utilisateur a enlevé la précédente valeur de la case
+        if selected_value == 0:
+            # Pour toutes les valeurs possibles
+            for n in range(1, 10):
+                # Et pour tous les formats de groupe de cases possible
+                for format in ["lines", "columns", "squares"]:
+                    # Récupère les valeurs et les coordonnées du groupe de cases courant
+                    group_coordinates = self.grid.get_coordinates_group(coordinates, format)
+                    group_values = self.grid.get_cell_group(coordinates, format)
+
+                    # Si la valeur n n'est pas en conflit avec d'autre cases du groupe courant
+                    if group_values.count(n) <= 1:
+                        # Pour toutes les cases de ce groupe
+                        for cell_coordinates in group_coordinates:
+                            # Si cette case a la valeur n et qu'elle est présente dans la liste des cases en conflit
+                            if self.grid.get_cell_value(cell_coordinates) == n and cell_coordinates in self.grid.duplicate_cells:
+                                # Enlever la case en question de la liste des cases en conflit
+                                self.grid.duplicate_cells.remove(cell_coordinates)
+        
+        # Si au contraitre l'utilisateur a mis une nouvelle valeur dans la case qui vient d'être mis à jour
+        else:
+            # Pour tout les formats de groupe possibles
             for format in ["lines", "columns", "squares"]:
+                # Récupère les valeurs et les coordonnées du groupe de cases en question
                 group_coordinates = self.grid.get_coordinates_group(coordinates, format)
                 group_values = self.grid.get_cell_group(coordinates, format)
-            
-                if group_values.count(n) > 1:
+
+                # Si la nouvelle valeur est en conflit avec d'autres dans le groupe courant
+                if group_values.count(selected_value) > 1:
+                    # Pour toutes les cases du groupe
                     for cell_coordinates in group_coordinates:
-                        if self.grid.get_cell_value(cell_coordinates) == n and not cell_coordinates in self.grid.duplicate_cells:
+                        # Si cette case a la même valeur que la case sélectionnée
+                        # Et qu'elle n'est pas présente dans la liste des cases en conflit
+                        if self.grid.get_cell_value(cell_coordinates) == selected_value and not cell_coordinates in self.grid.duplicate_cells:
+                            # Ajouter cette case à la liste des cases en conflit
                             self.grid.duplicate_cells.append(cell_coordinates)
-                    
-                else:
-                    for cell_coordinates in group_coordinates:
-                        if self.grid.get_cell_value(cell_coordinates) == n and cell_coordinates in self.grid.duplicate_cells:
-                            self.grid.duplicate_cells.remove(cell_coordinates)
 
         # Affichage des couleurs sur le texte
         for x in range(9):
