@@ -81,6 +81,9 @@ class Game:
 
                 if event.key == pygame.K_s:
                     self.sudoku.solve_grid()
+                
+                if event.key == pygame.K_d:
+                    self.sudoku.reverse_display_conflicts()
 
                 if event.key in self.key_mapping:
                     selected_cell = self.sudoku.selected_cell
@@ -92,7 +95,7 @@ class Game:
                             
                             # modifie la valeur de la cellule selectionnée
                             self.sudoku.set_selected_cell_value(value)
-                            self.sudoku.verify_cell(selected_cell) # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
+                            self.sudoku.verify_selected_cell() # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
                             
                         elif self.sudoku.grid.get_cell_state(selected_cell) == "locked":
                             print(f"grid.update(): cell {tuple(selected_cell)} is locked (press 'U' to Unlock)")
@@ -100,8 +103,8 @@ class Game:
                 
             
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for x in range(self.sudoku.grid.column_number):
-                    for y in range(self.sudoku.grid.line_number):
+                for x in range(9):
+                    for y in range(9):
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
                             self.sudoku.select_cell((x, y))
     
@@ -111,8 +114,8 @@ class Game:
         """
         self.screen.blit(self.grid_image, self.grid_image_rect)
 
-        for x in range(self.sudoku.grid.column_number):
-            for y in range(self.sudoku.grid.line_number):
+        for x in range(9):
+            for y in range(9):
                 if self.sudoku.grid.content[x][y].state == "superlocked":
                     # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
@@ -133,8 +136,8 @@ class Game:
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
 
-        for x in range(self.sudoku.grid.column_number):  # affichage des cases verrouillées
-            for y in range(self.sudoku.grid.line_number):
+        for x in range(9):  # affichage des cases verrouillées
+            for y in range(9):
                 # affichage case locked (affichage du cadenas)
                 if self.sudoku.grid.content[x][y].state == "locked":
                     self.screen.blit(self.padlock_image, self.all_rect[x][y])
@@ -180,10 +183,10 @@ class Game:
                 self.grid_image_rect.width / 9,
                 self.grid_image_rect.height / 9
             )
-            for y in range(self.sudoku.grid.line_number)] for x in range(self.sudoku.grid.column_number)]
+            for y in range(9)] for x in range(9)]
 
-        for x in range(self.sudoku.grid.column_number):  # recalcule et réattribue les valeurs de la taille des textes
-            for y in range(self.sudoku.grid.line_number):
+        for x in range(9):  # recalcule et réattribue les valeurs de la taille des textes
+            for y in range(9):
                 self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
         
     def verify(self):

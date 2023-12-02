@@ -16,10 +16,6 @@ class Grid:
             # Sinon créer une grille vierge
             self.content = [[Cell(0, "unlocked") for y in range(9)] for x in range(9)]
 
-        self.line_number = 9
-        self.column_number = 9
-        self.duplicate_cells: list[tuple[int, int]] = list()
-
     def get_cell_value(self, coordinates: tuple[int, int]) -> int:
         """
         Renvoi la valeur de la case de coordonnées (x, y)

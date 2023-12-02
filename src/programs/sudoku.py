@@ -11,7 +11,17 @@ class Sudoku:
         self.game = game
         self.grid = Grid()
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
+        self.conflicting_cells: list[tuple[int, int]] = list()
+        self.do_display_conflicts = True
+    
+    def reverse_display_conflicts(self):
+        """
+        Cette fonction inverse l'état de la variable booléenne `self.do_display_conflicts`
+        """
         
+        self.do_display_conflicts = not self.do_display_conflicts
+        self.verify_selected_cell()
+    
     def select_cell(self, coordinates: tuple[int, int]):
         """
         Selectionne la case de coordonnées (x, y)
@@ -41,6 +51,11 @@ class Sudoku:
         assert direction in ["left", "right", "up", "down"], f'The `direction` argument must be "left", "right", "up" or "down" (value : {direction})'
         
         # Code de la fonction
+        # Si aucune case n'est sélectionnée
+        if self.selected_cell == (-1, -1):
+            # Ne rien faire
+            return
+        
         match direction:
             
             case "left":
@@ -240,60 +255,52 @@ class Sudoku:
         # Si aucun doublon n'a été trouvé, renvoyer True
         return True
 
-    def verify_cell(self, coordinates: tuple[int, int]):
+    def verify_selected_cell(self):
         """
         Cette fonction est appelée à chaque fois que l'utilisateur met à jour la valeur d'une case
         Si la nouvelle valeur de cette case est entre 1 et 9, la fonction vérifie si elle n'entre pas en conflit avec d'autres valeurs
         Si la nouvelle valeur de cette case est 0, la fonction vérifie si cela annule de précédents conflits
         """
         
-        # Test de préconditions
-        test_errors(coordinates = coordinates)
+        tmp_conflicting_cells = list() # Liste temporaire dans laquelle seront stockées les coordonnées des cases en conflits
         
-        # Récupère la valeur de la case qui vient d'être mis à jour
-        selected_value = self.grid.get_cell_value(self.selected_cell)
-        
-        # Si l'utilisateur a enlevé la précédente valeur de la case
-        if selected_value == 0:
-            # Pour toutes les valeurs possibles
+        # Pour tous les formats possibles
+        for format in ["lines", "columns", "squares"]:
+            # Récupère les valeurs et les coordonnées du groupe correspondant à ce format
+            group_coordinates = self.grid.get_coordinates_group(self.selected_cell, format)
+            group_values = self.grid.get_cell_group(self.selected_cell, format)
+            
+            # Pour toutes les valeurs n possibles
             for n in range(1, 10):
-                # Et pour tous les formats de groupe de cases possible
-                for format in ["lines", "columns", "squares"]:
-                    # Récupère les valeurs et les coordonnées du groupe de cases courant
-                    group_coordinates = self.grid.get_coordinates_group(coordinates, format)
-                    group_values = self.grid.get_cell_group(coordinates, format)
-
-                    # Si la valeur n n'est pas en conflit avec d'autre cases du groupe courant
-                    if group_values.count(n) <= 1:
-                        # Pour toutes les cases de ce groupe
-                        for cell_coordinates in group_coordinates:
-                            # Si cette case a la valeur n et qu'elle est présente dans la liste des cases en conflit
-                            if self.grid.get_cell_value(cell_coordinates) == n and cell_coordinates in self.grid.duplicate_cells:
-                                # Enlever la case en question de la liste des cases en conflit
-                                self.grid.duplicate_cells.remove(cell_coordinates)
-        
-        # Si au contraitre l'utilisateur a mis une nouvelle valeur dans la case qui vient d'être mis à jour
-        else:
-            # Pour tout les formats de groupe possibles
-            for format in ["lines", "columns", "squares"]:
-                # Récupère les valeurs et les coordonnées du groupe de cases en question
-                group_coordinates = self.grid.get_coordinates_group(coordinates, format)
-                group_values = self.grid.get_cell_group(coordinates, format)
-
-                # Si la nouvelle valeur est en conflit avec d'autres dans le groupe courant
-                if group_values.count(selected_value) > 1:
-                    # Pour toutes les cases du groupe
+                
+                # Si la valeur est en conflit avec d'autres dans le groupe courant
+                if group_values.count(n) > 1:
+                    # Pour toutes les cases du groupe courant
                     for cell_coordinates in group_coordinates:
-                        # Si cette case a la même valeur que la case sélectionnée
-                        # Et qu'elle n'est pas présente dans la liste des cases en conflit
-                        if self.grid.get_cell_value(cell_coordinates) == selected_value and not cell_coordinates in self.grid.duplicate_cells:
-                            # Ajouter cette case à la liste des cases en conflit
-                            self.grid.duplicate_cells.append(cell_coordinates)
+                        # Si la case a pour valeur n
+                        if self.grid.get_cell_value(cell_coordinates) == n:
+                            # Ajouter la case à la liste temporaire des cases en conflit
+                            tmp_conflicting_cells.append(cell_coordinates)
+                            
+                # Si au contraire la valeur n'est pas en conflit avec d'autres dans le groupe courant
+                else:
+                    # Pour toutes les cases du groupe courant
+                    for cell_coordinates in group_coordinates:
+                        # Si la case a pour valeur n mais qu'elle est dans la liste des cases en conflit
+                        if self.grid.get_cell_value(cell_coordinates) == n and cell_coordinates in self.conflicting_cells:
+                            # Retirer la case de la liste des cases en conflit
+                            self.conflicting_cells.remove(cell_coordinates)
+        
+        # Pour toutes les cases qui sont en conflits
+        for cell_coordinates in tmp_conflicting_cells:
+            # Si la case n'est pas dans la liste des cases en conflits
+            if not cell_coordinates in self.conflicting_cells:
+                self.conflicting_cells.append(cell_coordinates)
 
         # Affichage des couleurs sur le texte
         for x in range(9):
             for y in range(9):
-                if (x, y) in self.grid.duplicate_cells:
+                if self.do_display_conflicts and (x, y) in self.conflicting_cells:
                     self.grid.set_cell_color((x, y), (255, 0, 0))
 
                 else:
