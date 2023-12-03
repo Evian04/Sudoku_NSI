@@ -270,6 +270,11 @@ class Sudoku:
             group_coordinates = self.grid.get_coordinates_group(self.selected_cell, format)
             group_values = self.grid.get_cell_group(self.selected_cell, format)
             
+            # Enlève toutes les cases vide de la liste des cases en conflit
+            for cell_coordinates in group_coordinates:
+                if self.grid.get_cell_value(cell_coordinates) == 0 and cell_coordinates in self.conflicting_cells:
+                    self.conflicting_cells.remove(cell_coordinates)
+            
             # Pour toutes les valeurs n possibles
             for n in range(1, 10):
                 
