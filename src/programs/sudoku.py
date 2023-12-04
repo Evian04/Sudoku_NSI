@@ -237,6 +237,16 @@ class Sudoku:
         # Sinon, mettre l'état de la case sélectionnée à "unlocked"
         self.grid.set_cell_state(self.selected_cell, "unlocked")
     
+    def clear(self):
+        """
+        Enlève toutes les cases qui ne sont pas superlocked
+        """
+        
+        for x in range(9):
+            for y in range(9):
+                if self.grid.get_cell_state((x, y)) == "unlocked":
+                    self.grid.set_cell_value((x, y), 0)
+    
     def is_valid(self) -> bool:
         """
         Renvois True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
@@ -342,6 +352,7 @@ class Sudoku:
             for y in range(9):
                 
                 if self.grid.get_cell_state((x, y)) != "superlocked":
+                    self.grid.set_cell_state((x, y), "unlocked")
                     self.grid.set_cell_value((x, y), 0)
     
     def put_obvious_solutions(self):

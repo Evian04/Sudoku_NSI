@@ -84,6 +84,9 @@ class Game:
                 
                 if event.key == pygame.K_d:
                     self.sudoku.reverse_display_conflicts()
+                    
+                if event.key == pygame.K_c:
+                    self.sudoku.clear()
 
                 if event.key in self.key_mapping:
                     selected_cell = self.sudoku.selected_cell
