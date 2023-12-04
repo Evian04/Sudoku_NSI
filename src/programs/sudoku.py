@@ -1,3 +1,4 @@
+import time
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import pygame
 
@@ -332,12 +333,14 @@ class Sudoku:
         Résout le Sudoku, ne tient pas compte des valeurs entrée pas l'utilisateur, seulement les cases présentes originalement
         :return:
         """
-        
+        starting_time = time.time()
+        print('solving...')
         self.clear_inputs()
         self.put_obvious_solutions()
         
         if self.backtracking_solving():
             print("Sudoku solved successfully")
+            print("executing time:",time.time() - starting_time)
             
         else:
             print("Cannot solve the sudoku")
@@ -382,6 +385,7 @@ class Sudoku:
         
         # Met à jour la fenêtre du jeu
         #self.game.update(pygame.event.get())
+        #pygame.display.flip()
         
         # Si l'utilisateur ferme la fenêtre
         if self.game.do_close_window:
@@ -399,13 +403,14 @@ class Sudoku:
         for value in self.grid.get_possible_values(first_empty_cell):
             # Mettre la valeur à l'emplacement de la case
             self.grid.set_cell_value(first_empty_cell, value)
-            
+            self.game.cell_update(first_empty_cell, pygame.event.get())
             # Si la grille est résolue, renvoyer True
             if self.backtracking_solving():
                 return True
             
             # Sinon, enlever la valeur, qui n'est donc pas la bonne
             self.grid.set_cell_value(first_empty_cell, 0)
-        
+            self.game.cell_update(first_empty_cell, pygame.event.get())
+
         # Si aucune des valeurs possibles de la case ne marche, renvoyer False
         return False

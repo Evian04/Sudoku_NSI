@@ -29,6 +29,3 @@ while True:
         # Arrêter le programme
         pygame.quit()
         break
-    
-    # Mettre à jour l'écran
-    pygame.display.flip()

@@ -1,6 +1,7 @@
 import pygame
 
 from src.programs.sudoku import Sudoku
+from src.programs.test_errors import test_errors
 
 
 class Game:
@@ -37,6 +38,53 @@ class Game:
         }
         self.update_rect()
     
+    def cell_update(self, coordinates:tuple[int, int], all_events: list[pygame.event.Event]):
+        """
+        mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
+        :param coordinates: coordonnée de la cellule à mettre à jour
+        :param all_events: ensemble des évenements en cours
+        """
+        test_errors(coordinates=coordinates)
+        
+        self.cell_display_element(coordinates)
+        
+        for event in all_events:
+            if event.type == pygame.QUIT:
+                self.do_close_window = True
+                return
+        
+            if event.type == pygame.WINDOWRESIZED:
+                self.update_rect()
+                self.display_elements()
+        
+        
+        pygame.display.flip()
+        
+    def cell_display_element(self, coordinates: tuple[int, int]):
+        """
+        mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
+        :param coordinates: coordonnées de la cellule à mettre à jour
+        """
+        test_errors(coordinates=coordinates)
+        
+
+        x, y = coordinates
+        image_rect_area = pygame.Rect(
+            self.grid_image_rect.width / 9 * x,
+            self.grid_image_rect.height / 9 * y,
+            self.grid_image_rect.width / 9,
+            self.grid_image_rect.height / 9)
+        self.screen.blit(self.grid_image, self.all_rect[x][y], area= image_rect_area)
+        if self.sudoku.grid.content[x][y].state == "locked":
+            self.screen.blit(self.padlock_image, self.all_rect[x][y], area= image_rect_area)
+        
+        # affichage du texte (numéro) pour chaque cellule
+        self.screen.blit(
+            self.sudoku.grid.content[x][y].text.get_text(),
+            self.all_rect[x][y].center
+        )
+    
+    
     def update(self, all_events: list[pygame.event.Event]):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
@@ -54,7 +102,7 @@ class Game:
             if event.type == pygame.WINDOWRESIZED:
                 self.update_rect()
                 
-            if self.is_solving:
+            if self.is_solving:  # ne pas vérifier les autres event si la résolution est en cours (economie performance)
                 continue
             
             if event.type == pygame.KEYDOWN:
@@ -110,6 +158,8 @@ class Game:
                     for y in range(9):
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
                             self.sudoku.select_cell((x, y))
+
+        pygame.display.flip()
     
     def display_elements(self):
         """
@@ -139,10 +189,10 @@ class Game:
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
 
-        for x in range(9):  # affichage des cases verrouillées
+        for x in range(9):
             for y in range(9):
                 # affichage case locked (affichage du cadenas)
-                if self.sudoku.grid.content[x][y].state == "locked":
+                if self.sudoku.grid.content[x][y].state == "locked":  # affichage des cases verrouillées
                     self.screen.blit(self.padlock_image, self.all_rect[x][y])
                 
                 # affichage du texte (numéro) pour chaque cellule
