@@ -128,7 +128,9 @@ class Game:
                     self.sudoku.unlock_selected_cell()
 
                 if event.key == pygame.K_s:
+                    pygame.display.set_caption("Sudoku (solving...)")
                     self.sudoku.solve_grid()
+                    pygame.display.set_caption("Sudoku")
                 
                 if event.key == pygame.K_d:
                     self.sudoku.reverse_display_conflicts()
