@@ -85,11 +85,11 @@ class Game:
         )
     
     
-    def update(self, all_events: list[pygame.event.Event]):
+    def update(self, all_events: list[pygame.event.Event] = None):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
         """
-        
+        if not all_events: all_events = pygame.event.get()
         pygame.draw.rect(self.screen, self.background_color, self.screen.get_rect())
         
         self.display_elements()
