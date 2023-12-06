@@ -146,14 +146,17 @@ class Sudoku:
         # Sépare les valeurs et les états des cases dans deux sous-listes
         file_content = file_content.split("\n\n")
         # Formate la liste des valeurs au format list[list[int]]
-        list_values = [[int(line[i]) for line in file_content[0].split("\n")]
-                       for i in range(len(file_content[0].split("\n")[0]))]
+        list_values = [
+            [int(line[i]) for i in range(len(file_content[0].split("\n")[0]))]
+            for line in file_content[0].split("\n")
+        ]
         
         # Formate la liste des états au format list[list[str]]
         convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
-        list_states = [[convert_state.get(line[i], "0") for line in file_content[1].split("\n")]
-                       for i in
-                       range(len(file_content[1].split("\n")[0]))]
+        list_states = [
+            [convert_state.get(line[i], "0") for i in range(len(file_content[1].split("\n")[0]))]
+            for line in file_content[1].split("\n")
+        ]
         
         # Test postconditions
         test_errors(list_values = list_values, list_states = list_states)
@@ -340,7 +343,7 @@ class Sudoku:
         
         if self.backtracking_solving():
             print("Sudoku solved successfully")
-            print("executing time:",time.time() - starting_time)
+            print("executing time:", time.time() - starting_time)
             
         else:
             print("Cannot solve the sudoku")
@@ -388,7 +391,7 @@ class Sudoku:
         #pygame.display.flip()
         
         # Si l'utilisateur ferme la fenêtre
-        if self.game.do_close_window:
+        if self.game.do_quit:
             # Arrêter le programme
             return False
         
