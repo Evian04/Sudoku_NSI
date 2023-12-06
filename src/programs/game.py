@@ -11,7 +11,7 @@ class Game:
         self.background_color = (0, 0, 0)
         self.sudoku = Sudoku(self)
         self.is_solving = False
-        self.do_close_window = False
+        self.do_quit = False
         self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier les valeurs des cellules
             pygame.K_1:         1,
             pygame.K_2:         2,
@@ -51,7 +51,7 @@ class Game:
         
         for event in all_events:
             if event.type == pygame.QUIT:
-                self.do_close_window = True
+                self.do_quit = True
                 return
         
             if event.type == pygame.WINDOWRESIZED:
@@ -86,21 +86,26 @@ class Game:
         )
     
     
-    def update(self, all_events: list[pygame.event.Event] = None):
+    def update(self):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
         """
-        if not all_events: all_events = pygame.event.get()
         pygame.draw.rect(self.screen, self.background_color, self.screen.get_rect())
         
         self.display_elements()
         
-        for event in all_events:
+        # Pour tous les évènements qui ont eu lieu depuis la dernière mise à jour de la fenêtre
+        for event in pygame.event.get():
+            
+            # Si l'un des évènements est de quitter la fenêtre
             if event.type == pygame.QUIT:
-                self.do_close_window = True
+                # Mettre la variable indiquant s'il faut fermer la fenêtre à True
+                self.do_quit = True
                 return
             
+            # Si l'un des évènements est un redimensionnement de a fenêtre
             if event.type == pygame.WINDOWRESIZED:
+                # Mettre à jour la position des éléments de la fenêtre
                 self.update_rect()
                 
             if self.is_solving:  # ne pas vérifier les autres event si la résolution est en cours (economie performance)
@@ -174,7 +179,7 @@ class Game:
 
         for x in range(9):
             for y in range(9):
-                if self.sudoku.grid.content[x][y].state == "superlocked":
+                if self.sudoku.grid.get_cell_state((x, y)) == "superlocked":
                     # affichage case superlocked (case grisée)
                     rect = self.all_rect[x][y].copy()
                     rect.width -= 6
