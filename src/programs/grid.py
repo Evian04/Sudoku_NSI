@@ -113,14 +113,14 @@ class Grid:
     
     def get_content_as(self, format: str) -> list[list[int]]:
         """
-        Renvois le contenu de la grille ligne par ligne, colonne par colonne ou carré par carré (argument `format`)
+        Renvoi le contenu de la grille ligne par ligne, colonne par colonne ou carré par carré (argument `format`)
         """
         
         return [[self.get_cell_value(self.get_coordinates_as((x, y), format, "lines")) for y in range(9)] for x in range(9)]
     
     def get_coordinates_group(self, coordinates: tuple[int, int], format: str) -> list[tuple[int, int]]:
         """
-        Renvois la liste des coordonnées des cases appartenant au même groupe que la case `coordinates`
+        Renvoi la liste des coordonnées des cases appartenant au même groupe que la case `coordinates`
         l'argument `format` indique le type de groupe à prendre en compte (ligne, colonne ou carré)
         """
         
@@ -132,7 +132,7 @@ class Grid:
     
     def get_cell_group(self, coordinates: tuple[int, int], format: str) -> list[int]:
         """
-        Renvois la liste des valeurs des cases appartenant au même groupe que la case `coordinates`
+        Renvoi la liste des valeurs des cases appartenant au même groupe que la case `coordinates`
         l'argument `format` indique le type de groupe à prendre en compte (ligne, colonne ou carré)
         """
         
@@ -144,7 +144,7 @@ class Grid:
     
     def get_all_empty_cells(self) -> list[tuple[int, int]]:
         """
-        Renvois la liste des coordonnées des cases vides de la grille
+        Renvoi la liste des coordonnées des cases vides de la grille
         """
         
         all_empty_cells = []
@@ -159,7 +159,7 @@ class Grid:
 
     def get_first_empty_cell(self) -> tuple[int, int]:
         """
-        Renvois les coordonnées de la première case vide
+        Renvoi les coordonnées de la première case vide
         """
         
         # Pour toutes les cases de la grille
@@ -170,7 +170,7 @@ class Grid:
     
     def get_possible_values(self, coordinates: tuple[int, int]) -> list[int]:
         """
-        Renvois les valeurs possibles (1 à 9) de la case en fonctions des autres chiffres de la même ligne, colomne ou carré
+        Renvoi les valeurs possibles (1 à 9) de la case en fonctions des autres chiffres de la même ligne, colomne ou carré
         """
         
         test_errors(coordinates = coordinates)
@@ -189,7 +189,7 @@ class Grid:
     
     def is_full(self) -> bool:
         """
-        Renvois True si la grille est remplie, et False si elle ne l'est pas
+        Renvoi True si la grille est remplie, et False si elle ne l'est pas
         """
         
         for x in range(9):

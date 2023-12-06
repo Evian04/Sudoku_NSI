@@ -31,7 +31,7 @@ class Cell:
 
     def get_text(self) -> Text:
         """
-        Renvois le text de la case
+        Renvoi le text de la case
         """
         
         return self.text

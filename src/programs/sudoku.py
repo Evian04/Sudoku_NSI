@@ -250,7 +250,7 @@ class Sudoku:
     
     def is_valid(self) -> bool:
         """
-        Renvois True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
+        Renvoi True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
         """
         
         # Pour tout les formats de grille possibles (lignes, colonnes et carrés)
@@ -268,11 +268,12 @@ class Sudoku:
 
     def verify_selected_cell(self):
         """
-        Cette fonction est appelée à chaque fois que l'utilisateur met à jour la valeur d'une case
+        Cette fonction est appelée à chaque fois que l'utilisateur met à jour la valeur d'une case (retourn False si aucyne selection n'existe)
         Si la nouvelle valeur de cette case est entre 1 et 9, la fonction vérifie si elle n'entre pas en conflit avec d'autres valeurs
         Si la nouvelle valeur de cette case est 0, la fonction vérifie si cela annule de précédents conflits
         """
-        
+        if self.selected_cell == (-1, -1):
+            return False  # pas de case séléctionnée
         tmp_conflicting_cells = list() # Liste temporaire dans laquelle seront stockées les coordonnées des cases en conflits
         
         # Pour tous les formats possibles
@@ -372,6 +373,8 @@ class Sudoku:
                 cell_possible_values = self.grid.get_possible_values(cell_coordinates)
                 if len(cell_possible_values) == 1:
                     self.grid.set_cell_value(cell_coordinates, cell_possible_values[0])
+                    self.grid.set_cell_color(cell_coordinates, (0,255,0))
+                    self.game.cell_update(cell_coordinates)
                     is_algorithm_finished = False
             
             if is_algorithm_finished:
@@ -380,7 +383,7 @@ class Sudoku:
     def backtracking_solving(self) -> bool:
         """
         Fonction récursive qui résout le Sudoku en testant toutes les possibilités
-        Renvois True si la grille courante est possible à résoudre, et False si elle ne l'est pas
+        Renvoi True si la grille courante est possible à résoudre, et False si elle ne l'est pas
         """
         
         # Met à jour la fenêtre du jeu
