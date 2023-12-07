@@ -400,7 +400,7 @@ class Sudoku:
             return self.is_valid()
         
         # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles
-        possible_values = [[self.grid.get_possible_values((x, y)), (x, y)] if self.grid.content[x][y].get_state() != 'superlock' and self.grid.content[x][y].get_value() == 0 else [-1] for y in range(9) for x in range(9)]
+        possible_values = [[self.grid.get_possible_values((x, y)), (x, y)] if self.grid.content[x][y].get_state() != 'superlocked' and self.grid.content[x][y].get_value() == 0 else [-1] for y in range(9) for x in range(9)]
 
         # supprime tous les éléments [-1] = cellules superlocked ou cases avec déjà des valeurs
         possible_values = list(filter(lambda x: x != [-1], possible_values))
