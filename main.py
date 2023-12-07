@@ -16,6 +16,7 @@ game = Game(screen)
 game.update()
 game.sudoku.load_grid()
 #game.sudoku.save_grid()
+all_events = pygame.event.get()
 
 
 while True:

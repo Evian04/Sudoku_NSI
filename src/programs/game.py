@@ -38,13 +38,14 @@ class Game:
         }
         self.update_rect()
     
-    def cell_update(self, coordinates:tuple[int, int], all_events: list[pygame.event.Event]):
+    def cell_update(self, coordinates:tuple[int, int], all_events: list[pygame.event.Event] = None):
         """
         mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
         :param coordinates: coordonnée de la cellule à mettre à jour
         :param all_events: ensemble des évenements en cours
         """
         test_errors(coordinates=coordinates)
+        if not all_events: all_events = pygame.event.get()
         
         self.cell_display_element(coordinates)
         
@@ -139,9 +140,11 @@ class Game:
                     self.sudoku.unlock_selected_cell()
 
                 if event.key == pygame.K_s:
+                    
                     pygame.display.set_caption("Sudoku (solving...)")
                     self.sudoku.solve_grid()
                     pygame.display.set_caption("Sudoku")
+                    
                 
                 if event.key == pygame.K_d:
                     self.sudoku.reverse_display_conflicts()
