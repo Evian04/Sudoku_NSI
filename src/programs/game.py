@@ -12,7 +12,7 @@ class Game:
         self.sudoku = Sudoku(self)
         self.is_solving = False
         self.do_quit = False
-        self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier les valeurs des cellules
+        self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une cellule
             pygame.K_1:         1,
             pygame.K_2:         2,
             pygame.K_3:         3,
@@ -66,18 +66,23 @@ class Game:
         mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
         :param coordinates: coordonnées de la cellule à mettre à jour
         """
+        # Test de préconditions
         test_errors(coordinates=coordinates)
-        
 
         x, y = coordinates
+        # Dimensions de la case à mettre à jour en fonction de la grille
         image_rect_area = pygame.Rect(
             self.grid_image_rect.width / 9 * x,
             self.grid_image_rect.height / 9 * y,
             self.grid_image_rect.width / 9,
             self.grid_image_rect.height / 9)
-        self.screen.blit(self.grid_image, self.all_rect[x][y], area= image_rect_area)
+        
+        # Affichage du fond d'écran de la case
+        self.screen.blit(self.grid_image, self.all_rect[x][y], area = image_rect_area)
+        
+        # Affichage du cadena si la case est "locked"
         if self.sudoku.grid.content[x][y].state == "locked":
-            self.screen.blit(self.padlock_image, self.all_rect[x][y], area= image_rect_area)
+            self.screen.blit(self.padlock_image, self.all_rect[x][y], area = image_rect_area)
         
         # affichage du texte (numéro) pour chaque cellule
         self.screen.blit(
@@ -85,11 +90,12 @@ class Game:
             self.all_rect[x][y].center
         )
     
-    
     def update(self):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
         """
+        
+        # Affichage du fond d'écran
         pygame.draw.rect(self.screen, self.background_color, self.screen.get_rect())
         
         self.display_elements()
@@ -213,32 +219,40 @@ class Game:
     
     def update_rect(self):
         """
-        Calcul de la taille et des rectangles des cellules
+        Calcul de la taille et des coordonnées des cellules
         """
         
+        # Charge l'image de la grille
         self.grid_image = pygame.image.load("src/graphics/grid.png")
         
+        # Si la longueur de la fenêtre est plus grande que sa largeur
         if self.screen.get_width() >= self.screen.get_height():
+            # Dimensionner la grille en fonction de la hauteur de la fenêtre
             self.grid_image = pygame.transform.scale(
                 self.grid_image,
                 (self.screen.get_height(), self.screen.get_height())
             )
         
         else:
+            # Sinon dimensionner la grille en fonction de la largeur de la fenêtre
             self.grid_image = pygame.transform.scale(
                 self.grid_image,
                 (self.screen.get_width(), self.screen.get_width())
             )
         
+        # Variable stockant les coordonnées et les dimensions de la grille
         self.grid_image_rect = self.grid_image.get_rect()
         self.grid_image_rect.x = self.screen.get_width() / 2 - self.grid_image_rect.width / 2
         
+        # Chargement de l'image du cadenas
         self.padlock_image = pygame.image.load("src/graphics/padlock.png")
+        # Redimensionne l'image du cadenas à 1/4 de la hauteur et de la largeur d'un case
         self.padlock_image = pygame.transform.scale(
             self.padlock_image,
             (self.grid_image_rect.width / 9 / 4, self.grid_image_rect.height / 9 / 4)
         )
         
+        # Variable contenant les coordonnées et les dimensions de toutes les cases de la grille
         self.all_rect = [[
             pygame.Rect(
                 self.grid_image_rect.x + self.grid_image_rect.width / 9 * x,
@@ -248,7 +262,8 @@ class Game:
             )
             for y in range(9)] for x in range(9)]
 
-        for x in range(9):  # recalcule et réattribue les valeurs de la taille des textes
+        # recalcule et réattribue les valeurs de la taille des textes
+        for x in range(9):
             for y in range(9):
                 self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
         
