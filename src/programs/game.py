@@ -139,7 +139,7 @@ class Game:
                 if event.key == pygame.K_s:
                     
                     pygame.display.set_caption("Sudoku (solving...)")
-                    self.sudoku.solve_grid()
+                    self.sudoku.solve_grid(clear_inputs=False)
                     pygame.display.set_caption("Sudoku")
                     
                 
@@ -148,6 +148,9 @@ class Game:
                     
                 if event.key == pygame.K_c:
                     self.sudoku.clear()
+                
+                if event.key == pygame.K_g:
+                    self.sudoku.generate_grid()
 
                 if event.key in self.key_mapping:
                     selected_cell = self.sudoku.selected_cell

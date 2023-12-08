@@ -64,7 +64,7 @@ class Grid:
             self.content[coordinates[0]][coordinates[1]].set_value(value)
         
         else:
-            print(f'Grid.set_cell: cell {coordinates[1]} is locked or superlocked')
+            print(f'Grid.set_cell: cell {coordinates} is locked or superlocked')
     
     def set_cell_state(self, coordinates: tuple[int, int], state: str):
         """
@@ -162,8 +162,8 @@ class Grid:
         all_empty_cells = []
         
         # Pour toutes les cases de la grille
-        for x in range(9):
-            for y in range(9):
+        for y in range(9):
+            for x in range(9):
                 if self.get_cell_value((x, y)) == 0:  # Si la valeur de la case est zéro
                     all_empty_cells.append((x, y))  # Ajouter à la liste des cases vides les coordonnées (x, y)
         
