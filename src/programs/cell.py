@@ -12,6 +12,7 @@ class Cell:
         
         self.text = Text("", "Arial", 30, (0, 0, 0))  # crée l'objet texte
         self.state = None
+        self.resolved:bool = False
         self.set_value(value)  # entre 0 et 9 (0 = case vide)
         self.set_state(state)  # valeurs possibles: "unlocked", "locked", "superlocked"
     
@@ -31,7 +32,7 @@ class Cell:
 
     def get_text(self) -> Text:
         """
-        Renvois le text de la case
+        Renvoi le text de la case
         """
         
         return self.text
