@@ -80,11 +80,11 @@ class Game:
             self.grid_image_rect.height / self.sudoku.grid.size)
         
         # Affichage du fond d'écran de la case
-        self.screen.blit(self.grid_image, self.all_rect[x][y], area = image_rect_area)
+        self.screen.blit(self.grid_image, self.all_rect[x][y], area=image_rect_area)
         
         # Affichage du cadena si la case est "locked"
         if self.sudoku.grid.get_cell_state((x, y)) == "locked":
-            self.screen.blit(self.padlock_image, self.all_rect[x][y], area = image_rect_area)
+            self.screen.blit(self.padlock_image, self.all_rect[x][y], area=image_rect_area)
         
         # affichage du texte (numéro) pour chaque cellule
         self.screen.blit(
