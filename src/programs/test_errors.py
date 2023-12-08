@@ -1,17 +1,17 @@
 def test_errors(**arguments):
-    
+    grid_size = 16
     if "coordinates" in arguments:
         coordinates = arguments["coordinates"]
         
         assert type(coordinates) == tuple, f"The `coordinates` arguments must be a tuple (type : {type(coordinates)})"
         assert type(coordinates[0]) == int and type(coordinates[1]) == int, f"The `coordinates` argument must contains intgers (value : {coordinates})"
-        assert coordinates[0] >= 0 and coordinates[0] <= 8 and coordinates[1] >= 0 and coordinates[1] <= 8, f"The `coordinates` argument must contains integers between 0 and 8 (value : {coordinates})"
+        assert coordinates[0] >= 0 and coordinates[0] < grid_size and coordinates[1] >= 0 and coordinates[1] < grid_size, f"The `coordinates` argument must contains integers between 0 and grid_size - 1 (value : {coordinates})"
         
     if "value" in arguments:
         value = arguments["value"]
         
         assert type(value) == int, f"The `value` argument must be an integer (type : {type(value)})"
-        assert value >= 0 and value <= 9, f"The `value` argument must be between 0 and 9"
+        assert value >= 0 and value < grid_size, f"The `value` argument must be between 0 and grid_size"
     
     if "color" in arguments:
         color = arguments["color"]
@@ -38,25 +38,25 @@ def test_errors(**arguments):
         list_values = arguments["list_values"]
         
         assert type(list_values) == list, f"The `list_values` argument must be a list (type : {type(list_values)})"
-        assert len(list_values) == 9, f"The `list_values` argument must have a length of 9 (length : {len(list_values)})"
+        assert len(list_values) == grid_size, f"The `list_values` argument must have a length of grid_size (length : {len(list_values)})"
         
         for sub_list in list_values:
             assert type(sub_list) == list, f"The `list_values` argument must contains lists (value : {list_values})"
-            assert len(sub_list) == 9, f"The `list_values` argument must contains lists that have lengths of 9 (value : {list_values})"
+            assert len(sub_list) == grid_size, f"The `list_values` argument must contains lists that have lengths of grid_size (value : {list_values})"
             
             for value in sub_list:
                 assert type(value) == int, f"The `list_values` argument must contains lists that contains integers (value : {list_values})"
-                assert value >= 0 and value <= 9, f"The `list_values` argument must contains lists that contains integers between 0 and 9 (value : {list_values})"
+                assert value >= 0 and value <= grid_size, f"The `list_values` argument must contains lists that contains integers between 0 and grid_size (value : {list_values})"
                 
     if "list_states" in arguments:
         list_states = arguments["list_states"]
         
         assert type(list_states) == list, f"The `list_states` argument must be a list (type : {type(list_states)})"
-        assert len(list_states) == 9, f"The `list_states` argument must have a length of 9 (length : {len(list_states)})"
+        assert len(list_states) == grid_size, f"The `list_states` argument must have a length of grid_size (length : {len(list_states)})"
         
         for sub_list in list_states:
             assert type(sub_list) == list, f"The `list_states` argument must contains lists (value : {list_states})"
-            assert len(sub_list) == 9, f"The `list_states` argument must contains lists that have lengths of 9 (value : {list_states})"
+            assert len(sub_list) == grid_size, f"The `list_states` argument must contains lists that have lengths of grid_size (value : {list_states})"
             
             for state in sub_list:
                 assert type(state) == str, f"The `list_values` argument must contains lists that contains strings (value : {list_states})"

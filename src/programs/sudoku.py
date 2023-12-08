@@ -11,7 +11,7 @@ class Sudoku:
     
     def __init__(self, game):
         self.game = game
-        self.grid = Grid()
+        self.grid = Grid(size=16)
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[int, int]] = list()
         self.do_display_conflicts = True
@@ -72,7 +72,7 @@ class Sudoku:
             
             case "right":
                 # Si l'utilisateur demande de déplacer la sélection vers la droite, mais qu'elle est déjà au maximum de cette direction
-                if self.selected_cell[0] == 8:
+                if self.selected_cell[0] == self.grid.size - 1:
                     # Alors ne rien faire
                     return
                 
@@ -90,7 +90,7 @@ class Sudoku:
             
             case "down":
                 # Si l'utilisateur demande de déplacer la sélection vers le bas, mais qu'elle est déjà au maximum de cette direction
-                if self.selected_cell[1] == 8:
+                if self.selected_cell[1] == self.grid.size - 1:
                     # Alors ne rien faire
                     return
                 
@@ -253,8 +253,8 @@ class Sudoku:
         Enlève toutes les cases qui ne sont pas superlocked
         """
         
-        for x in range(9):
-            for y in range(9):
+        for x in range(self.game.sudoku.grid.size):
+            for y in range(self.game.sudoku.grid.size):
                 if self.grid.get_cell_state((x, y)) == "unlocked":
                     self.grid.set_cell_value((x, y), 0)
     
@@ -265,8 +265,8 @@ class Sudoku:
         
         # Pour tout les formats de grille possibles (lignes, colonnes et carrés)
         for grid_format in [self.grid.get_content_as(format) for format in ["lines", "columns", "squares"]]:
-            for x in range(9):
-                for n in range(1, 10):
+            for x in range(self.game.sudoku.grid.size):
+                for n in range(1, 1 + self.game.sudoku.grid.size):
                     
                     # Si l'un des sous-groupes de ce format compte plusieur fois le même chiffre
                     if grid_format[x].count(n) > 1:
@@ -298,7 +298,7 @@ class Sudoku:
                     self.conflicting_cells.remove(cell_coordinates)
             
             # Pour toutes les valeurs n possibles
-            for n in range(1, 10):
+            for n in range(1, 1+ self.game.sudoku.grid.size):
                 # Si la valeur est en conflit avec d'autres dans le groupe courant
                 if group_values.count(n) > 1:
                     # Pour toutes les cases du groupe courant
@@ -325,8 +325,8 @@ class Sudoku:
                 self.conflicting_cells.append(cell_coordinates)
         
         # Affichage des couleurs sur le texte
-        for x in range(9):
-            for y in range(9):
+        for x in range(self.game.sudoku.grid.size):
+            for y in range(self.game.sudoku.grid.size):
                 if self.do_display_conflicts and (x, y) in self.conflicting_cells:
                     self.grid.set_cell_color((x, y), (255, 0, 0))
                 
@@ -343,21 +343,21 @@ class Sudoku:
             generate_numbers = 12
         
         #générer grille
-        self.grid = Grid()
+        self.grid = Grid(self.grid.size)
         
         #génerer des valeurs par défaut
         while True:
             for _ in range(generate_numbers):
-                coordinates = (random.randint(0, 8), random.randint(0, 8))
+                coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
                 while self.grid.get_cell_value(coordinates) != 0:
-                    coordinates = (random.randint(0,8), random.randint(0,8))
+                    coordinates = (random.randint(0,self.grid.size - 1), random.randint(0,self.grid.size - 1))
                     print("cell already existennt")
                 self.selected_cell = coordinates
-                self.grid.set_cell_value(coordinates, random.randint(1,9))
+                self.grid.set_cell_value(coordinates, random.randint(1,self.game.sudoku.grid.size))
                 self.verify_selected_cell()
     
                 while len(self.conflicting_cells) > 0:
-                    self.grid.set_cell_value(coordinates, random.randint(1, 9))
+                    self.grid.set_cell_value(coordinates, random.randint(1, self.game.sudoku.grid.size))
                     self.verify_selected_cell()
                     self.game.cell_update(coordinates)
     
@@ -398,8 +398,8 @@ class Sudoku:
         Fonction appelée uniquement par sole_grid()
         """
         
-        for x in range(9):
-            for y in range(9):
+        for x in range(self.game.sudoku.grid.size):
+            for y in range(self.game.sudoku.grid.size):
                 
                 if self.grid.get_cell_state((x, y)) != "superlocked":
                     self.grid.set_cell_state((x, y), "unlocked")
@@ -443,8 +443,8 @@ class Sudoku:
         
         # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles
         possible_values = [[self.grid.get_possible_values((x, y)), (x, y)] if self.grid.get_cell_state(
-            (x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == 0 else [-1] for y in range(9) for x in
-                           range(9)]
+            (x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == 0 else [-1] for y in range(self.game.sudoku.grid.size) for x in
+                           range(self.game.sudoku.grid.size)]
         
         # supprime tous les éléments [-1] = cellules superlocked ou cases avec déjà des valeurs
         possible_values = list(filter(lambda x: x != [-1], possible_values))
