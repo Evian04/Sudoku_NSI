@@ -94,9 +94,6 @@ class Game:
         Exécute les actions nécessaires au bon fonctionnement du jeu
         """
         
-        # Affichage du fond d'écran
-        pygame.draw.rect(self.screen, self.background_color, self.screen.get_rect())
-        
         self.display_elements()
         
         # Pour tous les évènements qui ont eu lieu depuis la dernière mise à jour de la fenêtre
@@ -178,6 +175,10 @@ class Game:
         """
         Permet de placer les éléments à afficher sur le brouillon de l'écran
         """
+        
+        # Affichage du fond d'écran
+        pygame.draw.rect(self.screen, self.background_color, self.screen.get_rect())
+        
         self.screen.blit(self.grid_image, self.grid_image_rect)
 
         for x in range(9):

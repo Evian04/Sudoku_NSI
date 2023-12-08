@@ -340,6 +340,7 @@ class Sudoku:
         print('solving...')
         self.clear_inputs()
         self.put_obvious_solutions()
+        self.game.display_elements()
         
         if self.backtracking_solving():
             print("Sudoku solved successfully")
