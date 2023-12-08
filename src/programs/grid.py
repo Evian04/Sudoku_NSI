@@ -16,6 +16,14 @@ class Grid:
             # Sinon créer une grille vierge
             self.content = [[Cell(0, "unlocked") for y in range(9)] for x in range(9)]
     
+    def get_cell(self, coordinates: tuple[int, int]) -> Cell:
+        """
+        Renvoi la cellule de coordonnées (x, y)
+        """
+        test_errors(coordinates=coordinates)
+
+        return self.content[coordinates[0]][coordinates[1]]
+        
     def get_cell_value(self, coordinates: tuple[int, int]) -> int:
         """
         Renvoi la valeur de la case de coordonnées (x, y)

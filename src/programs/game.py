@@ -81,12 +81,12 @@ class Game:
         self.screen.blit(self.grid_image, self.all_rect[x][y], area = image_rect_area)
         
         # Affichage du cadena si la case est "locked"
-        if self.sudoku.grid.content[x][y].state == "locked":
+        if self.sudoku.grid.get_cell_state((x, y)) == "locked":
             self.screen.blit(self.padlock_image, self.all_rect[x][y], area = image_rect_area)
         
         # affichage du texte (numéro) pour chaque cellule
         self.screen.blit(
-            self.sudoku.grid.content[x][y].text.get_text(),
+            self.sudoku.grid.get_cell((x, y)).text.get_text(),
             self.all_rect[x][y].center
         )
     
@@ -209,12 +209,12 @@ class Game:
         for x in range(9):
             for y in range(9):
                 # affichage case locked (affichage du cadenas)
-                if self.sudoku.grid.content[x][y].state == "locked":  # affichage des cases verrouillées
+                if self.sudoku.grid.get_cell((x, y)).state == "locked":  # affichage des cases verrouillées
                     self.screen.blit(self.padlock_image, self.all_rect[x][y])
                 
                 # affichage du texte (numéro) pour chaque cellule
                 self.screen.blit(
-                    self.sudoku.grid.content[x][y].text.get_text(),
+                    self.sudoku.grid.get_cell((x, y)).text.get_text(),
                     self.all_rect[x][y].center
                 )
     
@@ -266,7 +266,7 @@ class Game:
         # recalcule et réattribue les valeurs de la taille des textes
         for x in range(9):
             for y in range(9):
-                self.sudoku.grid.content[x][y].text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
+                self.sudoku.grid.get_cell((x, y)).text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
         
     def verify(self):
         """

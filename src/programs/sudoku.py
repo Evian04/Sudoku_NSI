@@ -148,15 +148,15 @@ class Sudoku:
         file_content = file_content.split("\n\n")
         # Formate la liste des valeurs au format list[list[int]]
         list_values = [
-            [int(line[i]) for i in range(len(file_content[0].split("\n")[0]))]
-            for line in file_content[0].split("\n")
+            [int(line[i]) for line in file_content[0].split("\n")]
+            for i in range(len(file_content[0].split("\n")[0]))
         ]
         
         # Formate la liste des états au format list[list[str]]
         convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
         list_states = [
-            [convert_state.get(line[i], "0") for i in range(len(file_content[1].split("\n")[0]))]
-            for line in file_content[1].split("\n")
+            [convert_state.get(line[i], "0") for line in file_content[1].split("\n")]
+            for i in range(len(file_content[1].split("\n")[0]))
         ]
         
         # Test postconditions
@@ -164,6 +164,7 @@ class Sudoku:
         
         # Remplace le contenu de la grille par le contenu lu dans le fichier
         self.grid.set_content(list_values, list_states)
+        print([[cell.value for cell in line] for line in self.grid.content])
     
     def save_grid(self):
         """
@@ -184,8 +185,10 @@ class Sudoku:
             return False
         
         # convertit toutes les valeurs des cellules en string
-        double_list_values = [[str(cell.value) for cell in line] for line in self.grid.content]
-        
+        double_list_values = [
+            [str(line[i].value) for line in self.grid.content]
+            for i in range(len(self.grid.content))
+        ]
         # convertit la double liste en liste simple (une string par linee)
         list_values = ["".join(line) for line in double_list_values]
 
@@ -195,8 +198,10 @@ class Sudoku:
         convert_state = {"unlocked": "0", "locked": "1", "superlocked": "2"}  # Dictionnaire de conversion
         
         # convertit toutes les valeurs des celules en string avec le dictionnaire de conversion
-        double_list_state = [[convert_state[cell.state] for cell in line] for line in self.grid.content]
-        
+        double_list_state = [
+            [convert_state[line[i].state] for line in self.grid.content]
+            for i in range(len(self.grid.content))
+        ]
         # convertit la double liste en liste simple (une string par ligne)
         list_state = ["".join(line) for line in double_list_state]
         
@@ -380,7 +385,7 @@ class Sudoku:
             return self.is_valid()
         
         # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles
-        possible_values = [[self.grid.get_possible_values((x, y)), (x, y)] if self.grid.content[x][y].get_state() != 'superlocked' and self.grid.content[x][y].get_value() == 0 else [-1] for y in range(9) for x in range(9)]
+        possible_values = [[self.grid.get_possible_values((x, y)), (x, y)] if self.grid.get_cell_state((x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == 0 else [-1] for y in range(9) for x in range(9)]
 
         # supprime tous les éléments [-1] = cellules superlocked ou cases avec déjà des valeurs
         possible_values = list(filter(lambda x: x != [-1], possible_values))
