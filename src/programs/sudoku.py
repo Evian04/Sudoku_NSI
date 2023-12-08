@@ -342,7 +342,6 @@ class Sudoku:
         starting_time = time.time()
         print('solving...')
         self.clear_inputs()
-        self.put_obvious_solutions()
         self.game.display_elements()
         
         if self.backtracking_solving():
@@ -364,27 +363,6 @@ class Sudoku:
                 if self.grid.get_cell_state((x, y)) != "superlocked":
                     self.grid.set_cell_state((x, y), "unlocked")
                     self.grid.set_cell_value((x, y), 0)
-    
-    def put_obvious_solutions(self):
-        """
-        Met dans la grille les chiffres évidents (les case où il n'y a qu'un chiffre possible)
-        """
-        
-        while True:
-            is_algorithm_finished = True
-            
-            cells_to_check = self.grid.get_all_empty_cells()
-            
-            for cell_coordinates in cells_to_check:
-                cell_possible_values = self.grid.get_possible_values(cell_coordinates)
-                if len(cell_possible_values) == 1:
-                    self.grid.set_cell_value(cell_coordinates, cell_possible_values[0])
-                    self.grid.set_cell_color(cell_coordinates, (0, 255, 0))
-                    self.game.cell_update(cell_coordinates)
-                    is_algorithm_finished = False
-            
-            if is_algorithm_finished:
-                break
     
     def backtracking_solving(self) -> bool:
         """
