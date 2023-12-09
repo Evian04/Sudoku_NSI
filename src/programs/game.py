@@ -139,10 +139,11 @@ class Game:
                     self.sudoku.move_selected_cell("down")
                 
                 if event.key == pygame.K_l:
-                    self.sudoku.lock_selected_cell()
-                
-                if event.key == pygame.K_u:
-                    self.sudoku.unlock_selected_cell()
+                    state = self.sudoku.grid.get_cell_state(self.sudoku.selected_cell)
+                    if state == 'unlocked':
+                        self.sudoku.lock_selected_cell()
+                    elif state == 'locked':
+                        self.sudoku.unlock_selected_cell()
                 
                 if event.key == pygame.K_s:
                     pygame.display.set_caption(self.title + " (solving...)")

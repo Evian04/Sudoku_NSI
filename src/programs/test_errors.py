@@ -1,5 +1,5 @@
 def test_errors(**arguments):
-    grid_size = 4
+    grid_size = 9
     if "coordinates" in arguments:
         coordinates = arguments["coordinates"]
         

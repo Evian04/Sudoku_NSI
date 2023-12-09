@@ -10,7 +10,7 @@ screen_size = (1080, 720) # Dimensions de la fenêtre
 #pygame.display.set_caption("Sudoku") # Nom de la fenêtre
 screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE) # Création de la fenêtre
 
-game = Game(screen, 4)
+game = Game(screen, 9)
 
 # Provisoire
 game.update()
