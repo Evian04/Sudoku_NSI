@@ -40,7 +40,8 @@ class Game:
         }
         self.update_rect()
     
-    def cell_update(self, coordinates:tuple[int, int], all_events: list[pygame.event.Event] = None):
+    def cell_update(self, coordinates: tuple[int, int], displaying: bool = True,
+                    all_events: list[pygame.event.Event] = None):
         """
         mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
         :param coordinates: coordonnée de la cellule à mettre à jour
@@ -49,20 +50,19 @@ class Game:
         test_errors(coordinates=coordinates)
         if not all_events: all_events = pygame.event.get()
         
-        self.cell_display_element(coordinates)
+        if displaying: self.cell_display_element(coordinates)
         
         for event in all_events:
             if event.type == pygame.QUIT:
                 self.do_quit = True
                 return
-        
+            
             if event.type == pygame.WINDOWRESIZED:
                 self.update_rect()
                 self.display_elements()
-        
-        
+                
         pygame.display.flip()
-        
+    
     def cell_display_element(self, coordinates: tuple[int, int]):
         """
         mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
@@ -70,7 +70,7 @@ class Game:
         """
         # Test de préconditions
         test_errors(coordinates=coordinates)
-
+        
         x, y = coordinates
         # Dimensions de la case à mettre à jour en fonction de la grille
         image_rect_area = pygame.Rect(
@@ -112,7 +112,7 @@ class Game:
             if event.type == pygame.WINDOWRESIZED:
                 # Mettre à jour la position des éléments de la fenêtre
                 self.update_rect()
-                
+            
             if self.is_solving:  # ne pas vérifier les autres event si la résolution est en cours (economie performance)
                 continue
             
@@ -137,46 +137,46 @@ class Game:
                 
                 if event.key == pygame.K_u:
                     self.sudoku.unlock_selected_cell()
-
+                
                 if event.key == pygame.K_s:
-                    
                     pygame.display.set_caption(self.title + " (solving...)")
                     self.sudoku.solve_grid(clear_inputs=False)
                     pygame.display.set_caption(self.title)
-                    
                 
                 if event.key == pygame.K_d:
                     self.sudoku.reverse_display_conflicts()
-                    
+                
                 if event.key == pygame.K_c:
                     self.sudoku.clear()
                 
                 if event.key == pygame.K_g:
-                    self.sudoku.generate_grid()
+                    pygame.display.set_caption(self.title + " (generating...)")
+                    self.sudoku.generate_grid(75)
+                    pygame.display.set_caption(self.title)
 
                 if event.key in self.key_mapping:
                     selected_cell = self.sudoku.selected_cell
-                    if selected_cell != (-1, -1): # si une cellule est selectionnée
+                    if selected_cell != (-1, -1):  # si une cellule est selectionnée
                         if self.sudoku.grid.get_cell_state(selected_cell) == "unlocked":
-                        
+                            
                             # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
                             value = self.key_mapping[event.key]
                             
                             # modifie la valeur de la cellule selectionnée
                             self.sudoku.set_selected_cell_value(value)
-                            self.sudoku.verify_selected_cell() # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
-                            
+                            self.sudoku.verify_selected_cell()  # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
+                        
                         elif self.sudoku.grid.get_cell_state(selected_cell) == "locked":
                             print(f"grid.update(): cell {tuple(selected_cell)} is locked (press 'U' to Unlock)")
-                        else: print(f"grid.update(): cell {tuple(selected_cell)} is superlocked")
-                
+                        else:
+                            print(f"grid.update(): cell {tuple(selected_cell)} is superlocked")
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for x in range(self.sudoku.grid.size):
                     for y in range(self.sudoku.grid.size):
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
                             self.sudoku.select_cell((x, y))
-
+        
         pygame.display.flip()
     
     def display_elements(self):
@@ -188,7 +188,7 @@ class Game:
         pygame.draw.rect(self.screen, self.background_color, self.screen.get_rect())
         
         self.screen.blit(self.grid_image, self.grid_image_rect)
-
+        
         for x in range(self.sudoku.grid.size):
             for y in range(self.sudoku.grid.size):
                 if self.sudoku.grid.get_cell_state((x, y)) == "superlocked":
@@ -210,7 +210,7 @@ class Game:
                 (120, 120, 120),
                 self.all_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]]
             )
-
+        
         for x in range(self.sudoku.grid.size):
             for y in range(self.sudoku.grid.size):
                 # affichage case locked (affichage du cadenas)
@@ -255,7 +255,8 @@ class Game:
         # Redimensionne l'image du cadenas à 1/4 de la hauteur et de la largeur d'un case
         self.padlock_image = pygame.transform.scale(
             self.padlock_image,
-            (self.grid_image_rect.width / self.sudoku.grid.size / 4, self.grid_image_rect.height / self.sudoku.grid.size / 4)
+            (self.grid_image_rect.width / self.sudoku.grid.size / 4,
+             self.grid_image_rect.height / self.sudoku.grid.size / 4)
         )
         
         # Variable contenant les coordonnées et les dimensions de toutes les cases de la grille
@@ -267,12 +268,13 @@ class Game:
                 self.grid_image_rect.height / self.sudoku.grid.size
             )
             for y in range(self.sudoku.grid.size)] for x in range(self.sudoku.grid.size)]
-
+        
         # recalcule et réattribue les valeurs de la taille des textes
         for x in range(self.sudoku.grid.size):
             for y in range(self.sudoku.grid.size):
-                self.sudoku.grid.get_cell((x, y)).text.set_font_size(round(0.375 * self.all_rect[x][y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
-        
+                self.sudoku.grid.get_cell((x, y)).text.set_font_size(round(0.375 * self.all_rect[x][
+                    y].height))  # 0.375 est le rapport entre la taille d'un carré et la taille de la police
+    
     def verify(self):
         """
         Vérifie et applique les modifications (changement de couleurs) si des cases sont identiques sur des lignes, colonnes, carrés
