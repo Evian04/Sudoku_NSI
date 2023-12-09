@@ -9,9 +9,9 @@ from src.programs.test_errors import test_errors
 
 class Sudoku:
     
-    def __init__(self, game):
+    def __init__(self, game, grid_size: int):
         self.game = game
-        self.grid = Grid(size=9) # /!\ mofifier aussi dans test_errors
+        self.grid = Grid(size=grid_size)  # /!\ mofifier aussi dans test_errors
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[int, int]] = list()
         self.do_display_conflicts = True
@@ -341,10 +341,11 @@ class Sudoku:
         """
         print("generating...")
         if generate_numbers is None:
-            generate_numbers = 12
+            generate_numbers = self.grid.size  # nombre de nombres à l'origine = largeur du sudoku (valeur arbitraire)
         starting_time = time.time()
         #générer grille
         self.grid = Grid(self.grid.size)
+        self.game.update_rect()
         self.game.update()
         
         #génerer des valeurs par défaut
@@ -353,6 +354,7 @@ class Sudoku:
             for _ in range(generate_numbers):
                 # générer une coordonnée au hasrd
                 coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
+                self.game.cell_update(coordinates, displaying=False)
                 # regénerer tant que la case est utilisée
                 while self.grid.get_cell_value(coordinates) != 0:
                     coordinates = (random.randint(0,self.grid.size - 1), random.randint(0,self.grid.size - 1))
@@ -381,7 +383,8 @@ class Sudoku:
                 break
             else:
                 self.clear_inputs()
-        
+                self.game.update(displaying=False)
+
         self.clear()
         self.game.display_elements()
         print('generating executing time:', time.time() - starting_time)

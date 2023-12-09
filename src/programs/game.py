@@ -6,10 +6,10 @@ from src.programs.test_errors import test_errors
 
 class Game:
     
-    def __init__(self, screen: pygame.Surface):
+    def __init__(self, screen: pygame.Surface, grid_size: int):
         self.screen = screen
         self.background_color = (0, 0, 0)
-        self.sudoku = Sudoku(self)
+        self.sudoku = Sudoku(self, grid_size=grid_size)
         self.title = f"Sudoku {self.sudoku.grid.size}x{self.sudoku.grid.size}"
         pygame.display.set_caption("Sudoku")  # Nom de la fenêtre
         self.is_solving = False
@@ -60,8 +60,10 @@ class Game:
             if event.type == pygame.WINDOWRESIZED:
                 self.update_rect()
                 self.display_elements()
+                # met à jour l'écran ici que si displaying est à False (éviter de le faire 2 fois)
+                if not displaying: pygame.display.flip()
                 
-        pygame.display.flip()
+        if displaying: pygame.display.flip()
     
     def cell_display_element(self, coordinates: tuple[int, int]):
         """
@@ -92,15 +94,17 @@ class Game:
             self.all_rect[x][y].center
         )
     
-    def update(self):
+    def update(self,displaying: bool = True, all_events: list[pygame.event.Event] = None, ):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
         """
-        
-        self.display_elements()
+        if displaying: self.display_elements()
+
+        if all_events is None:
+            all_events = pygame.event.get()
         
         # Pour tous les évènements qui ont eu lieu depuis la dernière mise à jour de la fenêtre
-        for event in pygame.event.get():
+        for event in all_events:
             
             # Si l'un des évènements est de quitter la fenêtre
             if event.type == pygame.QUIT:
@@ -112,6 +116,8 @@ class Game:
             if event.type == pygame.WINDOWRESIZED:
                 # Mettre à jour la position des éléments de la fenêtre
                 self.update_rect()
+                # met à jour l'écran ici que si displaying est à False (éviter de le faire 2 fois)
+                if not displaying: pygame.display.flip()
             
             if self.is_solving:  # ne pas vérifier les autres event si la résolution est en cours (economie performance)
                 continue
@@ -151,7 +157,7 @@ class Game:
                 
                 if event.key == pygame.K_g:
                     pygame.display.set_caption(self.title + " (generating...)")
-                    self.sudoku.generate_grid(75)
+                    self.sudoku.generate_grid(4)
                     pygame.display.set_caption(self.title)
 
                 if event.key in self.key_mapping:
@@ -177,7 +183,7 @@ class Game:
                         if self.all_rect[x][y].collidepoint(pygame.mouse.get_pos()):
                             self.sudoku.select_cell((x, y))
         
-        pygame.display.flip()
+        if displaying: pygame.display.flip()
     
     def display_elements(self):
         """
