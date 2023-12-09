@@ -183,12 +183,12 @@ class Grid:
                     return (x, y)  # Renvoyer les coordonnées (x, y)
     
     def get_possible_values(self, coordinates: tuple[int, int]) -> list[int]:
-        """
-        Renvoi les valeurs possibles (1 à 9) de la case en fonctions des autres chiffres de la même ligne, colomne ou carré
+        f"""
+        Renvoi les valeurs possibles (1 à {self.size}) de la case en fonctions des autres chiffres de la même ligne, colomne ou carré
         """
         
         test_errors(coordinates=coordinates)
-        possible_values = [n + 1 for n in range(9)]
+        possible_values = [n + 1 for n in range(self.size)]
         
         # Pour tout les formats existants
         for format in ["lines", "columns", "squares"]:
