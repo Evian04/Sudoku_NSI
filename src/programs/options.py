@@ -1,0 +1,1 @@
+sudoku_size = 9

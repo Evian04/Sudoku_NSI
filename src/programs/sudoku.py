@@ -372,9 +372,7 @@ class Sudoku:
                     if len(self.conflicting_cells) == 0:
                         break
                 
-                if len(self.conflicting_cells) == 0:# si aucune des valeurs n'est possibles -> nouvelle cellule
-                    self.grid.set_cell_state(coordinates, "locked")
-                else:
+                if len(self.conflicting_cells) != 0: # si au moin une valeur est possibles -> nouvelle cellule
                     generate_numbers += 1  # pour compenser le coup de perdu
                     self.grid.set_cell_value(coordinates, 0)
             
@@ -385,7 +383,6 @@ class Sudoku:
                 self.clear_inputs()
                 self.game.update(displaying=False)
 
-        self.clear()
         self.game.display_elements()
         print('generating executing time:', time.time() - starting_time)
         
