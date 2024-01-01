@@ -11,7 +11,7 @@ class Sudoku:
     
     def __init__(self, game, grid_size: int):
         self.game = game
-        self.grid = Grid(size=grid_size)  # /!\ mofifier aussi dans test_errors
+        self.grid = Grid(size = grid_size)  # /!\ mofifier aussi dans test_errors
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[int, int]] = list()
         self.do_display_conflicts = True
@@ -345,8 +345,8 @@ class Sudoku:
         starting_time = time.time()
         #générer grille
         self.grid = Grid(self.grid.size)
-        self.game.update_rect()
-        self.game.update()
+        self.game.graphism.update_rect()
+        self.game.graphism.update()
         
         #génerer des valeurs par défaut
         while True:
@@ -354,11 +354,11 @@ class Sudoku:
             for _ in range(generate_numbers):
                 # générer une coordonnée au hasrd
                 coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
-                self.game.cell_update(coordinates, displaying=False)
+                self.game.cell_update(coordinates, do_display=False)
                 # regénerer tant que la case est utilisée
                 while self.grid.get_cell_value(coordinates) != 0:
                     coordinates = (random.randint(0,self.grid.size - 1), random.randint(0,self.grid.size - 1))
-                    self.game.cell_update(coordinates, displaying=False)
+                    self.game.cell_update(coordinates, do_display=False)
 
                 self.selected_cell = coordinates
                 # génère la liste des possibilités et balaye dedans
@@ -366,7 +366,7 @@ class Sudoku:
                 for value in values:
                     #self.selected_cell = coordinates
                     self.grid.set_cell_value(coordinates, value)
-                    self.game.cell_update(coordinates, displaying=False)
+                    self.game.cell_update(coordinates, do_display=False)
                     self.verify_selected_cell()
 
                     if len(self.conflicting_cells) == 0:
@@ -381,9 +381,9 @@ class Sudoku:
                 break
             else:
                 self.clear_inputs()
-                self.game.update(displaying=False)
+                self.game.update(do_display=False)
 
-        self.game.display_elements()
+        self.game.graphism.display_elements()
         print('generating executing time:', time.time() - starting_time)
         
         
@@ -395,7 +395,7 @@ class Sudoku:
         starting_time = time.time()
         print('solving...')
         # self.put_obvious_solutions()
-        self.game.display_elements()
+        self.game.graphism.display_elements()
         
         if clear_inputs: self.clear_inputs()
         
@@ -424,7 +424,7 @@ class Sudoku:
         if not self.is_valid():
             return False
     
-        if self.backtracking_solving(displaying=False):
+        if self.backtracking_solving(do_display=False):
             return True
     
         else:
@@ -436,18 +436,19 @@ class Sudoku:
         Fonction appelée uniquement par sole_grid()
         """
         
-        for x in range(self.game.sudoku.grid.size):
-            for y in range(self.game.sudoku.grid.size):
+        for x in range(self.grid.size):
+            for y in range(self.grid.size):
                 
                 if self.grid.get_cell_state((x, y)) != "superlocked":
                     self.grid.set_cell_state((x, y), "unlocked")
                     self.grid.set_cell_value((x, y), 0)
     
-    def put_obvious_solutions(self, displaying: bool=True) -> list[tuple[int, int]]:
+    def put_obvious_solutions(self, do_display: bool = True) -> list[tuple[int, int]]:
         """
         Met dans la grille les chiffres évidents (les case où il n'y a qu'un chiffre possible)
         :return la liste des cellules modifiées (coordonnées)
         """
+        
         modified_cells = list()
         while True:
             is_algorithm_finished = True
@@ -458,7 +459,7 @@ class Sudoku:
                 cell_possible_values = self.grid.get_possible_values(cell_coordinates)
                 if len(cell_possible_values) == 1:
                     self.grid.set_cell_value(cell_coordinates, cell_possible_values[0])
-                    self.game.cell_update(cell_coordinates, displaying=displaying)
+                    self.game.cell_update(cell_coordinates, do_display = do_display)
                     modified_cells.append(cell_coordinates)
                     is_algorithm_finished = False
             
@@ -466,7 +467,8 @@ class Sudoku:
                 break
 
         return modified_cells
-    def backtracking_solving(self, displaying: bool = True) -> bool:
+
+    def backtracking_solving(self, do_display: bool = True) -> bool:
         """
         Fonction récursive qui résout le Sudoku en testant toutes les possibilités
         Renvoi True si la grille courante est possible à résoudre, et False si elle ne l'est pas
@@ -482,17 +484,19 @@ class Sudoku:
             return self.is_valid()
         
         # met les valeurs évidentes des cellules
-        modified_cells_coordinates = self.put_obvious_solutions(displaying=displaying)
+        modified_cells_coordinates = self.put_obvious_solutions(do_display = do_display)
         #modified_cells_coordinates = list()
         # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles
-        possible_values = [[self.grid.get_possible_values((x, y)), (x, y)] if self.grid.get_cell_state(
-            (x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == 0 else [-1] for y in range(self.game.sudoku.grid.size) for x in
-                           range(self.game.sudoku.grid.size)]
+        possible_values = [
+            [self.grid.get_possible_values((x, y)), (x, y)]
+            if self.grid.get_cell_state((x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == 0
+            else [-1] for y in range(self.grid.size) for x in range(self.grid.size)
+        ]
         
         # supprime tous les éléments [-1] = cellules superlocked ou cases avec déjà des valeurs
         possible_values = list(filter(lambda x: x != [-1], possible_values))
         # tri les éléments de la liste en fonction de la longueur de la liste des valeurs possibles (tri du moins de possibilités au plus de possibilités)
-        possible_values.sort(key=lambda v: len(v[0]))
+        possible_values.sort(key = lambda v: len(v[0]))
         # récupère la première valeur = nombre minimale de solution
         if len(possible_values) >= 1:  # test si il reste des possibilités à tester signifie que put obvious solutions a suffit
             values, cell_coordinates = possible_values[0]
@@ -503,15 +507,15 @@ class Sudoku:
             # defini la valeur de la cellule
             self.grid.set_cell_value(cell_coordinates, value)
             # affiche la valeur
-            self.game.cell_update(cell_coordinates, displaying)
-            if self.backtracking_solving(displaying=displaying):  # méthode récursive pour trouver les bonnes valeurs
+            self.game.cell_update(cell_coordinates, do_display)
+            if self.backtracking_solving(do_display=do_display):  # méthode récursive pour trouver les bonnes valeurs
                 return True
             
             else:
                 # defini la valeur de la cellule à 0
                 self.grid.set_cell_value(cell_coordinates, 0)
                 # affiche la valeur 0
-                self.game.cell_update(cell_coordinates, displaying)
+                self.game.cell_update(cell_coordinates, do_display)
 
         # défini la valeur des cellules modifiées dans put_obvious_solutions à 0
         if modified_cells_coordinates:

@@ -7,8 +7,8 @@ class Grid:
     La class `Grid` permet de stocker et de gérer le contenu de la grille du sudoku
     """
     
-    def __init__(self, size:int = 9, content: list[list[Cell]] = None):
-        test_errors(grid_size=size)
+    def __init__(self, size: int = 9, content: list[list[Cell]] = None):
+        test_errors(grid_size = size)
         self.size = size
         self.square_size = int(size ** 0.5)
         if content:
