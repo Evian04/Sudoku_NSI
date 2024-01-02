@@ -4,7 +4,7 @@ from src.programs.test_errors import test_errors
 class Graphism:
     
     def __init__(self, game, background_color: tuple[int, int, int]):
-        self.screen = game.screen
+        self.screen: pygame.Surface = game.screen
         self.game = game
         
         self.background_color = background_color
@@ -16,6 +16,13 @@ class Graphism:
         
         # Affichage du fond d'écran
         pygame.draw.rect(self.screen, self.background_color, self.screen.get_rect())
+        
+        # Affichage des bouttons
+        self.screen.blit(self.verification_button, self.verification_button_rect)
+        self.screen.blit(self.solve_button, self.solve_button_rect)
+        self.screen.blit(self.generate_button, self.generate_button_rect)
+        self.screen.blit(self.open_button, self.open_button_rect)
+        self.screen.blit(self.save_button, self.save_button_rect)
         
         # Affiche les contours de la grille
         self.screen.blit(self.outline_image, self.outline_rect)
@@ -98,6 +105,8 @@ class Graphism:
         
         else:
             self.rect_ref_distance = self.screen.get_width() * (2 / 3)
+            
+        self.rect_ref_distance *= 0.9
         
         self.outline_thickness = self.rect_ref_distance / 28 # 28 est le ratio entre la longueur du grand carré et de la marge
         

@@ -16,7 +16,7 @@ class Game:
         
         self.sudoku = Sudoku(self, grid_size = grid_size)
         self.title = f"Sudoku {self.sudoku.grid.size}x{self.sudoku.grid.size}"
-        pygame.display.set_caption("Sudoku")  # Nom de la fenêtre
+        pygame.display.set_caption(self.title)  # Nom de la fenêtre
         
         self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une cellule
             pygame.K_1:         1,
@@ -44,30 +44,6 @@ class Game:
         }
         self.graphism.update_rect()
     
-    def cell_update(self, coordinates: tuple[int, int], do_display: bool = True, all_events: list[pygame.event.Event] = None):
-        """
-        mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
-        :param coordinates: coordonnée de la cellule à mettre à jour
-        :param all_events: ensemble des évenements en cours
-        """
-        test_errors(coordinates=coordinates)
-        if not all_events: all_events = pygame.event.get()
-        
-        if do_display: self.graphism.cell_display_element(coordinates)
-        
-        for event in all_events:
-            if event.type == pygame.QUIT:
-                self.do_quit = True
-                return
-            
-            if event.type == pygame.WINDOWRESIZED:
-                self.graphism.update_rect()
-                self.graphism.display_elements()
-                # met à jour l'écran ici que si do_display est à False (éviter de le faire 2 fois)
-                if not do_display: pygame.display.flip()
-                
-        if do_display: pygame.display.flip()
-    
     def update(self, do_display: bool = True):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
@@ -76,14 +52,14 @@ class Game:
 
         all_events = pygame.event.get()
         
+        # Si l'un des évènements est de fermer la fenêtre
+        if pygame.QUIT in [event.type for event in all_events]:
+            # Mettre la variable indiquant s'il faut fermer la fenêtre à True
+            self.do_quit = True
+            return
+        
         # Pour tous les évènements qui ont eu lieu depuis la dernière mise à jour de la fenêtre
         for event in all_events:
-            
-            # Si l'un des évènements est de quitter la fenêtre
-            if event.type == pygame.QUIT:
-                # Mettre la variable indiquant s'il faut fermer la fenêtre à True
-                self.do_quit = True
-                return
             
             # Si l'un des évènements est un redimensionnement de a fenêtre
             if event.type == pygame.WINDOWRESIZED:
@@ -92,8 +68,30 @@ class Game:
                 # met à jour l'écran ici que si do_display est à False (éviter de le faire 2 fois)
                 if not do_display: pygame.display.flip()
             
-            if self.is_solving:  # ne pas vérifier les autres event si la résolution est en cours (economie performance)
+            if self.is_solving:  # ne pas vérifier les autres event si la résolution est en cours (économie performance)
                 continue
+            
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for x in range(self.sudoku.grid.size):
+                    for y in range(self.sudoku.grid.size):
+                        if self.graphism.all_cell_rect[x][y].collidepoint(pygame.mouse.get_pos()):
+                            self.sudoku.select_cell((x, y))
+                
+                if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.sudoku.reverse_display_conflicts()
+                    self.graphism.update_buttons_rect()
+                
+                elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.sudoku.solve_grid()
+                
+                elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.sudoku.generate_grid()
+                    
+                elif self.graphism.open_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.sudoku.open_grid()
+                    
+                elif self.graphism.save_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.sudoku.save_grid()
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -123,45 +121,53 @@ class Game:
                     elif state == 'locked':
                         self.sudoku.unlock_selected_cell()
                 
-                if event.key == pygame.K_s:
-                    pygame.display.set_caption(self.title + " (solving...)")
-                    self.sudoku.solve_grid()
-                    pygame.display.set_caption(self.title)
-                
-                if event.key == pygame.K_d:
-                    self.sudoku.reverse_display_conflicts()
-                
                 if event.key == pygame.K_c:
                     self.sudoku.clear()
-                
-                if event.key == pygame.K_g:
-                    pygame.display.set_caption(self.title + " (generating...)")
-                    self.sudoku.generate_grid(4)
-                    pygame.display.set_caption(self.title)
 
-                if event.key in self.key_mapping:
-                    selected_cell = self.sudoku.selected_cell
-                    if selected_cell != (-1, -1):  # si une cellule est selectionnée
-                        if self.sudoku.grid.get_cell_state(selected_cell) == "unlocked":
-                            
-                            # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 1 et 9)
-                            value = self.key_mapping[event.key]
-                            
-                            # modifie la valeur de la cellule selectionnée
-                            self.sudoku.set_selected_cell_value(value)
-                            self.sudoku.verify_selected_cell()  # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
+                if event.key in self.key_mapping: # Si l'action est de modifier une case de la grille
+                    
+                    if self.sudoku.selected_cell == (-1, -1): # Si aucune case n'est sélectionnée
+                        continue # Ne rien faire
                         
-                        elif self.sudoku.grid.get_cell_state(selected_cell) == "locked":
-                            print(f"grid.update(): cell {tuple(selected_cell)} is locked (press 'U' to Unlock)")
-                        else:
-                            print(f"grid.update(): cell {tuple(selected_cell)} is superlocked")
-            
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                for x in range(self.sudoku.grid.size):
-                    for y in range(self.sudoku.grid.size):
-                        if self.graphism.all_cell_rect[x][y].collidepoint(pygame.mouse.get_pos()):
-                            self.sudoku.select_cell((x, y))
+                    if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "unlocked":
+                        
+                        # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)
+                        value = self.key_mapping[event.key]
+                        
+                        # modifie la valeur de la cellule selectionnée
+                        self.sudoku.set_selected_cell_value(value)
+                        self.sudoku.verify_selected_cell()  # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
+                    
+                    elif self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "locked":
+                        print(f"grid.update(): cell {tuple(self.sudoku.selected_cell)} is locked (press 'U' to Unlock)")
+                        
+                    else:
+                        print(f"grid.update(): cell {tuple(self.sudoku.selected_cell)} is superlocked")
         
+        if do_display: pygame.display.flip()
+    
+    def cell_update(self, coordinates: tuple[int, int], do_display: bool = True, all_events: list[pygame.event.Event] = None):
+        """
+        mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
+        :param coordinates: coordonnée de la cellule à mettre à jour
+        :param all_events: ensemble des évenements en cours
+        """
+        test_errors(coordinates=coordinates)
+        if not all_events: all_events = pygame.event.get()
+        
+        if do_display: self.graphism.cell_display_element(coordinates)
+        
+        for event in all_events:
+            if event.type == pygame.QUIT:
+                self.do_quit = True
+                return
+            
+            if event.type == pygame.WINDOWRESIZED:
+                self.graphism.update_rect()
+                self.graphism.display_elements()
+                # met à jour l'écran ici que si do_display est à False (éviter de le faire 2 fois)
+                if not do_display: pygame.display.flip()
+                
         if do_display: pygame.display.flip()
     
     def verify(self):

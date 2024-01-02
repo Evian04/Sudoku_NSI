@@ -123,7 +123,7 @@ class Sudoku:
         # Code de la fonction
         self.grid.set_cell_color(self.selected_cell, color)
     
-    def load_grid(self):
+    def open_grid(self):
         """
         Charge une grille à partir d'un fichier
         """
@@ -257,6 +257,7 @@ class Sudoku:
             for y in range(self.game.sudoku.grid.size):
                 if self.grid.get_cell_state((x, y)) == "unlocked":
                     self.grid.set_cell_value((x, y), 0)
+                    self.verify_cell((x, y))
     
     def is_valid(self) -> bool:
         """
@@ -278,19 +279,26 @@ class Sudoku:
     
     def verify_selected_cell(self):
         """
-        Cette fonction est appelée à chaque fois que l'utilisateur met à jour la valeur d'une case (retourn False si aucyne selection n'existe)
-        Si la nouvelle valeur de cette case est entre 1 et 9, la fonction vérifie si elle n'entre pas en conflit avec d'autres valeurs
-        Si la nouvelle valeur de cette case est 0, la fonction vérifie si cela annule de précédents conflits
+        Appelle la fonction "verify_cell" avec les coordonnées de la case sélectionnée
         """
+        
         if self.selected_cell == (-1, -1):
-            return False  # pas de case séléctionnée
+            return
+        
+        self.verify_cell(self.selected_cell)
+                    
+    def verify_cell(self, cell_coordinates: tuple[int, int]):
+        """
+        Vérifie si la case "cell_coordinates" est en conflit avec d'autres cases dans la grille
+        """
+        
         tmp_conflicting_cells = list()  # Liste temporaire dans laquelle seront stockées les coordonnées des cases en conflits
         
         # Pour tous les formats possibles
         for format in ["lines", "columns", "squares"]:
             # Récupère les valeurs et les coordonnées du groupe correspondant à ce format
-            group_coordinates = self.grid.get_coordinates_group(self.selected_cell, format)
-            group_values = self.grid.get_cell_group(self.selected_cell, format)
+            group_coordinates = self.grid.get_coordinates_group(cell_coordinates, format)
+            group_values = self.grid.get_cell_group(cell_coordinates, format)
             
             # Enlève toutes les cases vide de la liste des cases en conflit
             for cell_coordinates in group_coordinates:
@@ -333,20 +341,24 @@ class Sudoku:
                 else:
                     self.grid.set_cell_color((x, y), (0, 0, 0))
     
-    def generate_grid(self, generate_numbers: int = None):
+    def generate_grid(self, generate_numbers: int = 0):
         """
         Génère une grille de sudoku résolu
         :param generate_numbers: nombres de valuers à placer au début pour générer la grille (valeurs aléatoires)
         met à jour self.grid
         """
         print("generating...")
-        if generate_numbers is None:
+        pygame.display.set_caption(self.game.title + " (generating...)")
+        
+        if generate_numbers == 0:
             generate_numbers = self.grid.size  # nombre de nombres à l'origine = largeur du sudoku (valeur arbitraire)
+            
         starting_time = time.time()
+        
         #générer grille
-        self.grid = Grid(self.grid.size)
+        self.grid = Grid(generate_numbers)
         self.game.graphism.update_rect()
-        self.game.graphism.update()
+        self.game.graphism.display_elements()
         
         #génerer des valeurs par défaut
         while True:
@@ -354,19 +366,19 @@ class Sudoku:
             for _ in range(generate_numbers):
                 # générer une coordonnée au hasrd
                 coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
-                self.game.cell_update(coordinates, do_display=False)
+                self.game.cell_update(coordinates, do_display = False)
                 # regénerer tant que la case est utilisée
                 while self.grid.get_cell_value(coordinates) != 0:
-                    coordinates = (random.randint(0,self.grid.size - 1), random.randint(0,self.grid.size - 1))
-                    self.game.cell_update(coordinates, do_display=False)
+                    coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
+                    self.game.cell_update(coordinates, do_display = False)
 
                 self.selected_cell = coordinates
                 # génère la liste des possibilités et balaye dedans
-                values = random.choices(range(1, self.grid.size + 1), k=self.grid.size)
+                values = random.choices(range(1, self.grid.size + 1), k = self.grid.size)
                 for value in values:
                     #self.selected_cell = coordinates
                     self.grid.set_cell_value(coordinates, value)
-                    self.game.cell_update(coordinates, do_display=False)
+                    self.game.cell_update(coordinates, do_display = False)
                     self.verify_selected_cell()
 
                     if len(self.conflicting_cells) == 0:
@@ -377,43 +389,44 @@ class Sudoku:
                     self.grid.set_cell_value(coordinates, 0)
             
             self.selected_cell = (-1, -1)
-            if self.solve_grid_generated():
+            if self.solve_generated_grid():
                 break
             else:
                 self.clear_inputs()
-                self.game.update(do_display=False)
+                self.game.update(do_display = False)
 
         self.game.graphism.display_elements()
         print('generating executing time:', time.time() - starting_time)
+        pygame.display.set_caption(self.game.title)
         
         
-    def solve_grid(self, clear_inputs:bool=True):
+    def solve_grid(self):
         """
         Résout le Sudoku, tient compte des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
         :return:
         """
         starting_time = time.time()
+        pygame.display.set_caption(self.game.title + " (solving...)")
         print('solving...')
         # self.put_obvious_solutions()
         self.game.graphism.display_elements()
         
-        if clear_inputs: self.clear_inputs()
+        self.clear_inputs()
         
         if not self.is_valid():
-            print("Invalid input... Cannot solve the sudoku")
-            return False
+            print("Invalid input, cannot solve the sudoku")
 
-        if self.backtracking_solving():
+        elif self.backtracking_solving():
             print("Sudoku solved successfully")
             print("solving executing time:", time.time() - starting_time)
-            return True
 
         else:
             print("Cannot solve the sudoku")
             print("solving executing time:", time.time() - starting_time)
-            return False
+            
+        pygame.display.set_caption(self.game.title)
     
-    def solve_grid_generated(self):
+    def solve_generated_grid(self):
         """
         Résout le Sudoku, tient compte ou non des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
         :return:
