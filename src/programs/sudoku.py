@@ -8,21 +8,16 @@ from src.programs.test_errors import test_errors
 
 
 class Sudoku:
+    """
+    La classe "Sudoku" permet d'effectuer des actions complexes sur la grille,
+    telles que la résoudre, en charger une depuis un fichier, ou encore en générer une nouvelle
+    """
     
     def __init__(self, game, grid_size: int):
         self.game = game
         self.grid = Grid(size = grid_size)  # /!\ mofifier aussi dans test_errors
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[int, int]] = list()
-        self.do_display_conflicts = True
-    
-    def reverse_display_conflicts(self):
-        """
-        Cette fonction inverse l'état de la variable booléenne `self.do_display_conflicts`
-        """
-        
-        self.do_display_conflicts = not self.do_display_conflicts
-        self.verify_selected_cell()
     
     def select_cell(self, coordinates: tuple[int, int]):
         """
@@ -30,7 +25,7 @@ class Sudoku:
         """
         
         # Test des préconditions
-        test_errors(coordinates=coordinates)
+        test_errors(self.grid.size, coordinates = coordinates)
         
         # Code de la fonction
         self.selected_cell = coordinates
@@ -98,7 +93,7 @@ class Sudoku:
                 self.selected_cell = (self.selected_cell[0], self.selected_cell[1] + 1)
         
         # Test des postconditions
-        test_errors(coordinates=self.selected_cell)
+        test_errors(self.grid.size, coordinates = self.selected_cell)
     
     def set_selected_cell_value(self, value: int):
         """
@@ -107,7 +102,7 @@ class Sudoku:
         
         # Test des préconditions
         assert self.selected_cell != (-1, -1), "You must select a cell in order to set its value"
-        test_errors(coordinates=self.selected_cell, value=value)
+        test_errors(self.grid.size, coordinates = self.selected_cell, value = value)
         
         # Code de la fonction
         self.grid.set_cell_value(self.selected_cell, value)
@@ -118,7 +113,7 @@ class Sudoku:
         """
         
         # Test des préconditions
-        test_errors(color=color)
+        test_errors(color = color)
         
         # Code de la fonction
         self.grid.set_cell_color(self.selected_cell, color)
@@ -161,7 +156,7 @@ class Sudoku:
         ]
         
         # Test postconditions
-        test_errors(list_values=list_values, list_states=list_states)
+        test_errors(self.grid.size, list_values = list_values, list_states= list_states)
         
         # Remplace le contenu de la grille par le contenu lu dans le fichier
         self.grid.set_content(list_values, list_states)
@@ -185,7 +180,7 @@ class Sudoku:
             print('No file selected for saving')
             return False
         
-        # convertit toutes les valeurs des cellules en string
+        # convertit toutes les valeurs des cases en string
         double_list_values = [
             [str(line[i].value) for line in self.grid.content]
             for i in range(len(self.grid.content))
@@ -237,7 +232,7 @@ class Sudoku:
         
         # Test de préconditions
         assert self.selected_cell != (-1, -1), "You must select a cell in order to unlock it"
-        test_errors(coordinates=self.selected_cell)
+        test_errors(self.grid.size, coordinates = self.selected_cell)
         
         # Code de la fonction
         # Si la case sélectionnée est "superlocked"
@@ -253,8 +248,8 @@ class Sudoku:
         Enlève toutes les cases qui ne sont pas superlocked
         """
         
-        for x in range(self.game.sudoku.grid.size):
-            for y in range(self.game.sudoku.grid.size):
+        for x in range(self.grid.size):
+            for y in range(self.grid.size):
                 if self.grid.get_cell_state((x, y)) == "unlocked":
                     self.grid.set_cell_value((x, y), 0)
                     self.verify_cell((x, y))
@@ -266,8 +261,8 @@ class Sudoku:
         
         # Pour tout les formats de grille possibles (lignes, colonnes et carrés)
         for grid_format in [self.grid.get_content_as(format) for format in ["lines", "columns", "squares"]]:
-            for x in range(self.game.sudoku.grid.size):
-                for n in range(1, 1 + self.game.sudoku.grid.size):
+            for x in range(self.grid.size):
+                for n in range(1, 1 + self.grid.size):
                     
                     # Si l'un des sous-groupes de ce format compte plusieur fois le même chiffre
                     if grid_format[x].count(n) > 1:
@@ -306,7 +301,7 @@ class Sudoku:
                     self.conflicting_cells.remove(cell_coordinates)
             
             # Pour toutes les valeurs n possibles
-            for n in range(1, 1+ self.game.sudoku.grid.size):
+            for n in range(1, 1+ self.grid.size):
                 # Si la valeur est en conflit avec d'autres dans le groupe courant
                 if group_values.count(n) > 1:
                     # Pour toutes les cases du groupe courant
@@ -332,14 +327,10 @@ class Sudoku:
             if not cell_coordinates in self.conflicting_cells:
                 self.conflicting_cells.append(cell_coordinates)
         
-        # Affichage des couleurs sur le texte
-        for x in range(self.game.sudoku.grid.size):
-            for y in range(self.game.sudoku.grid.size):
-                if self.do_display_conflicts and (x, y) in self.conflicting_cells:
-                    self.grid.set_cell_color((x, y), (255, 0, 0))
-                
-                else:
-                    self.grid.set_cell_color((x, y), (0, 0, 0))
+        # Mets à jours l'état de conflit de toutes les cases
+        for x in range(self.grid.size):
+            for y in range(self.grid.size):
+                self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
     
     def generate_grid(self, generate_numbers: int = 0):
         """
@@ -384,7 +375,7 @@ class Sudoku:
                     if len(self.conflicting_cells) == 0:
                         break
                 
-                if len(self.conflicting_cells) != 0: # si au moin une valeur est possibles -> nouvelle cellule
+                if len(self.conflicting_cells) != 0: # si au moin une valeur est possibles -> nouvelle case
                     generate_numbers += 1  # pour compenser le coup de perdu
                     self.grid.set_cell_value(coordinates, 0)
             
@@ -459,7 +450,7 @@ class Sudoku:
     def put_obvious_solutions(self, do_display: bool = True) -> list[tuple[int, int]]:
         """
         Met dans la grille les chiffres évidents (les case où il n'y a qu'un chiffre possible)
-        :return la liste des cellules modifiées (coordonnées)
+        :return la liste des cases modifiées (coordonnées)
         """
         
         modified_cells = list()
@@ -496,7 +487,7 @@ class Sudoku:
             # Si la grille est remplie, renvoyer True si elle est résolue, et False si la résolution n'est pas valide
             return self.is_valid()
         
-        # met les valeurs évidentes des cellules
+        # met les valeurs évidentes des cases
         modified_cells_coordinates = self.put_obvious_solutions(do_display = do_display)
         #modified_cells_coordinates = list()
         # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles
@@ -506,7 +497,7 @@ class Sudoku:
             else [-1] for y in range(self.grid.size) for x in range(self.grid.size)
         ]
         
-        # supprime tous les éléments [-1] = cellules superlocked ou cases avec déjà des valeurs
+        # supprime tous les éléments [-1] = cases superlocked ou cases avec déjà des valeurs
         possible_values = list(filter(lambda x: x != [-1], possible_values))
         # tri les éléments de la liste en fonction de la longueur de la liste des valeurs possibles (tri du moins de possibilités au plus de possibilités)
         possible_values.sort(key = lambda v: len(v[0]))
@@ -517,7 +508,7 @@ class Sudoku:
             return self.is_valid()
         # balaye dans les solutions
         for value in values:
-            # defini la valeur de la cellule
+            # defini la valeur de la case
             self.grid.set_cell_value(cell_coordinates, value)
             # affiche la valeur
             self.game.cell_update(cell_coordinates, do_display)
@@ -525,12 +516,12 @@ class Sudoku:
                 return True
             
             else:
-                # defini la valeur de la cellule à 0
+                # defini la valeur de la case à 0
                 self.grid.set_cell_value(cell_coordinates, 0)
                 # affiche la valeur 0
                 self.game.cell_update(cell_coordinates, do_display)
 
-        # défini la valeur des cellules modifiées dans put_obvious_solutions à 0
+        # défini la valeur des cases modifiées dans put_obvious_solutions à 0
         if modified_cells_coordinates:
             for coordinates in modified_cells_coordinates:
                 self.grid.set_cell_value(coordinates, 0)

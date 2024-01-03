@@ -1,4 +1,3 @@
-from src.programs.text import Text
 from src.programs.test_errors import test_errors
 
 class Cell:
@@ -10,61 +9,34 @@ class Cell:
         
         test_errors(value = value, state = state)
         
-        self.text = Text("", "Arial", 30, (0, 0, 0))  # crée l'objet texte
-        self.resolved = False
-        self.set_value(value)  # entre 0 et 9 (0 = case vide)
-        self.set_state(state)  # valeurs possibles: "unlocked", "locked", "superlocked"
-    
-    def get_value(self) -> int:
-        """
-        Renvoi la valeur de la case
-        """
+        self.value = value
+        self.state = state
         
-        return self.value
-    
-    def get_state(self) -> str:
-        """
-        Renvoi l'état de la case
-        """
-        
-        return self.state
-
-    def get_text(self) -> Text:
-        """
-        Renvoi le text de la case
-        """
-        
-        return self.text
+        self.is_in_conflict = False
     
     def set_value(self, value: int):
         """
-        Met la valeur de la case à `value`
+        Met la valeur de la case à "value"
         """
         
         test_errors(value = value)
         
         self.value = value
-        
-        if self.value != 0:
-            self.text.set_text(str(self.value))
-            
-        else:
-            self.text.set_text("")
 
     def set_state(self, state: str):
         """
-        Met l'état de la case sur `state`
+        Met l'état de la case à "state"
         """
         
         test_errors(state = state)
         
         self.state = state
         
-    def set_color(self, color: tuple[int, int, int]):
+    def set_conflicting_state(self, conflicting_state: bool):
         """
-        Met la couleur de la case à `color`
+        Met la variable "is_in_conflict" à "conflicting_state"
         """
         
-        test_errors(color = color)
+        assert type(conflicting_state) == bool, 'The "conflicting_state" argument must be a boolean'
         
-        self.text.set_color(color)
+        self.is_in_conflict = conflicting_state

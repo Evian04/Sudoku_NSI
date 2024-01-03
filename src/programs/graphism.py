@@ -2,16 +2,28 @@ import pygame
 from src.programs.test_errors import test_errors
 
 class Graphism:
+    """
+    La classe "Graphism" permet de gérer l'affichage des éléments sur la fenêtre
+    """
     
     def __init__(self, game, background_color: tuple[int, int, int]):
         self.screen: pygame.Surface = game.screen
         self.game = game
         
+        self.do_display_conflicts = True
+        
         self.background_color = background_color
+    
+    def reverse_display_conflicts(self):
+        """
+        Cette fonction inverse l'état de la variable booléenne "self.do_display_conflicts"
+        """
+        
+        self.do_display_conflicts = not self.do_display_conflicts
     
     def display_elements(self):
         """
-        Permet de placer les éléments à afficher sur le brouillon de l'écran
+        Permet de placer les éléments à afficher sur l'écran
         """
         
         # Affichage du fond d'écran
@@ -54,44 +66,51 @@ class Graphism:
                 if self.game.sudoku.grid.get_cell((x, y)).state == "locked":  # affichage des cases verrouillées
                     self.screen.blit(self.padlock_image, self.all_cell_rect[x][y])
                 
-                # affichage du texte (numéro) pour chaque cellule
-                text = self.game.sudoku.grid.get_cell((x, y)).text.get_text()
-                self.screen.blit(
-                    text,
-                    [
-                        self.all_cell_rect[x][y].center[0] - text.get_width() / 2,
-                        self.all_cell_rect[x][y].center[1] - text.get_height() / 2,
-                        self.all_cell_rect[x][y].width,
-                        self.all_cell_rect[x][y].height
-                    ]
-                )
+                # affichage du chiffre de chaque case
+                self.display_cell_digit((x, y))
     
     def cell_display_element(self, coordinates: tuple[int, int]):
         """
-        mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
-        :param coordinates: coordonnées de la cellule à mettre à jour
+        mise à jour rapide d'une case uniquement, utilisée lors de la résolution
+        :param coordinates: coordonnées de la case à mettre à jour
         """
         # Test de préconditions
-        test_errors(coordinates=coordinates)
+        test_errors(self.game.sudoku.grid.size, coordinates = coordinates)
         
         x, y = coordinates
         
         self.screen.blit(self.cell_image, self.all_cell_rect[x][y])
         
         # Affichage du cadena si la case est "locked"
-        if self.game.sudoku.grid.get_cell_state((x, y)) == "locked":
+        if self.game.sudoku.grid.get_cell_state(coordinates) == "locked":
             self.screen.blit(self.padlock_image, self.all_cell_rect[x][y])
         
-        # affichage du texte (numéro) de la cellule
-        text = self.game.sudoku.grid.get_cell((x, y)).text.get_text()
+        # affichage du chiffre de la case
+        self.display_cell_digit(coordinates)
+    
+    def display_cell_digit(self, coordinates):
+        """
+        Permet d'afficher un chiffre particulier dans une case
+        """
+        
+        test_errors(self.game.sudoku.grid.size, coordinates = coordinates)
+        
+        digit = self.game.sudoku.grid.get_cell_value(coordinates)
+        
+        if digit == 0:
+            return
+        
+        if not self.game.sudoku.grid.is_cell_in_conflict(coordinates) or not self.do_display_conflicts:
+            digit_image = self.all_digits_image[digit - 1]
+            
+        else:
+            digit_image = self.all_digits_image[digit + 8]
+        
+        x, y = coordinates
+        
         self.screen.blit(
-            text,
-            [
-                self.all_cell_rect[x][y].center[0] - text.get_width() / 2,
-                self.all_cell_rect[x][y].center[1] - text.get_height() / 2,
-                self.all_cell_rect[x][y].width,
-                self.all_cell_rect[x][y].height
-            ]
+            digit_image,
+            self.all_cell_rect[x][y]
         )
     
     def update_rect(self):
@@ -107,10 +126,12 @@ class Graphism:
             self.rect_ref_distance = self.screen.get_width() * (2 / 3)
             
         self.rect_ref_distance *= 0.9
-        
         self.outline_thickness = self.rect_ref_distance / 28 # 28 est le ratio entre la longueur du grand carré et de la marge
         
+        self.cell_dimensions = [(self.rect_ref_distance - 4 * self.outline_thickness) * (1 / self.game.sudoku.grid.size)] * 2
+        
         self.update_buttons_rect()
+        self.update_digits_rect()
         
         self.outline_image = pygame.image.load("src/graphics/outline.png")
         self.outline_image = pygame.transform.scale(self.outline_image, [self.rect_ref_distance] * 2)
@@ -119,19 +140,17 @@ class Graphism:
         self.outline_rect.x = self.screen.get_width() * (1 / 2) - self.rect_ref_distance * (1 / 4)
         self.outline_rect.y = self.screen.get_height() * (1 / 2) - self.rect_ref_distance * (1 / 2)
         
-        cell_dimensions = [(self.rect_ref_distance - 4 * self.outline_thickness) * (1 / self.game.sudoku.grid.size)] * 2
-        
         self.cell_image = pygame.image.load("src/graphics/cell.png")
-        self.cell_image = pygame.transform.scale(self.cell_image, cell_dimensions)
+        self.cell_image = pygame.transform.scale(self.cell_image, self.cell_dimensions)
         
         self.superlocked_cell_image = pygame.image.load("src/graphics/superlocked_cell.png")
-        self.superlocked_cell_image = pygame.transform.scale(self.superlocked_cell_image, cell_dimensions)
+        self.superlocked_cell_image = pygame.transform.scale(self.superlocked_cell_image, self.cell_dimensions)
         
         self.selected_cell_image = pygame.image.load("src/graphics/selected_cell.png")
-        self.selected_cell_image = pygame.transform.scale(self.selected_cell_image, cell_dimensions)
+        self.selected_cell_image = pygame.transform.scale(self.selected_cell_image, self.cell_dimensions)
         
         self.superlocked_selected_cell_image = pygame.image.load("src/graphics/superlocked_selected_cell.png")
-        self.superlocked_selected_cell_image = pygame.transform.scale(self.superlocked_selected_cell_image, cell_dimensions)
+        self.superlocked_selected_cell_image = pygame.transform.scale(self.superlocked_selected_cell_image, self.cell_dimensions)
         
         self.padlock_image = pygame.image.load("src/graphics/padlock.png")
         self.padlock_image = pygame.transform.scale(self.padlock_image, [self.cell_image.get_width() / 6] * 2)
@@ -144,20 +163,22 @@ class Graphism:
                 self.cell_image.get_height()
             ])
         for y in range(self.game.sudoku.grid.size)] for x in range(self.game.sudoku.grid.size)]
+    
+    def update_digits_rect(self):
+        self.all_digits_image: list[pygame.Surface] = []
         
-        # recalcule et réattribue les valeurs de la taille des textes
-        for x in range(self.game.sudoku.grid.size):
-            for y in range(self.game.sudoku.grid.size):
-                self.game.sudoku.grid.get_cell((x, y)).text.set_font_size(round(0.375 * self.all_cell_rect[x][y].height))
-                # 0.375 est le rapport entre la taille d'un carré et la taille de la police
-                # /!\ Méthode provisoire, le text sera remplacé par des images
+        for color in ["black", "red"]:
+            for i in range(1, 10):
+                digit_image = pygame.image.load(f"src/graphics/digits/{i}_{color}.png")
+                digit_image = pygame.transform.scale(digit_image, self.cell_dimensions)
+                self.all_digits_image.append(digit_image)
     
     def update_buttons_rect(self):
         """
         Calcule les dimensions et les coordonnées des éléments de la fenêtre
         """
         
-        self.verification_button = pygame.image.load("src/graphics/buttons/verification_{}.png".format("on" if self.game.sudoku.do_display_conflicts else "off"))
+        self.verification_button = pygame.image.load("src/graphics/buttons/verification_{}.png".format("on" if self.do_display_conflicts else "off"))
         
         buttons_dimensions = [
             self.rect_ref_distance * (1 / 2) - self.outline_thickness,

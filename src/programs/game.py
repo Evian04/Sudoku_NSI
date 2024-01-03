@@ -6,6 +6,10 @@ from src.programs.test_errors import test_errors
 
 
 class Game:
+    """
+    La classe Game permet de mettre à jour la fenêtre en mettant en relation les entrées
+    de l'utilisateurs avec le contenu du sudoku et la gestion des graphismes
+    """
     
     def __init__(self, screen: pygame.Surface, grid_size: int):
         self.screen = screen
@@ -18,7 +22,7 @@ class Game:
         self.title = f"Sudoku {self.sudoku.grid.size}x{self.sudoku.grid.size}"
         pygame.display.set_caption(self.title)  # Nom de la fenêtre
         
-        self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une cellule
+        self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une case
             pygame.K_1:         1,
             pygame.K_2:         2,
             pygame.K_3:         3,
@@ -78,7 +82,7 @@ class Game:
                             self.sudoku.select_cell((x, y))
                 
                 if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.sudoku.reverse_display_conflicts()
+                    self.graphism.reverse_display_conflicts()
                     self.graphism.update_buttons_rect()
                 
                 elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
@@ -134,7 +138,7 @@ class Game:
                         # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)
                         value = self.key_mapping[event.key]
                         
-                        # modifie la valeur de la cellule selectionnée
+                        # modifie la valeur de la case selectionnée
                         self.sudoku.set_selected_cell_value(value)
                         self.sudoku.verify_selected_cell()  # vérifie si cette valeur est déjà présente sur la ligne, colonne, carré
                     
@@ -148,11 +152,11 @@ class Game:
     
     def cell_update(self, coordinates: tuple[int, int], do_display: bool = True, all_events: list[pygame.event.Event] = None):
         """
-        mise à jour rapide d'une cellule uniquement, utilisée lors de la résolution
-        :param coordinates: coordonnée de la cellule à mettre à jour
+        mise à jour rapide d'une case uniquement, utilisée lors de la résolution
+        :param coordinates: coordonnée de la case à mettre à jour
         :param all_events: ensemble des évenements en cours
         """
-        test_errors(coordinates=coordinates)
+        test_errors(self.sudoku.grid.size, coordinates=coordinates)
         if not all_events: all_events = pygame.event.get()
         
         if do_display: self.graphism.cell_display_element(coordinates)
@@ -169,8 +173,3 @@ class Game:
                 if not do_display: pygame.display.flip()
                 
         if do_display: pygame.display.flip()
-    
-    def verify(self):
-        """
-        Vérifie et applique les modifications (changement de couleurs) si des cases sont identiques sur des lignes, colonnes, carrés
-        """
