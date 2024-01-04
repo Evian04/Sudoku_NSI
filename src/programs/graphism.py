@@ -69,7 +69,7 @@ class Graphism:
                 # affichage du chiffre de chaque case
                 self.display_cell_digit((x, y))
     
-    def cell_display_element(self, coordinates: tuple[int, int]):
+    def display_cell_elements(self, coordinates: tuple[int, int]):
         """
         mise à jour rapide d'une case uniquement, utilisée lors de la résolution
         :param coordinates: coordonnées de la case à mettre à jour
@@ -153,7 +153,7 @@ class Graphism:
         self.superlocked_selected_cell_image = pygame.transform.scale(self.superlocked_selected_cell_image, self.cell_dimensions)
         
         self.padlock_image = pygame.image.load("src/graphics/padlock.png")
-        self.padlock_image = pygame.transform.scale(self.padlock_image, [self.cell_image.get_width() / 6] * 2)
+        self.padlock_image = pygame.transform.scale(self.padlock_image, [self.cell_image.get_width() / 4] * 2)
         
         self.all_cell_rect = [[
             pygame.Rect([

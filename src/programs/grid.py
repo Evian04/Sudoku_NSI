@@ -8,7 +8,7 @@ class Grid:
     """
     
     def __init__(self, size: int = 9, content: list[list[Cell]] = None):
-        test_errors(grid_size = size)
+        test_errors(size)
         self.size = size
         self.square_size = int(size ** 0.5)
         if content:
@@ -17,7 +17,7 @@ class Grid:
         
         else:
             # Sinon créer une grille vierge
-            self.content = [[Cell(0, "unlocked") for y in range(self.size)] for x in range(self.size)]
+            self.content = [[Cell(0, "unlocked", self.size) for y in range(self.size)] for x in range(self.size)]
         
     def get_cell(self, coordinates: tuple[int, int]) -> Cell:
         """
@@ -37,7 +37,7 @@ class Grid:
         
         for x in range(self.size):
             for y in range(self.size):
-                self.content[x][y] = Cell(list_values[x][y], list_states[x][y])
+                self.content[x][y] = Cell(list_values[x][y], list_states[x][y], self.size)
     
     def get_all_values(self) -> list[list[int]]:
         """
@@ -101,7 +101,7 @@ class Grid:
         Renvois si la case est en conflit avec d'autres ou non
         """
         
-        test_errors(coordinates = coordinates)
+        test_errors(self.size, coordinates = coordinates)
         
         x, y = coordinates
         conflicting_state = self.content[x][y].is_in_conflict
@@ -144,18 +144,33 @@ class Grid:
                     (coordinates[0] % self.square_size) * self.square_size + coordinates[1] % self.square_size
                 )
     
-    def get_content_as(self, format: str) -> list[list[int]]:
+    def get_all_values_as(self, format: str) -> list[list[int]]:
         """
-        Renvoi le contenu de la grille ligne par ligne, colonne par colonne ou carré par carré (argument "format")
+        Renvoi les valeurs des cases de la grille en lignes, colonnes ou carrés (argument "format")
         """
+        
+        test_errors(format = format)
         
         return [
             [
                 self.get_cell_value(self.get_coordinates_as((x, y), format, "lines")) for y in range(self.size)
             ] for x in range(self.size)
         ]
+        
+    def get_all_coordinates_as(self, format: str) -> list[list[tuple[int, int]]]:
+        """
+        Renvois les coordonnées des cases de la grilles ordonnées en lignes, colonnes ou carrés (argument "format")
+        """
+        
+        test_errors(format = format)
+        
+        return [
+            [
+                self.get_coordinates_as((x, y), format, "lines") for y in range(self.size)
+            ] for x in range(self.size)
+        ]
     
-    def get_coordinates_group(self, coordinates: tuple[int, int], format: str) -> list[tuple[int, int]]:
+    def get_group_coordinates(self, coordinates: tuple[int, int], format: str) -> list[tuple[int, int]]:
         """
         Renvoi la liste des coordonnées des cases appartenant au même groupe que la case "coordinates"
         l'argument "format" indique le type de groupe à prendre en compte (ligne, colonne ou carré)
@@ -167,10 +182,10 @@ class Grid:
         
         return [self.get_coordinates_as((formated_coordinates[0], y), format, "lines") for y in range(self.size)]
     
-    def get_cell_group(self, coordinates: tuple[int, int], format: str) -> list[int]:
+    def get_group_values(self, coordinates: tuple[int, int], format: str) -> list[int]:
         """
         Renvoi la liste des valeurs des cases appartenant au même groupe que la case "coordinates"
-        l'argument "format" indique le type de groupe à prendre en compte (ligne, colonne ou carré)
+        L'argument "format" indique le type de groupe à prendre en compte (ligne, colonne ou carré)
         """
         
         test_errors(self.size, coordinates = coordinates, format = format)
@@ -224,7 +239,7 @@ class Grid:
         
         # Pour tout les formats existants
         for format in ["lines", "columns", "squares"]:
-            group = self.get_cell_group(coordinates, format)
+            group = self.get_group_values(coordinates, format)
             
             for cell_value in group:
                 if cell_value in possible_values:

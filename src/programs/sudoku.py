@@ -14,8 +14,10 @@ class Sudoku:
     """
     
     def __init__(self, game, grid_size: int):
+        test_errors(grid_size)
+        
         self.game = game
-        self.grid = Grid(size = grid_size)  # /!\ mofifier aussi dans test_errors
+        self.grid = Grid(grid_size)
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[int, int]] = list()
     
@@ -160,7 +162,7 @@ class Sudoku:
         
         # Remplace le contenu de la grille par le contenu lu dans le fichier
         self.grid.set_content(list_values, list_states)
-        # print([[cell.value for cell in line] for line in self.grid.content])
+        self.verify_overall()
     
     def save_grid(self):
         """
@@ -243,24 +245,13 @@ class Sudoku:
         # Sinon, mettre l'état de la case sélectionnée à "unlocked"
         self.grid.set_cell_state(self.selected_cell, "unlocked")
     
-    def clear(self):
-        """
-        Enlève toutes les cases qui ne sont pas superlocked
-        """
-        
-        for x in range(self.grid.size):
-            for y in range(self.grid.size):
-                if self.grid.get_cell_state((x, y)) == "unlocked":
-                    self.grid.set_cell_value((x, y), 0)
-                    self.verify_cell((x, y))
-    
     def is_valid(self) -> bool:
         """
         Renvoi True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
         """
         
         # Pour tout les formats de grille possibles (lignes, colonnes et carrés)
-        for grid_format in [self.grid.get_content_as(format) for format in ["lines", "columns", "squares"]]:
+        for grid_format in [self.grid.get_all_values_as(format) for format in ["lines", "columns", "squares"]]:
             for x in range(self.grid.size):
                 for n in range(1, 1 + self.grid.size):
                     
@@ -272,62 +263,43 @@ class Sudoku:
         # Si aucun doublon n'a été trouvé, renvoyer True
         return True
     
-    def verify_selected_cell(self):
+    def verify_overall(self):
         """
-        Appelle la fonction "verify_cell" avec les coordonnées de la case sélectionnée
-        """
-        
-        if self.selected_cell == (-1, -1):
-            return
-        
-        self.verify_cell(self.selected_cell)
-                    
-    def verify_cell(self, cell_coordinates: tuple[int, int]):
-        """
-        Vérifie si la case "cell_coordinates" est en conflit avec d'autres cases dans la grille
+        Vérifie dans toute la grille si des cases sont en conflit
         """
         
         tmp_conflicting_cells = list()  # Liste temporaire dans laquelle seront stockées les coordonnées des cases en conflits
         
         # Pour tous les formats possibles
         for format in ["lines", "columns", "squares"]:
-            # Récupère les valeurs et les coordonnées du groupe correspondant à ce format
-            group_coordinates = self.grid.get_coordinates_group(cell_coordinates, format)
-            group_values = self.grid.get_cell_group(cell_coordinates, format)
+            all_values = self.grid.get_all_values_as(format)
+            all_coordinates = self.grid.get_all_coordinates_as(format)
             
-            # Enlève toutes les cases vide de la liste des cases en conflit
-            for cell_coordinates in group_coordinates:
-                if self.grid.get_cell_value(cell_coordinates) == 0 and cell_coordinates in self.conflicting_cells:
-                    self.conflicting_cells.remove(cell_coordinates)
-            
-            # Pour toutes les valeurs n possibles
-            for n in range(1, 1+ self.grid.size):
-                # Si la valeur est en conflit avec d'autres dans le groupe courant
-                if group_values.count(n) > 1:
-                    # Pour toutes les cases du groupe courant
-                    for cell_coordinates in group_coordinates:
-                        # Si la case a pour valeur n
-                        if self.grid.get_cell_value(cell_coordinates) == n:
-                            # Ajouter la case à la liste temporaire des cases en conflit
-                            tmp_conflicting_cells.append(cell_coordinates)
+            for x in range(self.grid.size):
+                group_values = all_values[x]
+                groupe_coordinates = all_coordinates[x]
                 
-                # Si au contraire la valeur n'est pas en conflit avec d'autres dans le groupe courant
-                else:
-                    # Pour toutes les cases du groupe courant
-                    for cell_coordinates in group_coordinates:
-                        # Si la case a pour valeur n mais qu'elle est dans la liste des cases en conflit
-                        if self.grid.get_cell_value(
-                                cell_coordinates) == n and cell_coordinates in self.conflicting_cells:
-                            # Retirer la case de la liste des cases en conflit
-                            self.conflicting_cells.remove(cell_coordinates)
+                for n in range(self.grid.size + 1):
+                    if group_values.count(n) > 1 and n != 0:
+                        
+                        for y in range(self.grid.size):
+                            if group_values[y] == n and not groupe_coordinates[y] in tmp_conflicting_cells:
+                                tmp_conflicting_cells.append(groupe_coordinates[y])
+                    
+                    else:
+                        for y in range(self.grid.size):
+                            if group_values[y] == n and groupe_coordinates[y] in self.conflicting_cells:
+                                self.conflicting_cells.remove(groupe_coordinates[y])
         
-        # Pour toutes les cases qui sont en conflits
-        for cell_coordinates in tmp_conflicting_cells:
-            # Si la case n'est pas dans la liste des cases en conflits
-            if not cell_coordinates in self.conflicting_cells:
-                self.conflicting_cells.append(cell_coordinates)
+        for x in range(self.grid.size):
+            for y in range(self.grid.size):
+                
+                if (x, y) in tmp_conflicting_cells and not (x, y) in self.conflicting_cells:
+                    self.conflicting_cells.append((x, y))
         
-        # Mets à jours l'état de conflit de toutes les cases
+        self.update_cells_conflicting_state()
+    
+    def update_cells_conflicting_state(self):
         for x in range(self.grid.size):
             for y in range(self.grid.size):
                 self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
@@ -370,7 +342,7 @@ class Sudoku:
                     #self.selected_cell = coordinates
                     self.grid.set_cell_value(coordinates, value)
                     self.game.cell_update(coordinates, do_display = False)
-                    self.verify_selected_cell()
+                    self.verify_overall()
 
                     if len(self.conflicting_cells) == 0:
                         break
@@ -380,8 +352,8 @@ class Sudoku:
                     self.grid.set_cell_value(coordinates, 0)
             
             self.selected_cell = (-1, -1)
-            if self.solve_generated_grid():
-                break
+            if self.solve_generated_grid(): break
+            
             else:
                 self.clear_inputs()
                 self.game.update(do_display = False)
@@ -391,11 +363,13 @@ class Sudoku:
         pygame.display.set_caption(self.game.title)
         
         
-    def solve_grid(self):
+    def solve_grid(self, do_display: bool):
         """
         Résout le Sudoku, tient compte des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
-        :return:
         """
+        
+        assert type(do_display) == bool, f'The "do_display" argument must be a boolean (type : {type(do_display)})'
+        
         starting_time = time.time()
         pygame.display.set_caption(self.game.title + " (solving...)")
         print('solving...')
@@ -407,7 +381,7 @@ class Sudoku:
         if not self.is_valid():
             print("Invalid input, cannot solve the sudoku")
 
-        elif self.backtracking_solving():
+        elif self.backtracking_solving(do_display):
             print("Sudoku solved successfully")
             print("solving executing time:", time.time() - starting_time)
 
@@ -420,15 +394,12 @@ class Sudoku:
     def solve_generated_grid(self):
         """
         Résout le Sudoku, tient compte ou non des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
-        :return:
         """
-        # self.put_obvious_solutions()
-        #self.game.display_elements()
         
         if not self.is_valid():
             return False
     
-        if self.backtracking_solving(do_display=False):
+        if self.backtracking_solving(False):
             return True
     
         else:
@@ -437,7 +408,6 @@ class Sudoku:
     def clear_inputs(self):
         """
         Supprime toutes les valeurs entrées par l'utilisateur
-        Fonction appelée uniquement par sole_grid()
         """
         
         for x in range(self.grid.size):
@@ -450,7 +420,7 @@ class Sudoku:
     def put_obvious_solutions(self, do_display: bool = True) -> list[tuple[int, int]]:
         """
         Met dans la grille les chiffres évidents (les case où il n'y a qu'un chiffre possible)
-        :return la liste des cases modifiées (coordonnées)
+        Renvois la liste des coordonnées des cases modifiées
         """
         
         modified_cells = list()
@@ -472,7 +442,7 @@ class Sudoku:
 
         return modified_cells
 
-    def backtracking_solving(self, do_display: bool = True) -> bool:
+    def backtracking_solving(self, do_display: bool) -> bool:
         """
         Fonction récursive qui résout le Sudoku en testant toutes les possibilités
         Renvoi True si la grille courante est possible à résoudre, et False si elle ne l'est pas
@@ -488,42 +458,53 @@ class Sudoku:
             return self.is_valid()
         
         # met les valeurs évidentes des cases
-        modified_cells_coordinates = self.put_obvious_solutions(do_display = do_display)
-        #modified_cells_coordinates = list()
-        # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles
-        possible_values = [
+        modified_cells_coordinates = self.put_obvious_solutions(do_display)
+        
+        # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles)
+        cells_to_fill = [
             [self.grid.get_possible_values((x, y)), (x, y)]
             if self.grid.get_cell_state((x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == 0
-            else [-1] for y in range(self.grid.size) for x in range(self.grid.size)
+            else []
+            for y in range(self.grid.size) for x in range(self.grid.size)
         ]
         
-        # supprime tous les éléments [-1] = cases superlocked ou cases avec déjà des valeurs
-        possible_values = list(filter(lambda x: x != [-1], possible_values))
-        # tri les éléments de la liste en fonction de la longueur de la liste des valeurs possibles (tri du moins de possibilités au plus de possibilités)
-        possible_values.sort(key = lambda v: len(v[0]))
-        # récupère la première valeur = nombre minimale de solution
-        if len(possible_values) >= 1:  # test si il reste des possibilités à tester signifie que put obvious solutions a suffit
-            values, cell_coordinates = possible_values[0]
-        else: # vérifier la validité de la grille
+        # supprime tous les éléments [] = cases superlocked ou cases avec déjà des valeurs
+        cells_to_fill = list(filter(lambda x: x != [], cells_to_fill))
+        
+        """while [] in cells_to_fill:
+            cells_to_fill.remove([])"""
+        
+        # Si il n'y a pas de case vide
+        if len(cells_to_fill) == 0:
+            # Renvoyer la validité du sudoku obtenu
             return self.is_valid()
-        # balaye dans les solutions
-        for value in values:
-            # defini la valeur de la case
+        
+        # tri les cases de la liste en fonction du nombre de valeurs possibles
+        cells_to_fill.sort(key = lambda element: len(element[0]))
+        
+        # Récupère les coordonnées et valeurs possibles de la cases ayant le moins de valeurs possibles
+        cell_possible_values, cell_coordinates = cells_to_fill[0]
+        
+        # Pour toutes les valeurs possibles de la case
+        for value in cell_possible_values:
+            # Met la valeur de la case à "value"
             self.grid.set_cell_value(cell_coordinates, value)
+            
             # affiche la valeur
             self.game.cell_update(cell_coordinates, do_display)
-            if self.backtracking_solving(do_display=do_display):  # méthode récursive pour trouver les bonnes valeurs
+            
+            # Si la fonction récursive renvois une réponse positive, alors faire remonter la réponse 
+            if self.backtracking_solving(do_display):
                 return True
             
+            # Sinon retirer la valeur mise dans la case
             else:
-                # defini la valeur de la case à 0
                 self.grid.set_cell_value(cell_coordinates, 0)
-                # affiche la valeur 0
-                self.game.cell_update(cell_coordinates, do_display)
+                self.game.cell_update(cell_coordinates, do_display) # Met à jour l'affichage du contenu de la case
 
-        # défini la valeur des cases modifiées dans put_obvious_solutions à 0
-        if modified_cells_coordinates:
-            for coordinates in modified_cells_coordinates:
-                self.grid.set_cell_value(coordinates, 0)
-        # Si aucune des valeurs possibles de la case ne marche, renvoyer False
+        # Enlève toutes les valeurs "évidentes" mises au préalable
+        for coordinates in modified_cells_coordinates:
+            self.grid.set_cell_value(coordinates, 0)
+        
+        # Renvoyer False car cela signifie qu'aucune solution n'a été trouvé
         return False
