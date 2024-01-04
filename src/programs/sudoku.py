@@ -162,7 +162,7 @@ class Sudoku:
         
         # Remplace le contenu de la grille par le contenu lu dans le fichier
         self.grid.set_content(list_values, list_states)
-        self.verify_overall()
+        self.verify_grid()
     
     def save_grid(self):
         """
@@ -263,7 +263,7 @@ class Sudoku:
         # Si aucun doublon n'a été trouvé, renvoyer True
         return True
     
-    def verify_overall(self):
+    def verify_grid(self):
         """
         Vérifie dans toute la grille si des cases sont en conflit
         """
@@ -342,7 +342,7 @@ class Sudoku:
                     #self.selected_cell = coordinates
                     self.grid.set_cell_value(coordinates, value)
                     self.game.cell_update(coordinates, do_display = False)
-                    self.verify_overall()
+                    self.verify_grid()
 
                     if len(self.conflicting_cells) == 0:
                         break

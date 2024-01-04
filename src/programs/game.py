@@ -20,8 +20,8 @@ class Game:
         
         self.do_display_during_solving = True
         
-        self.graphism = Graphism(self, (0, 0, 0))
         self.sudoku = Sudoku(self, grid_size = grid_size)
+        self.graphism = Graphism(self, (0, 0, 0))
         
         self.title = f"Sudoku {self.sudoku.grid.size}x{self.sudoku.grid.size}"
         pygame.display.set_caption(self.title)  # Nom de la fenêtre
@@ -69,19 +69,23 @@ class Game:
         # Pour tous les évènements qui ont eu lieu depuis la dernière mise à jour de la fenêtre
         for event in all_events:
             
-            # Si l'un des évènements est un redimensionnement de a fenêtre
+            # Si la fenètre est redimensionnée
             if event.type == pygame.WINDOWRESIZED:
-                # Mettre à jour la position des éléments de la fenêtre
+                # Mettre à jour la position / dimensions des éléments de la fenêtre
                 self.graphism.update_rect()
                 pygame.display.flip()
-            
-            if self.is_solving:  # ne pas vérifier les autres event si la résolution est en cours (économie performance)
+                
+            # Ne pas vérifier les autres event si la résolution est en cours (économie performance)
+            if self.is_solving:
                 continue
             
+            # Si l'utilisateur effectue un clique gauche
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Vérifier si le curseur de la souris est sur une case de la grille
                 for x in range(self.sudoku.grid.size):
                     for y in range(self.sudoku.grid.size):
                         if self.graphism.all_cell_rect[x][y].collidepoint(pygame.mouse.get_pos()):
+                            # Sélectionner la case qui a été cliquée
                             self.sudoku.select_cell((x, y))
                 
                 if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
@@ -90,7 +94,7 @@ class Game:
                 
                 elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.solve_grid(self.do_display_during_solving)
-                    self.sudoku.verify_overall()
+                    self.sudoku.verify_grid()
                 
                 elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.generate_grid()
@@ -119,7 +123,7 @@ class Game:
                 
                 if event.key == pygame.K_c:
                     self.sudoku.clear_inputs()
-                    self.sudoku.verify_overall()
+                    self.sudoku.verify_grid()
                 
                 if event.key == pygame.K_l:
                     if self.sudoku.selected_cell == (-1, -1):
@@ -156,7 +160,7 @@ class Game:
                     self.sudoku.set_selected_cell_value(value)
                     
                     # vérifie si cette valeur entre en conflit avec d'autres valeurs de la grille
-                    self.sudoku.verify_overall()
+                    self.sudoku.verify_grid()
         
         if do_display: pygame.display.flip()
     

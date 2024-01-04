@@ -9,6 +9,9 @@ class Graphism:
     def __init__(self, game, background_color: tuple[int, int, int]):
         self.screen: pygame.Surface = game.screen
         self.game = game
+        self.grid_size = game.sudoku.grid.size
+        self.square_size = int(self.grid_size ** 0.5)
+        print(self.grid_size, self.square_size)
         
         self.do_display_conflicts = True
         
@@ -40,8 +43,8 @@ class Graphism:
         self.screen.blit(self.outline_image, self.outline_rect)
         
         # Pour toutes les coordonnées de cases
-        for x in range(self.game.sudoku.grid.size):
-            for y in range(self.game.sudoku.grid.size):
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
                 rect = self.all_cell_rect[x][y]
                 
                 if self.game.sudoku.grid.get_cell_state((x, y)) != "superlocked" and (x, y) != self.game.sudoku.selected_cell:
@@ -60,8 +63,8 @@ class Graphism:
                     # Affichage d'une case superlocked et sélectionnée
                     self.screen.blit(self.superlocked_selected_cell_image, rect)
         
-        for x in range(self.game.sudoku.grid.size):
-            for y in range(self.game.sudoku.grid.size):
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
                 # affichage case locked (affichage du cadenas)
                 if self.game.sudoku.grid.get_cell((x, y)).state == "locked":  # affichage des cases verrouillées
                     self.screen.blit(self.padlock_image, self.all_cell_rect[x][y])
@@ -75,7 +78,7 @@ class Graphism:
         :param coordinates: coordonnées de la case à mettre à jour
         """
         # Test de préconditions
-        test_errors(self.game.sudoku.grid.size, coordinates = coordinates)
+        test_errors(self.grid_size, coordinates = coordinates)
         
         x, y = coordinates
         
@@ -93,7 +96,7 @@ class Graphism:
         Permet d'afficher un chiffre particulier dans une case
         """
         
-        test_errors(self.game.sudoku.grid.size, coordinates = coordinates)
+        test_errors(self.grid_size, coordinates = coordinates)
         
         digit = self.game.sudoku.grid.get_cell_value(coordinates)
         
@@ -128,7 +131,7 @@ class Graphism:
         self.rect_ref_distance *= 0.9
         self.outline_thickness = self.rect_ref_distance / 28 # 28 est le ratio entre la longueur du grand carré et de la marge
         
-        self.cell_dimensions = [(self.rect_ref_distance - 4 * self.outline_thickness) * (1 / self.game.sudoku.grid.size)] * 2
+        self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
         
         self.update_buttons_rect()
         self.update_digits_rect()
@@ -157,12 +160,12 @@ class Graphism:
         
         self.all_cell_rect = [[
             pygame.Rect([
-                self.outline_rect.x + self.outline_thickness * (1 + x // 3) + x * self.cell_image.get_width(),
-                self.outline_rect.y + self.outline_thickness * (1 + y // 3) + y * self.cell_image.get_height(),
+                self.outline_rect.x + self.outline_thickness * (1 + x // self.square_size) + x * self.cell_image.get_width(),
+                self.outline_rect.y + self.outline_thickness * (1 + y // self.square_size) + y * self.cell_image.get_height(),
                 self.cell_image.get_width(),
                 self.cell_image.get_height()
             ])
-        for y in range(self.game.sudoku.grid.size)] for x in range(self.game.sudoku.grid.size)]
+        for y in range(self.grid_size)] for x in range(self.grid_size)]
     
     def update_digits_rect(self):
         self.all_digits_image: list[pygame.Surface] = []
