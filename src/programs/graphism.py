@@ -11,7 +11,6 @@ class Graphism:
         self.game = game
         self.grid_size = game.sudoku.grid.size
         self.square_size = int(self.grid_size ** 0.5)
-        print(self.grid_size, self.square_size)
         
         self.do_display_conflicts = True
         
