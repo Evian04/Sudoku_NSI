@@ -416,6 +416,15 @@ class Sudoku:
                 if self.grid.get_cell_state((x, y)) != "superlocked":
                     self.grid.set_cell_state((x, y), "unlocked")
                     self.grid.set_cell_value((x, y), 0)
+    def clear(self):
+        """
+        supprime toutes les valeurs des cases autres que les superlocked et les locked
+        """
+        for x in range(self.grid.size):
+            for y in range(self.grid.size):
+        
+                if self.grid.get_cell_state((x, y)) == "unlocked":
+                    self.grid.set_cell_value((x, y), 0)
     
     def put_obvious_solutions(self, do_display: bool = True) -> list[tuple[int, int]]:
         """

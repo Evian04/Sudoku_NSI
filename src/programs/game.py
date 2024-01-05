@@ -122,7 +122,7 @@ class Game:
                     self.sudoku.move_selected_cell("down")
                 
                 if event.key == pygame.K_c:
-                    self.sudoku.clear_inputs()
+                    self.sudoku.clear()
                     self.sudoku.verify_grid()
                 
                 if event.key == pygame.K_l:
