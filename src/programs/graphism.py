@@ -173,7 +173,7 @@ class Graphism:
         self.superlocked_selected_cell_image = pygame.transform.scale(self.superlocked_selected_cell_image, self.cell_dimensions)
         
         self.padlock_image = pygame.image.load(f"src/graphics/{self.pack}/cells/padlock.png")
-        self.padlock_image = pygame.transform.scale(self.padlock_image, [self.cell_image.get_width() / 3] * 2)
+        self.padlock_image = pygame.transform.scale(self.padlock_image, [self.cell_image.get_width() / 2.3] * 2)
         
         self.all_cell_rect = [[
             pygame.Rect([
