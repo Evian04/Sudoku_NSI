@@ -17,7 +17,7 @@ class Sudoku:
         test_errors(grid_size)
         
         self.game = game
-        self.grid = Grid(grid_size)
+        self.grid = Grid(self.game.values, grid_size)
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[int, int]] = list()
     
@@ -97,7 +97,7 @@ class Sudoku:
         # Test des postconditions
         test_errors(self.grid.size, coordinates = self.selected_cell)
     
-    def set_selected_cell_value(self, value: int):
+    def set_selected_cell_value(self, value: str):
         """
         Met la valeur de la case sélectionnée à `value`
         """
@@ -146,7 +146,7 @@ class Sudoku:
         file_content = file_content.split("\n\n")
         # Formate la liste des valeurs au format list[list[int]]
         list_values = [
-            [int(line[i]) for line in file_content[0].split("\n")]
+            [line[i] for line in file_content[0].split("\n")]
             for i in range(len(file_content[0].split("\n")[0]))
         ]
         
@@ -253,8 +253,8 @@ class Sudoku:
         # Pour tout les formats de grille possibles (lignes, colonnes et carrés)
         for grid_format in [self.grid.get_all_values_as(format) for format in ["lines", "columns", "squares"]]:
             for x in range(self.grid.size):
-                for n in range(1, 1 + self.grid.size):
-                    
+                #for n in range(1, 1 + self.grid.size):
+                for n in self.game.values[:self.grid.size]:
                     # Si l'un des sous-groupes de ce format compte plusieur fois le même chiffre
                     if grid_format[x].count(n) > 1:
                         # Renvoyer False
@@ -279,7 +279,7 @@ class Sudoku:
                 group_values = all_values[x]
                 groupe_coordinates = all_coordinates[x]
                 
-                for n in range(self.grid.size + 1):
+                for n in self.game.values[:self.grid.size]:
                     if group_values.count(n) > 1 and n != 0:
                         
                         for y in range(self.grid.size):
@@ -319,7 +319,7 @@ class Sudoku:
         starting_time = time.time()
         
         #générer grille
-        self.grid = Grid(generate_numbers)
+        self.grid = Grid( self.game.values, generate_numbers)
         self.game.graphism.update_rect()
         self.game.graphism.display_elements()
         
@@ -349,7 +349,7 @@ class Sudoku:
                 
                 if len(self.conflicting_cells) != 0: # si au moin une valeur est possibles -> nouvelle case
                     generate_numbers += 1  # pour compenser le coup de perdu
-                    self.grid.set_cell_value(coordinates, 0)
+                    self.grid.set_cell_value(coordinates, '0')
             
             self.selected_cell = (-1, -1)
             if self.solve_generated_grid(): break
@@ -415,7 +415,7 @@ class Sudoku:
                 
                 if self.grid.get_cell_state((x, y)) != "superlocked":
                     self.grid.set_cell_state((x, y), "unlocked")
-                    self.grid.set_cell_value((x, y), 0)
+                    self.grid.set_cell_value((x, y), '0')
     def clear(self):
         """
         supprime toutes les valeurs des cases autres que les superlocked et les locked
@@ -424,7 +424,7 @@ class Sudoku:
             for y in range(self.grid.size):
         
                 if self.grid.get_cell_state((x, y)) == "unlocked":
-                    self.grid.set_cell_value((x, y), 0)
+                    self.grid.set_cell_value((x, y), '0')
     
     def put_obvious_solutions(self, do_display: bool = True) -> list[tuple[int, int]]:
         """
@@ -472,7 +472,7 @@ class Sudoku:
         # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles)
         cells_to_fill = [
             [self.grid.get_possible_values((x, y)), (x, y)]
-            if self.grid.get_cell_state((x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == 0
+            if self.grid.get_cell_state((x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == '0'
             else []
             for y in range(self.grid.size) for x in range(self.grid.size)
         ]
@@ -508,12 +508,12 @@ class Sudoku:
             
             # Sinon retirer la valeur mise dans la case
             else:
-                self.grid.set_cell_value(cell_coordinates, 0)
+                self.grid.set_cell_value(cell_coordinates, '0')
                 self.game.cell_update(cell_coordinates, do_display) # Met à jour l'affichage du contenu de la case
 
         # Enlève toutes les valeurs "évidentes" mises au préalable
         for coordinates in modified_cells_coordinates:
-            self.grid.set_cell_value(coordinates, 0)
+            self.grid.set_cell_value(coordinates, '0')
         
         # Renvoyer False car cela signifie qu'aucune solution n'a été trouvé
         return False

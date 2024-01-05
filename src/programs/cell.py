@@ -5,7 +5,7 @@ class Cell:
     La classe Cell contient les données relatives aux cases (valeur, état, etc...)
     """
     
-    def __init__(self, value: int, state: str, sudoku_size: int):
+    def __init__(self, value: str, state: str, sudoku_size: int):
         
         test_errors(sudoku_size, value = value, state = state)
         
@@ -15,11 +15,10 @@ class Cell:
         
         self.is_in_conflict = False
     
-    def set_value(self, value: int):
+    def set_value(self, value: str):
         """
         Met la valeur de la case à "value"
         """
-        
         test_errors(self.sudoku_size, value = value)
         
         self.value = value
