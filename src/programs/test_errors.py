@@ -25,8 +25,8 @@ def test_errors(sudoku_size = 0, **arguments):
         
         value = arguments["value"]
         
-        assert type(value) == str, f'The "value" argument must be an integer (type : {type(value)})'
-        assert 0 <= int(value) <= sudoku_size, f'The "value" argument must be between 0 and {sudoku_size} (value : {value})'
+        assert type(value) == str, f'The "value" argument must be a string (type : {type(value)})'
+        #assert 0 <= int(value) <= sudoku_size, f'The "value" argument must be between 0 and {sudoku_size} (value : {value})'
     
     if "color" in arguments:
         color = arguments["color"]
