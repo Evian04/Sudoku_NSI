@@ -90,7 +90,7 @@ class Game:
                 
                 if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.graphism.reverse_display_conflicts()
-                    self.graphism.update_buttons_rect()
+                    self.graphism.update_verification_rect()
                 
                 elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.solve_grid(self.do_display_during_solving)
