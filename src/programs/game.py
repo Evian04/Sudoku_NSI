@@ -20,7 +20,7 @@ class Game:
         
         self.do_display_during_solving = True
         
-        self.values = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
+        self.values = "123456789ABCDEFGHIJKLMNOP"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
 
         self.sudoku = Sudoku(self, grid_size = grid_size)
         self.graphism = Graphism(self, (0, 0, 0))

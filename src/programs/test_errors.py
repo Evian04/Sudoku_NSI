@@ -26,7 +26,7 @@ def test_errors(sudoku_size = 0, **arguments):
         value = arguments["value"]
         
         assert type(value) == str, f'The "value" argument must be an integer (type : {type(value)})'
-        #assert 0 <= value <= sudoku_size, f'The "value" argument must be between 0 and {sudoku_size} (value : {value})'
+        assert 0 <= int(value) <= sudoku_size, f'The "value" argument must be between 0 and {sudoku_size} (value : {value})'
     
     if "color" in arguments:
         color = arguments["color"]
@@ -66,9 +66,9 @@ def test_errors(sudoku_size = 0, **arguments):
                 f'The "list_values" argument must contains lists that have lengths of {sudoku_size} (value : {list_values})'
             
             for value in sub_list:
-                assert type(value) == int, \
-                    f'The "list_values" argument must contains lists that contains integers (value : {list_values})'
-                assert 0 <= value <= sudoku_size, \
+                assert type(value) == str, \
+                    f'The "list_values" argument must contains lists that contains strings (value : {list_values})'
+                assert 0 <= int(value) <= sudoku_size, \
                     f'The "list_values" argument must contains lists that contains integers between 0 and {sudoku_size} (value : {list_values})'
     
     if "list_states" in arguments:

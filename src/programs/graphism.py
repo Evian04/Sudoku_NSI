@@ -187,10 +187,10 @@ class Graphism:
     def update_digits_rect(self):
         self.all_digits_image: list[pygame.Surface] = []
         
-        for color in ["black", "red"]:
+        for color in ["regular", "wrong"]:
             #for i in range(1, 10):  # /!\ AJOUTER LA POSSIBILITE D'AVOIR + DE CHIFFRES -> LETTRES ?
             for i in self.game.values[:self.grid_size]:
-                digit_image = pygame.image.load(f"src/graphics/digits/{i}_{color}.png")
+                digit_image = pygame.image.load(f"src/graphics/{self.pack}/digits/{i}_{color}.png")
                 digit_image = pygame.transform.scale(digit_image, self.cell_dimensions)
                 self.all_digits_image.append(digit_image)
     

@@ -128,8 +128,8 @@ class Sudoku:
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
         file_path = askopenfilename(
             initialdir="src/save_folder",
-            initialfile="model_2.sdk",
-            filetypes=[("Sudoku file", "*.sdk")]
+            initialfile = "model_2.sdk",
+            filetypes = [("Sudoku file", "*.sdk")]
         )
         
         # Dans le cas où l'utilisateur n'a pas sélectionné de fichier
@@ -158,7 +158,7 @@ class Sudoku:
         ]
         
         # Test postconditions
-        test_errors(self.grid.size, list_values = list_values, list_states= list_states)
+        test_errors(self.grid.size, list_values = list_values, list_states = list_states)
         
         # Remplace le contenu de la grille par le contenu lu dans le fichier
         self.grid.set_content(list_values, list_states)
