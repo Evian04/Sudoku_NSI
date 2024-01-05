@@ -7,17 +7,18 @@ class Grid:
     La class "Grid" permet de stocker et de gérer le contenu de la grille du sudoku
     """
     
-    def __init__(self, size: int = 9, content: list[list[Cell]] = None):
+    def __init__(self, global_possibles_values: str, size: int = 9, content: list[list[Cell]] = None):
         test_errors(size)
         self.size = size
         self.square_size = int(size ** 0.5)
+        self.global_possibles_values = global_possibles_values
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu
             self.content = content.copy()
         
         else:
             # Sinon créer une grille vierge
-            self.content = [[Cell(0, "unlocked", self.size) for y in range(self.size)] for x in range(self.size)]
+            self.content = [[Cell('0', "unlocked", self.size) for y in range(self.size)] for x in range(self.size)]
         
     def get_cell(self, coordinates: tuple[int, int]) -> Cell:
         """
@@ -28,7 +29,7 @@ class Grid:
 
         return self.content[coordinates[0]][coordinates[1]]
     
-    def set_content(self, list_values: list[list[int]], list_states: list[list[str]]):
+    def set_content(self, list_values: list[list[str]], list_states: list[list[str]]):
         """
         Remplace le contenu de la grille par "new content"
         """
@@ -39,7 +40,7 @@ class Grid:
             for y in range(self.size):
                 self.content[x][y] = Cell(list_values[x][y], list_states[x][y], self.size)
     
-    def get_all_values(self) -> list[list[int]]:
+    def get_all_values(self) -> list[list[str]]:
         """
         Retourne une double liste de toutes les valeurs
         (identique à self.content, mais remplace les cases pas les valeurs des cases)
@@ -47,20 +48,19 @@ class Grid:
         
         return [[cell.value for cell in line] for line in self.content]
     
-    def set_cell_value(self, coordinates: tuple[int, int], value: int):
+    def set_cell_value(self, coordinates: tuple[int, int], value: str):
         """
         Met la case de coordonnées (x, y) à la valeur "value"
         """
         
         test_errors(self.size, coordinates = coordinates, value = value)
-        
         if self.content[coordinates[0]][coordinates[1]].state == "unlocked":
             self.content[coordinates[0]][coordinates[1]].set_value(value)
         
         else:
             print(f"Grid.set_cell: cell {coordinates} is locked or superlocked")
         
-    def get_cell_value(self, coordinates: tuple[int, int]) -> int:
+    def get_cell_value(self, coordinates: tuple[int, int]) -> str:
         """
         Renvoi la valeur de la case de coordonnées (x, y)
         """
@@ -144,7 +144,7 @@ class Grid:
                     (coordinates[0] % self.square_size) * self.square_size + coordinates[1] % self.square_size
                 )
     
-    def get_all_values_as(self, format: str) -> list[list[int]]:
+    def get_all_values_as(self, format: str) -> list[list[str]]:
         """
         Renvoi les valeurs des cases de la grille en lignes, colonnes ou carrés (argument "format")
         """
@@ -182,7 +182,7 @@ class Grid:
         
         return [self.get_coordinates_as((formated_coordinates[0], y), format, "lines") for y in range(self.size)]
     
-    def get_group_values(self, coordinates: tuple[int, int], format: str) -> list[int]:
+    def get_group_values(self, coordinates: tuple[int, int], format: str) -> list[str]:
         """
         Renvoi la liste des valeurs des cases appartenant au même groupe que la case "coordinates"
         L'argument "format" indique le type de groupe à prendre en compte (ligne, colonne ou carré)
@@ -208,7 +208,7 @@ class Grid:
             for x in range(self.size):
                 coordinates = (x, y)
                 
-                if self.get_cell_value(coordinates) == 0:  # Si la valeur de la case est zéro
+                if self.get_cell_value(coordinates) == '0':  # Si la valeur de la case est zéro
                     test_errors(self.size, coordinates = coordinates)
                     all_empty_cells.append(coordinates)  # Ajouter à la liste des cases vides les coordonnées (x, y)
         
@@ -224,18 +224,18 @@ class Grid:
             for x in range(self.size):
                 coordinates = (x, y)
                 
-                if self.get_cell_value(coordinates) == 0:  # Dès qu'une case vide est rencontrée
+                if self.get_cell_value(coordinates) == '0':  # Dès qu'une case vide est rencontrée
                     test_errors(self.size, coordinates = coordinates)
                     return (x, y)  # Renvoyer les coordonnées (x, y)
     
-    def get_possible_values(self, coordinates: tuple[int, int]) -> list[int]:
+    def get_possible_values(self, coordinates: tuple[int, int]) -> list[str]:
         """
         Renvoi les valeurs possibles (de 1 à "self.size") de la case en fonctions des autres chiffres de la même ligne, colomne ou carré
         """
         
         test_errors(self.size, coordinates = coordinates)
-        
-        possible_values = [n + 1 for n in range(self.size)]
+        #possible_values = [str(n + 1) for n in range(self.size)]
+        possible_values = [digit for digit in self.global_possibles_values[:self.size]]
         
         # Pour tout les formats existants
         for format in ["lines", "columns", "squares"]:
@@ -254,7 +254,7 @@ class Grid:
         
         for x in range(self.size):
             for y in range(self.size):
-                if self.get_cell_value((x, y)) == 0:
+                if self.get_cell_value((x, y)) == '0':
                     return False
         
         return True

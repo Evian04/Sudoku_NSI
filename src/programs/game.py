@@ -20,6 +20,8 @@ class Game:
         
         self.do_display_during_solving = True
         
+        self.values = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
+
         self.sudoku = Sudoku(self, grid_size = grid_size)
         self.graphism = Graphism(self, (0, 0, 0))
         
@@ -27,28 +29,29 @@ class Game:
         pygame.display.set_caption(self.title)  # Nom de la fenêtre
         
         self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une case
-            pygame.K_1:         1,
-            pygame.K_2:         2,
-            pygame.K_3:         3,
-            pygame.K_4:         4,
-            pygame.K_5:         5,
-            pygame.K_6:         6,
-            pygame.K_7:         7,
-            pygame.K_8:         8,
-            pygame.K_9:         9,
-            pygame.K_KP_1:      1,
-            pygame.K_KP_2:      2,
-            pygame.K_KP_3:      3,
-            pygame.K_KP_4:      4,
-            pygame.K_KP_5:      5,
-            pygame.K_KP_6:      6,
-            pygame.K_KP_7:      7,
-            pygame.K_KP_8:      8,
-            pygame.K_KP_9:      9,
-            pygame.K_BACKSPACE: 0,  # 0 correspond à une case vide (supprime la valeur  de la case)
-            pygame.K_DELETE:    0,
-            pygame.K_0:         0,
-            pygame.K_KP_0:      0
+            pygame.K_1:         '1',
+            pygame.K_2:         '2',
+            pygame.K_3:         '3',
+            pygame.K_4:         '4',
+            pygame.K_5:         '5',
+            pygame.K_6:         '6',
+            pygame.K_7:         '7',
+            pygame.K_8:         '8',
+            pygame.K_9:         '9',
+            pygame.K_KP_1:      '1',
+            pygame.K_KP_2:      '2',
+            pygame.K_KP_3:      '3',
+            pygame.K_KP_4:      '4',
+            pygame.K_KP_5:      '5',
+            pygame.K_KP_6:      '6',
+            pygame.K_KP_7:      '7',
+            pygame.K_KP_8:      '8',
+            pygame.K_KP_9:      '9',
+            pygame.K_a:         "A",
+            pygame.K_BACKSPACE: '0',  # 0 correspond à une case vide (supprime la valeur de la case)
+            pygame.K_DELETE:    '0',
+            pygame.K_0:         '0',
+            pygame.K_KP_0:      '0'
         }
         self.graphism.update_rect()
     
@@ -122,7 +125,7 @@ class Game:
                     self.sudoku.move_selected_cell("down")
                 
                 if event.key == pygame.K_c:
-                    self.sudoku.clear_inputs()
+                    self.sudoku.clear()
                     self.sudoku.verify_grid()
                 
                 if event.key == pygame.K_l:
@@ -155,7 +158,8 @@ class Game:
                         
                     # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)
                     value = self.key_mapping[event.key]
-                    
+                    if value not in self.values[:self.sudoku.grid.size] and value != "0": # cette valeur n'est pas autorisé pour cette grille (trop grande ou inexistante)
+                        continue
                     # modifie la valeur de la case selectionnée
                     self.sudoku.set_selected_cell_value(value)
                     

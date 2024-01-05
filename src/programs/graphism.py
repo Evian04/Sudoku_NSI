@@ -119,15 +119,13 @@ class Graphism:
         
         digit = self.game.sudoku.grid.get_cell_value(coordinates)
         
-        if digit == 0:
+        if digit == '0':
             return
         
         if not self.game.sudoku.grid.is_cell_in_conflict(coordinates) or not self.do_display_conflicts:
-            digit_image = self.all_digits_image[digit - 1]
-            
+            digit_image = self.all_digits_image[self.game.values.index(digit)]
         else:
-            digit_image = self.all_digits_image[digit + self.grid_size - 1]
-        
+            digit_image = self.all_digits_image[self.game.values.index(digit) + self.grid_size]
         x, y = coordinates
         
         self.screen.blit(
@@ -189,9 +187,10 @@ class Graphism:
     def update_digits_rect(self):
         self.all_digits_image: list[pygame.Surface] = []
         
-        for color in ["regular", "wrong"]:
-            for i in range(1, 10):
-                digit_image = pygame.image.load(f"src/graphics/{self.pack}/digits/{i}_{color}.png")
+        for color in ["black", "red"]:
+            #for i in range(1, 10):  # /!\ AJOUTER LA POSSIBILITE D'AVOIR + DE CHIFFRES -> LETTRES ?
+            for i in self.game.values[:self.grid_size]:
+                digit_image = pygame.image.load(f"src/graphics/digits/{i}_{color}.png")
                 digit_image = pygame.transform.scale(digit_image, self.cell_dimensions)
                 self.all_digits_image.append(digit_image)
     
