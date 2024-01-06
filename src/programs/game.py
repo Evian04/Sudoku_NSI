@@ -1,8 +1,6 @@
-import json
-
 import pygame
 
-import time
+import json
 
 from src.programs.sudoku import Sudoku
 from src.programs.graphism import Graphism
@@ -15,19 +13,20 @@ class Game:
     de l'utilisateurs avec le contenu du sudoku et la gestion des graphismes
     """
     
-    def __init__(self, screen: pygame.Surface, config_filepath: str, grid_size: int = None):
+    def __init__(self, screen: pygame.Surface, config_filepath: str):
         self.screen = screen
         self.config_filepath = config_filepath  # chemin d'accès du fichier de configuration
         self.config_file = None  # valeur par defaut
         self.load_config_file()  # charge le fichier de configuration et met à jour l'attribut self.config_file
+        
         self.do_quit = False
         self.is_solving = False
         self.do_display_during_solving = True
         
         self.values = "123456789ABCDEFGHIJKLMNOP"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
-        if not grid_size: # si l'argument grid size n'est pas renseigné
-            grid_size = self.get_config_value("grid_size")
-        self.sudoku = Sudoku(self, grid_size=grid_size)
+        grid_size = self.get_config_value("grid_size")
+        
+        self.sudoku = Sudoku(self, grid_size = grid_size)
         self.graphism = Graphism(self, (0, 0, 0))
         
         self.title = f"Sudoku {self.sudoku.grid.size}x{self.sudoku.grid.size}"
@@ -221,8 +220,9 @@ class Game:
         Charge le fichier de configuration spécifié à self.config_filepath
         attribut self.config_file mis à jour
         """
-        with open(self.config_filepath) as tmps_file:
-            self.config_file = json.load(fp=tmps_file)
+        
+        with open(self.config_filepath) as file:
+            self.config_file = json.load(fp = file)
     
     def get_config_value(self, key: str) -> object:
         """
@@ -230,7 +230,9 @@ class Game:
         :param key: configuration à récupérer (clé)
         :return: valeur obtenue
         """
-        test_errors(config_file=self.config_file, config_key=key)
+        
+        test_errors(config_file = self.config_file, config_key = key)
+        
         return self.config_file[key]
     
     def update_config_file(self, key: str, value):
@@ -239,7 +241,10 @@ class Game:
         :param key: clé de l'élément à mettre à jour
         :param value: nouvelle valeur
         """
-        test_errors(config_file=self.config_file, config_key=key)
+        
+        test_errors(config_file = self.config_file, config_key = key)
+        
         self.config_file[key] = value
-        with open(self.config_filepath, "w") as tmp_file:
-            tmp_file.write(json.dumps(self.config_file))
+        
+        with open(self.config_filepath, "w") as file:
+            file.write(json.dumps(self.config_file))

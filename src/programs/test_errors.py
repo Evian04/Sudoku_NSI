@@ -93,11 +93,15 @@ def test_errors(sudoku_size=0, **arguments):
     
     if "config_file" in arguments:
         config_file = arguments["config_file"]
-        assert config_file, "No config saved, please load config file"  # test si l'attribut game.config_file contient une valeur
-        assert type(config_file) == dict, \
-            f'The "config_file" argument must be a dict (value : {config_file})'
+        
+        assert type(config_file) == dict, f'The "config_file" argument must be a dict (value : {config_file})'
+        assert len(config_file) != 0, \
+            "No config saved, please load config file"  # test si l'attribut game.config_file contient une valeur
     
     if "config_key" in arguments:
         config_key = arguments["config_key"]
-        assert "config_file" in arguments, "config_file argument is required"  # verifie si le fichier de configuration a déjà été vérifié
-        assert arguments["config_file"].get(config_key, None) is not None, f"Key does not exist (value : {config_key})"
+        
+        assert "config_file" in arguments, \
+            'You must pass a value for "config_file argument" in order to verify "config_key'  # verifie si le fichier de configuration a déjà été vérifié
+        assert type(config_key) == str, f'The "config_key" argument must be a string (type : {type(config_key)})'
+        assert config_key in config_file, f"Key does not exist (value : {config_key})"
