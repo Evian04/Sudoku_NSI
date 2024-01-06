@@ -13,7 +13,7 @@ class Graphism:
         self.square_size = int(self.grid_size ** 0.5)
         
         self.do_display_conflicts = True
-        self.pack = "TexturePack_1"
+        self.pack = "TexturePack_2"
         
         self.background_color = background_color
     
