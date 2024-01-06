@@ -16,7 +16,6 @@ class Game:
     def __init__(self, screen: pygame.Surface, config_filepath: str):
         self.screen = screen
         self.config_filepath = config_filepath  # chemin d'accès du fichier de configuration
-        self.config_file = None  # valeur par defaut
         self.load_config_file()  # charge le fichier de configuration et met à jour l'attribut self.config_file
         
         self.do_quit = False
