@@ -169,7 +169,7 @@ class Game:
                     
                     # Si la case sélectionnée est "locked", afficher un message console
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "locked":
-                        print(f'Cell {self.sudoku.selected_cell} is locked (press "l" to unlock)')
+                        print(f'Cell {self.sudoku.selected_cell} is locked (press Ctrl+L to unlock)')
                         continue
                         
                     # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)
