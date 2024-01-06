@@ -146,7 +146,7 @@ class Graphism:
             self.rect_ref_distance = self.screen.get_width() * (2 / 3)
             
         self.rect_ref_distance *= 0.9
-        self.outline_thickness = self.rect_ref_distance / 35 # Ratio entre la longueur du grand carré et de la marge
+        self.outline_thickness = self.rect_ref_distance / 30 # Ratio entre la longueur du grand carré et de la marge
         
         self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
         
