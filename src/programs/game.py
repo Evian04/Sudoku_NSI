@@ -111,7 +111,7 @@ class Game:
                 
                 if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.graphism.reverse_display_conflicts()
-                    self.update_config_file(key="is_checked", value=self.graphism.do_display_conflicts)
+                    self.update_config_file("do_check_values", self.graphism.do_display_conflicts)
                     self.graphism.update_verification_rect()
                 
                 elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):

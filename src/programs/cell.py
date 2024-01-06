@@ -19,6 +19,7 @@ class Cell:
         """
         Met la valeur de la case à "value"
         """
+        
         test_errors(self.sudoku_size, value = value)
         
         self.value = value
