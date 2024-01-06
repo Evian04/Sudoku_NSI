@@ -130,27 +130,28 @@ class Game:
                     self.sudoku.save_grid()
             
             if event.type == pygame.KEYDOWN:
-                touches = pygame.key.get_pressed()
-                if touches[pygame.K_ESCAPE]:
+                keys_pressed = pygame.key.get_pressed()
+                
+                if keys_pressed[pygame.K_ESCAPE]:
                     self.sudoku.deselect_cell()
                 
-                if touches[pygame.K_LEFT]:
+                if keys_pressed[pygame.K_LEFT]:
                     self.sudoku.move_selected_cell("left")
                 
-                if touches[pygame.K_RIGHT]:
+                if keys_pressed[pygame.K_RIGHT]:
                     self.sudoku.move_selected_cell("right")
                 
-                if touches[pygame.K_UP]:
+                if keys_pressed[pygame.K_UP]:
                     self.sudoku.move_selected_cell("up")
                 
-                if touches[pygame.K_DOWN]:
+                if keys_pressed[pygame.K_DOWN]:
                     self.sudoku.move_selected_cell("down")
                 
-                if (touches[pygame.K_LCTRL] or touches[pygame.K_RCTRL]) and touches[pygame.K_c]:
+                if (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_c]:
                     self.sudoku.clear()
                     self.sudoku.verify_grid()
                 
-                if (touches[pygame.K_LCTRL] or touches[pygame.K_RCTRL]) and touches[pygame.K_l]:
+                if (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_l]:
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
                     
