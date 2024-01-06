@@ -10,7 +10,7 @@ class Grid:
     def __init__(self, global_possibles_values: str, size: int = 9, content: list[list[Cell]] = None):
         test_errors(size)
         self.size = size
-        self.square_size = int(size ** 0.5)
+        self.square_size = int(self.size ** 0.5)
         self.global_possibles_values = global_possibles_values
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu

@@ -48,6 +48,21 @@ class Game:
             pygame.K_KP_8:      '8',
             pygame.K_KP_9:      '9',
             pygame.K_a:         "A",
+            pygame.K_b:         "B",
+            pygame.K_c:         "C",
+            pygame.K_d:         "D",
+            pygame.K_e:         "E",
+            pygame.K_f:         "F",
+            pygame.K_g:         "G",
+            pygame.K_h:         "H",
+            pygame.K_i:         "I",
+            pygame.K_j:         "J",
+            pygame.K_k:         "K",
+            pygame.K_l:         "L",
+            pygame.K_m:         "M",
+            pygame.K_n:         "N",
+            pygame.K_o:         "O",
+            pygame.K_p:         "P",
             pygame.K_BACKSPACE: '0',  # 0 correspond à une case vide (supprime la valeur de la case)
             pygame.K_DELETE:    '0',
             pygame.K_0:         '0',
@@ -109,26 +124,27 @@ class Game:
                     self.sudoku.save_grid()
             
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                touches = pygame.key.get_pressed()
+                if touches[pygame.K_ESCAPE]:
                     self.sudoku.deselect_cell()
                 
-                if event.key == pygame.K_LEFT:
+                if touches[pygame.K_LEFT]:
                     self.sudoku.move_selected_cell("left")
                 
-                if event.key == pygame.K_RIGHT:
+                if touches[pygame.K_RIGHT]:
                     self.sudoku.move_selected_cell("right")
                 
-                if event.key == pygame.K_UP:
+                if touches[pygame.K_UP]:
                     self.sudoku.move_selected_cell("up")
                 
-                if event.key == pygame.K_DOWN:
+                if touches[pygame.K_DOWN]:
                     self.sudoku.move_selected_cell("down")
                 
-                if event.key == pygame.K_c:
+                if (touches[pygame.K_LCTRL] or touches[pygame.K_RCTRL]) and touches[pygame.K_c]:
                     self.sudoku.clear()
                     self.sudoku.verify_grid()
                 
-                if event.key == pygame.K_l:
+                if (touches[pygame.K_LCTRL] or touches[pygame.K_RCTRL]) and touches[pygame.K_l]:
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
                     
@@ -153,7 +169,7 @@ class Game:
                     
                     # Si la case sélectionnée est "locked", afficher un message console
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "locked":
-                        print(f'Cell {self.sudoku.selected_cell} is locked (press "l" to unlock)')
+                        print(f'Cell {self.sudoku.selected_cell} is locked (press Ctrl+L to unlock)')
                         continue
                         
                     # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)

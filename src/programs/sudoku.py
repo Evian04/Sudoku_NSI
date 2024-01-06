@@ -1,6 +1,7 @@
 import random
 import time
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter.messagebox import askyesnocancel
 import pygame
 
 from src.programs.grid import Grid
@@ -128,8 +129,8 @@ class Sudoku:
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
         file_path = askopenfilename(
             initialdir="src/save_folder",
-            initialfile = "model_2.sdk",
-            filetypes = [("Sudoku file", "*.sdk")]
+            initialfile="model_2.sdk",
+            filetypes=[("Sudoku file", "*.sdk")]
         )
         
         # Dans le cas où l'utilisateur n'a pas sélectionné de fichier
@@ -157,6 +158,20 @@ class Sudoku:
             for i in range(len(file_content[1].split("\n")[0]))
         ]
         
+        if len(list_values) != self.grid.size:
+            grid_size = len(list_values)
+            test_errors(grid_size)
+            response = askyesnocancel("Changement taille Sudoku",f"Voulez-vous changer la taille du sudoku, de {self.grid.size}x{self.grid.size} à {grid_size}x{grid_size} ?\nLes données non sauvegardées seront perdues")
+            if not response: return None # signifie que l'utilisateur souhaite garder la taille actuelle de son sudoku
+            self.grid = Grid(self.game.values, grid_size)
+            self.game.graphism.grid_size = self.grid.size
+            self.game.graphism.square_size = int(self.grid.size ** 0.5)
+
+            self.game.title = f"Sudoku {grid_size}x{grid_size}"
+            
+            self.game.graphism.update_rect()
+            self.game.graphism.display_elements()
+
         # Test postconditions
         test_errors(self.grid.size, list_values = list_values, list_states = list_states)
         
@@ -311,7 +326,7 @@ class Sudoku:
         met à jour self.grid
         """
         print("generating...")
-        pygame.display.set_caption(self.game.title + " (generating...)")
+        pygame.display.set_caption(self.game.title + " (génération...)")
         
         if generate_numbers == 0:
             generate_numbers = self.grid.size  # nombre de nombres à l'origine = largeur du sudoku (valeur arbitraire)
@@ -319,7 +334,7 @@ class Sudoku:
         starting_time = time.time()
         
         #générer grille
-        self.grid = Grid( self.game.values, generate_numbers)
+        self.grid = Grid(self.game.values, generate_numbers)
         self.game.graphism.update_rect()
         self.game.graphism.display_elements()
         
@@ -329,11 +344,11 @@ class Sudoku:
             for _ in range(generate_numbers):
                 # générer une coordonnée au hasrd
                 coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
-                self.game.cell_update(coordinates, do_display = False)
+                self.game.cell_update(coordinates, do_display=False)
                 # regénerer tant que la case est utilisée
                 while self.grid.get_cell_value(coordinates) != 0:
                     coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
-                    self.game.cell_update(coordinates, do_display = False)
+                    self.game.cell_update(coordinates, do_display=False)
 
                 self.selected_cell = coordinates
                 # génère la liste des possibilités et balaye dedans
@@ -341,7 +356,7 @@ class Sudoku:
                 for value in values:
                     #self.selected_cell = coordinates
                     self.grid.set_cell_value(coordinates, value)
-                    self.game.cell_update(coordinates, do_display = False)
+                    self.game.cell_update(coordinates, do_display=False)
                     self.verify_grid()
 
                     if len(self.conflicting_cells) == 0:
@@ -356,7 +371,7 @@ class Sudoku:
             
             else:
                 self.clear_inputs()
-                self.game.update(do_display = False)
+                self.game.update(do_display=False)
 
         self.game.graphism.display_elements()
         print('generating executing time:', time.time() - starting_time)
@@ -371,7 +386,7 @@ class Sudoku:
         assert type(do_display) == bool, f'The "do_display" argument must be a boolean (type : {type(do_display)})'
         
         starting_time = time.time()
-        pygame.display.set_caption(self.game.title + " (solving...)")
+        pygame.display.set_caption(self.game.title + " (résolution...)")
         print('solving...')
         # self.put_obvious_solutions()
         self.game.graphism.display_elements()
