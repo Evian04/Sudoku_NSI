@@ -1,3 +1,5 @@
+import json
+
 import pygame
 
 import time
@@ -13,16 +15,19 @@ class Game:
     de l'utilisateurs avec le contenu du sudoku et la gestion des graphismes
     """
     
-    def __init__(self, screen: pygame.Surface, grid_size: int):
+    def __init__(self, screen: pygame.Surface, config_filepath: str, grid_size: int = None):
         self.screen = screen
+        self.config_filepath = config_filepath  # chemin d'accès du fichier de configuration
+        self.config_file = None  # valeur par defaut
+        self.load_config_file()  # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.do_quit = False
         self.is_solving = False
-        
         self.do_display_during_solving = True
         
         self.values = "123456789ABCDEFGHIJKLMNOP"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
-
-        self.sudoku = Sudoku(self, grid_size = grid_size)
+        if not grid_size: # si l'argument grid size n'est pas renseigné
+            grid_size = self.get_config_value("grid_size")
+        self.sudoku = Sudoku(self, grid_size=grid_size)
         self.graphism = Graphism(self, (0, 0, 0))
         
         self.title = f"Sudoku {self.sudoku.grid.size}x{self.sudoku.grid.size}"
@@ -75,7 +80,7 @@ class Game:
         Exécute les actions nécessaires au bon fonctionnement du jeu
         """
         if do_display: self.graphism.display_elements()
-
+        
         all_events = pygame.event.get()
         
         # Si l'un des évènements est de fermer la fenêtre
@@ -92,7 +97,7 @@ class Game:
                 # Mettre à jour la position / dimensions des éléments de la fenêtre
                 self.graphism.update_rect()
                 pygame.display.flip()
-                
+            
             # Ne pas vérifier les autres event si la résolution est en cours (économie performance)
             if self.is_solving:
                 continue
@@ -108,6 +113,7 @@ class Game:
                 
                 if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.graphism.reverse_display_conflicts()
+                    self.update_config_file(key="is_checked", value=self.graphism.do_display_conflicts)
                     self.graphism.update_verification_rect()
                 
                 elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
@@ -116,10 +122,10 @@ class Game:
                 
                 elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.generate_grid()
-                    
+                
                 elif self.graphism.open_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.open_grid()
-                    
+                
                 elif self.graphism.save_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.save_grid()
             
@@ -152,11 +158,11 @@ class Game:
                     
                     if state == 'unlocked':
                         self.sudoku.lock_selected_cell()
-                        
+                    
                     elif state == 'locked':
                         self.sudoku.unlock_selected_cell()
-
-                if event.key in self.key_mapping: # Si l'action est de modifier une case de la grille
+                
+                if event.key in self.key_mapping:  # Si l'action est de modifier une case de la grille
                     
                     # Si aucune case n'est sélectionnée, ne rien faire
                     if self.sudoku.selected_cell == (-1, -1):
@@ -171,10 +177,11 @@ class Game:
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "locked":
                         print(f'Cell {self.sudoku.selected_cell} is locked (press Ctrl+L to unlock)')
                         continue
-                        
+                    
                     # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)
                     value = self.key_mapping[event.key]
-                    if value not in self.values[:self.sudoku.grid.size] and value != "0": # cette valeur n'est pas autorisé pour cette grille (trop grande ou inexistante)
+                    if value not in self.values[
+                                    :self.sudoku.grid.size] and value != "0":  # cette valeur n'est pas autorisé pour cette grille (trop grande ou inexistante)
                         continue
                     # modifie la valeur de la case selectionnée
                     self.sudoku.set_selected_cell_value(value)
@@ -189,7 +196,7 @@ class Game:
         Met à jour une case uniquement (gain de performance), utilisée lors de la résolution
         """
         
-        test_errors(self.sudoku.grid.size, coordinates = coordinates)
+        test_errors(self.sudoku.grid.size, coordinates=coordinates)
         
         if do_display:
             self.graphism.display_cell_elements(coordinates)
@@ -207,3 +214,31 @@ class Game:
                 self.graphism.display_elements()
                 
                 pygame.display.flip()
+    
+    def load_config_file(self):
+        """
+        Charge le fichier de configuration spécifié à self.config_filepath
+        attribut self.config_file mis à jour
+        """
+        with open(self.config_filepath) as tmps_file:
+            self.config_file = json.load(fp=tmps_file)
+    
+    def get_config_value(self, key: str) -> object:
+        """
+        recupère une valeur de configuration
+        :param key: configuration à récupérer (clé)
+        :return: valeur obtenue
+        """
+        test_errors(config_file=self.config_file, config_key=key)
+        return self.config_file[key]
+    
+    def update_config_file(self, key: str, value):
+        """
+        met à jour le fichier de configuration
+        :param key: clé de l'élément à mettre à jour
+        :param value: nouvelle valeur
+        """
+        test_errors(config_file=self.config_file, config_key=key)
+        self.config_file[key] = value
+        with open(self.config_filepath, "w") as tmp_file:
+            tmp_file.write(json.dumps(self.config_file))

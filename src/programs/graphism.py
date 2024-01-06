@@ -12,8 +12,9 @@ class Graphism:
         self.grid_size = game.sudoku.grid.size
         self.square_size = int(self.grid_size ** 0.5)
         
-        self.do_display_conflicts = True
-        self.pack = "TexturePack_1"
+        self.do_display_conflicts = self.game.get_config_value('is_checked')
+        self.pack = self.game.get_config_value('texture_pack')
+
         
         self.background_color = background_color
     

@@ -1,4 +1,4 @@
-def test_errors(sudoku_size = 0, **arguments):
+def test_errors(sudoku_size=0, **arguments):
     """
     Fonction permettant de gérer les erreures potentielles lors de l'exécution du programme
     """
@@ -26,7 +26,7 @@ def test_errors(sudoku_size = 0, **arguments):
         value = arguments["value"]
         
         assert type(value) == str, f'The "value" argument must be a string (type : {type(value)})'
-        #assert 0 <= int(value) <= sudoku_size, f'The "value" argument must be between 0 and {sudoku_size} (value : {value})'
+        # assert 0 <= int(value) <= sudoku_size, f'The "value" argument must be between 0 and {sudoku_size} (value : {value})'
     
     if "color" in arguments:
         color = arguments["color"]
@@ -90,3 +90,14 @@ def test_errors(sudoku_size = 0, **arguments):
                     f'The "list_values" argument must contains lists that contains strings (value : {list_states})'
                 assert state in ["unlocked", "locked", "superlocked"], \
                     f'The "list_values" argument must contains lists that contains "unlocked", "locked" or "superlocked" (value : {list_states})'
+    
+    if "config_file" in arguments:
+        config_file = arguments["config_file"]
+        assert config_file, "No config saved, please load config file"  # test si l'attribut game.config_file contient une valeur
+        assert type(config_file) == dict, \
+            f'The "config_file" argument must be a dict (value : {config_file})'
+    
+    if "config_key" in arguments:
+        config_key = arguments["config_key"]
+        assert "config_file" in arguments, "config_file argument is required"  # verifie si le fichier de configuration a déjà été vérifié
+        assert arguments["config_file"].get(config_key, None) is not None, f"Key does not exist (value : {config_key})"
