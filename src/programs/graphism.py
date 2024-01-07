@@ -154,27 +154,27 @@ class Graphism:
         self.update_digits_rect()
         
         self.grid_background = pygame.image.load(f"src/graphics/{self.pack}/grid_background.png")
-        self.grid_background = pygame.transform.scale(self.grid_background, [self.rect_ref_distance] * 2)
+        self.grid_background = pygame.transform.smoothscale(self.grid_background, [self.rect_ref_distance] * 2)
         
         self.grid_background_rect = self.grid_background.get_rect()
         self.grid_background_rect.x = self.screen.get_width() * (1 / 2) - self.rect_ref_distance * (1 / 4)
         self.grid_background_rect.y = self.screen.get_height() * (1 / 2) - self.rect_ref_distance * (1 / 2)
         
         self.cell_image = pygame.image.load(f"src/graphics/{self.pack}/cells/cell.png")
-        self.cell_image = pygame.transform.scale(self.cell_image, self.cell_dimensions)
+        self.cell_image = pygame.transform.smoothscale(self.cell_image, self.cell_dimensions)
         pygame.image.save(self.cell_image, "resolution_image.png")
         
         self.superlocked_cell_image = pygame.image.load(f"src/graphics/{self.pack}/cells/superlocked_cell.png")
-        self.superlocked_cell_image = pygame.transform.scale(self.superlocked_cell_image, self.cell_dimensions)
+        self.superlocked_cell_image = pygame.transform.smoothscale(self.superlocked_cell_image, self.cell_dimensions)
         
         self.selected_cell_image = pygame.image.load(f"src/graphics/{self.pack}/cells/selected_cell.png")
-        self.selected_cell_image = pygame.transform.scale(self.selected_cell_image, self.cell_dimensions)
+        self.selected_cell_image = pygame.transform.smoothscale(self.selected_cell_image, self.cell_dimensions)
         
         self.superlocked_selected_cell_image = pygame.image.load(f"src/graphics/{self.pack}/cells/superlocked_selected_cell.png")
-        self.superlocked_selected_cell_image = pygame.transform.scale(self.superlocked_selected_cell_image, self.cell_dimensions)
+        self.superlocked_selected_cell_image = pygame.transform.smoothscale(self.superlocked_selected_cell_image, self.cell_dimensions)
         
         self.padlock_image = pygame.image.load(f"src/graphics/{self.pack}/cells/padlock.png")
-        self.padlock_image = pygame.transform.scale(self.padlock_image, [self.cell_image.get_width() / 2.3] * 2)
+        self.padlock_image = pygame.transform.smoothscale(self.padlock_image, [self.cell_image.get_width() / 2.3] * 2)
         
         self.all_cell_rect = [[
             pygame.Rect([
@@ -192,7 +192,7 @@ class Graphism:
             #for i in range(1, 10):  # /!\ AJOUTER LA POSSIBILITE D'AVOIR + DE CHIFFRES -> LETTRES ?
             for i in self.game.values[:self.grid_size]:
                 digit_image = pygame.image.load(f"src/graphics/{self.pack}/digits/{i}_{color}.png")
-                digit_image = pygame.transform.scale(digit_image, self.cell_dimensions)
+                digit_image = pygame.transform.smoothscale(digit_image, self.cell_dimensions)
                 self.all_digits_image.append(digit_image)
     
     def update_verification_rect(self):
@@ -201,10 +201,10 @@ class Graphism:
         """
         
         self.verification_button = pygame.image.load("src/graphics/{0}/buttons/verification_{1}.png".format(self.pack, "on" if self.do_display_conflicts else "off"))
-        self.verification_button = pygame.transform.scale(self.verification_button, self.buttons_dimensions)
+        self.verification_button = pygame.transform.smoothscale(self.verification_button, self.buttons_dimensions)
     
         self.verification_selected_button = pygame.image.load("src/graphics/{0}/buttons/verification_{1}_selected.png".format(self.pack, "on" if self.do_display_conflicts else "off"))
-        self.verification_selected_button = pygame.transform.scale(self.verification_selected_button, self.buttons_dimensions)
+        self.verification_selected_button = pygame.transform.smoothscale(self.verification_selected_button, self.buttons_dimensions)
     
     def update_buttons_rect(self):
         """
@@ -226,48 +226,48 @@ class Graphism:
         
         buttons_gap = (self.rect_ref_distance - self.buttons_dimensions[1]) / 4
         
-        self.verification_button = pygame.transform.scale(self.verification_button, self.buttons_dimensions)
-        self.verification_selected_button = pygame.transform.scale(self.verification_selected_button, self.buttons_dimensions)
+        self.verification_button = pygame.transform.smoothscale(self.verification_button, self.buttons_dimensions)
+        self.verification_selected_button = pygame.transform.smoothscale(self.verification_selected_button, self.buttons_dimensions)
         
         self.verification_button_rect = self.verification_button.get_rect()
         self.verification_button_rect.x = buttons_ref_coordinates[0]
         self.verification_button_rect.y = buttons_ref_coordinates[1]
         
         self.solve_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/solve.png")
-        self.solve_button = pygame.transform.scale(self.solve_button, self.buttons_dimensions)
+        self.solve_button = pygame.transform.smoothscale(self.solve_button, self.buttons_dimensions)
         
         self.solve_selected_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/solve_selected.png")
-        self.solve_selected_button = pygame.transform.scale(self.solve_selected_button, self.buttons_dimensions)
+        self.solve_selected_button = pygame.transform.smoothscale(self.solve_selected_button, self.buttons_dimensions)
         
         self.solve_button_rect = self.solve_button.get_rect()
         self.solve_button_rect.x = buttons_ref_coordinates[0]
         self.solve_button_rect.y = buttons_ref_coordinates[1] + buttons_gap
         
         self.generate_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/generate.png")
-        self.generate_button = pygame.transform.scale(self.generate_button, self.buttons_dimensions)
+        self.generate_button = pygame.transform.smoothscale(self.generate_button, self.buttons_dimensions)
         
         self.generate_selected_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/generate_selected.png")
-        self.generate_selected_button = pygame.transform.scale(self.generate_selected_button, self.buttons_dimensions)
+        self.generate_selected_button = pygame.transform.smoothscale(self.generate_selected_button, self.buttons_dimensions)
         
         self.generate_button_rect = self.generate_button.get_rect()
         self.generate_button_rect.x = buttons_ref_coordinates[0]
         self.generate_button_rect.y = buttons_ref_coordinates[1] + 2 * buttons_gap
         
         self.open_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/open.png")
-        self.open_button = pygame.transform.scale(self.open_button, self.buttons_dimensions)
+        self.open_button = pygame.transform.smoothscale(self.open_button, self.buttons_dimensions)
         
         self.open_selected_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/open_selected.png")
-        self.open_selected_button = pygame.transform.scale(self.open_selected_button, self.buttons_dimensions)
+        self.open_selected_button = pygame.transform.smoothscale(self.open_selected_button, self.buttons_dimensions)
         
         self.open_button_rect = self.open_button.get_rect()
         self.open_button_rect.x = buttons_ref_coordinates[0]
         self.open_button_rect.y = buttons_ref_coordinates[1] + 3 * buttons_gap
         
         self.save_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/save.png")
-        self.save_button = pygame.transform.scale(self.save_button, self.buttons_dimensions)
+        self.save_button = pygame.transform.smoothscale(self.save_button, self.buttons_dimensions)
         
         self.save_selected_button = pygame.image.load(f"src/graphics/{self.pack}/buttons/save_selected.png")
-        self.save_selected_button = pygame.transform.scale(self.save_selected_button, self.buttons_dimensions)
+        self.save_selected_button = pygame.transform.smoothscale(self.save_selected_button, self.buttons_dimensions)
         
         self.save_button_rect = self.save_button.get_rect()
         self.save_button_rect.x = buttons_ref_coordinates[0]
