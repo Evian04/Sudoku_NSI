@@ -119,7 +119,8 @@ class Game:
                     self.sudoku.verify_grid()
                 
                 elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.sudoku.generate_grid()
+                    #self.sudoku.generate_grid()
+                    continue
                 
                 elif self.graphism.open_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.open_grid()
@@ -179,9 +180,11 @@ class Game:
                     
                     # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)
                     value = self.key_mapping[event.key]
-                    if value not in self.values[
-                                    :self.sudoku.grid.size] and value != "0":  # cette valeur n'est pas autorisé pour cette grille (trop grande ou inexistante)
+                    
+                    # Teste si la valeur n'est pas autorisé pour cette grille (trop grande ou inexistante)
+                    if value not in self.values[:self.sudoku.grid.size] and value != "0":
                         continue
+                    
                     # modifie la valeur de la case selectionnée
                     self.sudoku.set_selected_cell_value(value)
                     

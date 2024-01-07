@@ -162,6 +162,7 @@ class Graphism:
         
         self.cell_image = pygame.image.load(f"src/graphics/{self.pack}/cells/cell.png")
         self.cell_image = pygame.transform.scale(self.cell_image, self.cell_dimensions)
+        pygame.image.save(self.cell_image, "resolution_image.png")
         
         self.superlocked_cell_image = pygame.image.load(f"src/graphics/{self.pack}/cells/superlocked_cell.png")
         self.superlocked_cell_image = pygame.transform.scale(self.superlocked_cell_image, self.cell_dimensions)
