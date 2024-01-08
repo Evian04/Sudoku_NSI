@@ -161,7 +161,8 @@ class Sudoku:
         if len(list_values) != self.grid.size:
             grid_size = len(list_values)
             test_errors(grid_size)
-            response = askyesnocancel("Changement taille Sudoku",f"Voulez-vous changer la taille du sudoku, de {self.grid.size}x{self.grid.size} à {grid_size}x{grid_size} ?\nLes données non sauvegardées seront perdues")
+            response = askyesnocancel("Changement taille Sudoku", \
+                f"Voulez-vous changer la taille du sudoku, de {self.grid.size}x{self.grid.size} à {grid_size}x{grid_size} ?\nLes données non sauvegardées seront perdues")
             if not response: return None # signifie que l'utilisateur souhaite garder la taille actuelle de son sudoku
             self.grid = Grid(self.game.values, grid_size)
             self.game.graphism.grid_size = self.grid.size
