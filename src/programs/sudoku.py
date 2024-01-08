@@ -319,61 +319,22 @@ class Sudoku:
             for y in range(self.grid.size):
                 self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
     
-    def generate_grid(self, generate_numbers: int = 0):
+    def generate_grid(self, do_display: bool):
         """
         Génère une grille de sudoku résolu
         :param generate_numbers: nombres de valuers à placer au début pour générer la grille (valeurs aléatoires)
         met à jour self.grid
         """
+        
+        assert type(do_display) == bool, f'The "do_display" argument must be a boolean (type : {type(do_display)})'
+        
         print("generating...")
         pygame.display.set_caption(self.game.title + " (génération...)")
-        
-        if generate_numbers == 0:
-            generate_numbers = self.grid.size  # nombre de nombres à l'origine = largeur du sudoku (valeur arbitraire)
-            
+
         starting_time = time.time()
         
-        #générer grille
-        self.grid = Grid(self.game.values, generate_numbers)
-        self.game.graphism.update_rect()
-        self.game.graphism.display_elements()
-        
-        #génerer des valeurs par défaut
-        while True:
-            # compter sur le nombre de nombre à générer
-            for _ in range(generate_numbers):
-                # générer une coordonnée au hasrd
-                coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
-                self.game.cell_update(coordinates, do_display=False)
-                # regénerer tant que la case est utilisée
-                while self.grid.get_cell_value(coordinates) != 0:
-                    coordinates = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
-                    self.game.cell_update(coordinates, do_display=False)
+        self.backtracking_solving(do_display, True)
 
-                self.selected_cell = coordinates
-                # génère la liste des possibilités et balaye dedans
-                values = random.choices(range(1, self.grid.size + 1), k = self.grid.size)
-                for value in values:
-                    #self.selected_cell = coordinates
-                    self.grid.set_cell_value(coordinates, value)
-                    self.game.cell_update(coordinates, do_display=False)
-                    self.verify_grid()
-
-                    if len(self.conflicting_cells) == 0:
-                        break
-                
-                if len(self.conflicting_cells) != 0: # si au moin une valeur est possibles -> nouvelle case
-                    generate_numbers += 1  # pour compenser le coup de perdu
-                    self.grid.set_cell_value(coordinates, '0')
-            
-            self.selected_cell = (-1, -1)
-            if self.solve_generated_grid(): break
-            
-            else:
-                self.clear_inputs()
-                self.game.update(do_display=False)
-
-        self.game.graphism.display_elements()
         print('generating executing time:', time.time() - starting_time)
         pygame.display.set_caption(self.game.title)
         
@@ -466,7 +427,7 @@ class Sudoku:
 
         return modified_cells
 
-    def backtracking_solving(self, do_display: bool) -> bool:
+    def backtracking_solving(self, do_display: bool, do_choice_randomly: bool = False) -> bool:
         """
         Fonction récursive qui résout le Sudoku en testant toutes les possibilités
         Renvoi True si la grille courante est possible à résoudre, et False si elle ne l'est pas
@@ -495,16 +456,17 @@ class Sudoku:
         # supprime tous les éléments [] = cases superlocked ou cases avec déjà des valeurs
         cells_to_fill = list(filter(lambda x: x != [], cells_to_fill))
         
-        """while [] in cells_to_fill:
-            cells_to_fill.remove([])"""
-        
         # Si il n'y a pas de case vide
         if len(cells_to_fill) == 0:
             # Renvoyer la validité du sudoku obtenu
             return self.is_valid()
         
         # tri les cases de la liste en fonction du nombre de valeurs possibles
-        cells_to_fill.sort(key = lambda element: len(element[0]))
+        minimum = min([len(element[0]) for element in cells_to_fill])
+        cells_to_fill = list(filter(lambda x: len(x[0]) == minimum, cells_to_fill))
+        
+        if do_choice_randomly:
+            random.shuffle(cells_to_fill)
         
         # Récupère les coordonnées et valeurs possibles de la cases ayant le moins de valeurs possibles
         cell_possible_values, cell_coordinates = cells_to_fill[0]

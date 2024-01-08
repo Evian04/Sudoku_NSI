@@ -102,6 +102,6 @@ def test_errors(sudoku_size=0, **arguments):
         config_key = arguments["config_key"]
         
         assert "config_file" in arguments, \
-            'You must pass a value for "config_file argument" in order to verify "config_key'  # verifie si le fichier de configuration a déjà été vérifié
+            'You must pass a value for "config_file argument" in order to verify "config_key"'  # verifie si le fichier de configuration a déjà été vérifié
         assert type(config_key) == str, f'The "config_key" argument must be a string (type : {type(config_key)})'
         assert config_key in config_file, f"Key does not exist (value : {config_key})"

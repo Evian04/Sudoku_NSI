@@ -20,8 +20,8 @@ class Game:
         
         self.do_quit = False
         self.is_solving = False
-        self.do_display_during_solving = True
         
+        self.do_display_during_solving = self.get_config_value("do_display_during_solving")
         self.values = "123456789ABCDEFGHIJKLMNOP"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
         grid_size = self.get_config_value("grid_size")
         
@@ -119,8 +119,8 @@ class Game:
                     self.sudoku.verify_grid()
                 
                 elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    #self.sudoku.generate_grid()
-                    continue
+                    self.sudoku.generate_grid(self.do_display_during_solving)
+                    self.sudoku.verify_grid()
                 
                 elif self.graphism.open_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.sudoku.open_grid()
