@@ -130,20 +130,19 @@ class Game:
             
             if event.type == pygame.KEYDOWN:
                 keys_pressed = pygame.key.get_pressed()
-                
-                if keys_pressed[pygame.K_ESCAPE]:
+                if event.key == pygame.K_ESCAPE:
                     self.sudoku.deselect_cell()
                 
-                if keys_pressed[pygame.K_LEFT]:
+                if event.key == pygame.K_LEFT:
                     self.sudoku.move_selected_cell("left")
                 
-                if keys_pressed[pygame.K_RIGHT]:
+                if event.key == pygame.K_RIGHT:
                     self.sudoku.move_selected_cell("right")
                 
-                if keys_pressed[pygame.K_UP]:
+                if event.key == pygame.K_UP:
                     self.sudoku.move_selected_cell("up")
                 
-                if keys_pressed[pygame.K_DOWN]:
+                if event.key == pygame.K_DOWN:
                     self.sudoku.move_selected_cell("down")
                 
                 if (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_c]:
