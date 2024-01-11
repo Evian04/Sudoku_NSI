@@ -428,6 +428,14 @@ class Sudoku:
 
         return modified_cells
 
+    def count_possible_solutions(self) -> int:
+        """
+        Fonction récurusive qui compte le nombre de solutions possibles dans le sudoku
+        Renvois -1 si la fenêtre doit être fermée, et le nombre de solutions possibles dans les autres cas
+        """
+        
+        pass
+    
     def backtracking_solving(self, do_display: bool, do_choice_randomly: bool = False) -> bool:
         """
         Fonction récursive qui résout le Sudoku en testant toutes les possibilités
