@@ -225,11 +225,11 @@ class Game:
         with open(self.config_filepath) as file:
             self.config_file = json.load(fp = file)
     
-    def get_config_value(self, key: str) -> object:
+    def get_config_value(self, key: str):
         """
         recupère une valeur de configuration
         :param key: configuration à récupérer (clé)
-        :return: valeur obtenue
+        :return: valeur obtenue (différents types int, bool, etc)
         """
         
         test_errors(config_file = self.config_file, config_key = key)
