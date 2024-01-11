@@ -434,7 +434,9 @@ class Sudoku:
         Renvois -1 si la fenêtre doit être fermée, et le nombre de solutions possibles dans les autres cas
         """
         
-        pass
+        encountered_solutions = 0
+        
+        
     
     def backtracking_solving(self, do_display: bool, do_choice_randomly: bool = False) -> bool:
         """

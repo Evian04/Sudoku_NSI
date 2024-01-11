@@ -84,12 +84,12 @@ class Graphism:
         
         for x in range(self.grid_size):
             for y in range(self.grid_size):
-                # affichage case locked (affichage du cadenas)
-                if self.game.sudoku.grid.get_cell((x, y)).state == "locked":  # affichage des cases verrouillées
-                    self.screen.blit(self.padlock_image, self.all_cell_rect[x][y])
-                
                 # affichage du chiffre de chaque case
                 self.display_cell_digit((x, y))
+                
+                # affichage du cadenas si la case est vérouillée
+                if self.game.sudoku.grid.get_cell((x, y)).state == "locked":
+                    self.screen.blit(self.padlock_image, self.all_cell_rect[x][y])
     
     def display_cell_elements(self, coordinates: tuple[int, int]):
         """
