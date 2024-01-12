@@ -335,6 +335,8 @@ class Sudoku:
         starting_time = time.time()
         
         self.backtracking_solving(do_display, True)
+        
+        # Pochoire
 
         print('generating executing time:', time.time() - starting_time)
         pygame.display.set_caption(self.game.title)
@@ -436,7 +438,42 @@ class Sudoku:
         
         encountered_solutions = 0
         
+        # récupère les valeurs possibles de toutes les cases [liste des valeurs possibles, coordonnées]
+        cells_to_fill = [
+            [self.grid.get_possible_values((x, y)), (x, y)]
+            if self.grid.get_cell_state((x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == '0'
+            else []
+            for y in range(self.grid.size) for x in range(self.grid.size)
+        ]
+
+        # supprime tous les éléments [] = cases superlocked ou cases avec déjà des valeurs
+        cells_to_fill = list(filter(lambda x: x != [], cells_to_fill))
         
+        if len(cells_to_fill) == 0:
+            return 0
+        
+        # tri les cases de la liste en fonction du nombre de valeurs possibles
+        minimum = min([len(element[0]) for element in cells_to_fill])
+        cells_to_fill = list(filter(lambda x: len(x[0]) == minimum, cells_to_fill))
+        
+        # Récupère les coordonnées et valeurs possibles de la cases ayant le moins de valeurs possibles
+        cell_possible_values, cell_coordinates = cells_to_fill[0]
+        
+        # Pour chaque valeur possible de la case en question
+        for value in cell_possible_values:
+            # Mettre la valeur dans la case
+            self.grid.set_cell_value(cell_coordinates, value)
+            
+            # Si la grille est complète et valide, ajouter 1 au compteur des solutions rencontrées
+            if self.grid.is_full():
+                encountered_solutions += 1
+            
+            else:
+                encountered_solutions += self.count_possible_solutions()
+            
+            self.grid.set_cell_value(cell_coordinates, "0")
+        
+        return encountered_solutions
     
     def backtracking_solving(self, do_display: bool, do_choice_randomly: bool = False) -> bool:
         """
@@ -456,7 +493,7 @@ class Sudoku:
         # met les valeurs évidentes des cases
         modified_cells_coordinates = self.put_obvious_solutions(do_display)
         
-        # récupère les valeurs possibles de toutes les cases (en premier une liste des valeurs possibles)
+        # récupère les valeurs possibles de toutes les cases [liste des valeurs possibles, coordonnées]
         cells_to_fill = [
             [self.grid.get_possible_values((x, y)), (x, y)]
             if self.grid.get_cell_state((x, y)) != 'superlocked' and self.grid.get_cell_value((x, y)) == '0'
