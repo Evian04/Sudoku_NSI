@@ -11,6 +11,7 @@ class Grid:
         test_errors(size)
         self.size = size
         self.square_size = int(self.size ** 0.5)
+        self.cells_count = self.size ** 2 #nombre de cellules
         self.global_possibles_values = global_possibles_values
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu
@@ -19,6 +20,23 @@ class Grid:
         else:
             # Sinon créer une grille vierge
             self.content = [[Cell('0', "unlocked", self.size) for y in range(self.size)] for x in range(self.size)]
+
+    def update_attributes(self, size:int, list_values:list[list[str]] = None, list_states: list[list[str]] = None):
+        """
+        met à jour les attributs de la grille, utiliser lors d'un changement de taille de la grille
+        """
+        self.size = size
+        self.square_size = int(self.size ** 0.5)
+        self.cells_count = self.size ** 2
+        
+        if list_values:
+            if not list_states:
+                list_states = [["unlocked" for _ in range(self.size)] for _ in range(self.size)]
+            test_errors(self.size, list_values=list_values, list_states=list_states)
+            self.set_content(list_values, list_states)
+            
+        
+        
         
     def get_cell(self, coordinates: tuple[int, int]) -> Cell:
         """
@@ -39,15 +57,20 @@ class Grid:
         for x in range(self.size):
             for y in range(self.size):
                 self.content[x][y] = Cell(list_values[x][y], list_states[x][y], self.size)
-    
     def get_all_values(self) -> list[list[str]]:
         """
-        Retourne une double liste de toutes les valeurs
+        Retourne une double liste de toutes les valeurs de la grille
         (identique à self.content, mais remplace les cases pas les valeurs des cases)
         """
         
         return [[cell.value for cell in line] for line in self.content]
     
+    def get_all_coordinates_simple_list(self) -> list[tuple[int, int]]:
+        """
+        Retourne une liste (simple) de toutes les coordonnées de la grille
+        """
+        return [(x, y) for x in range(0, self.size) for y in range(0, self.size)]
+
     def set_cell_value(self, coordinates: tuple[int, int], value: str):
         """
         Met la case de coordonnées (x, y) à la valeur "value"

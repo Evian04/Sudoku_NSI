@@ -14,6 +14,7 @@ class Game:
     """
     
     def __init__(self, screen: pygame.Surface, config_filepath: str):
+        self.name = "Sudokool"
         self.screen = screen
         self.config_filepath = config_filepath  # chemin d'accès du fichier de configuration
         self.load_config_file()  # charge le fichier de configuration et met à jour l'attribut self.config_file
@@ -28,7 +29,7 @@ class Game:
         self.sudoku = Sudoku(self, grid_size = grid_size)
         self.graphism = Graphism(self, (0, 0, 0))
         
-        self.title = f"Sudoku {self.sudoku.grid.size}x{self.sudoku.grid.size}"
+        self.title = f"{self.name} {self.sudoku.grid.size}x{self.sudoku.grid.size}"
         pygame.display.set_caption(self.title)  # Nom de la fenêtre
         
         self.key_mapping = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une case
@@ -119,7 +120,7 @@ class Game:
                     self.sudoku.verify_grid()
                 
                 elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.sudoku.generate_grid(self.do_display_during_solving)
+                    self.sudoku.generate_grid(0.4, self.do_display_during_solving)
                     self.sudoku.verify_grid()
                 
                 elif self.graphism.open_button_rect.collidepoint(pygame.mouse.get_pos()):

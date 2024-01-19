@@ -16,7 +16,16 @@ class Graphism:
         self.pack = self.game.get_config_value('texture_pack')
         
         self.background_color = background_color
-    
+
+    def update_grid_attributes(self, size: int):
+        """
+        met à jour les attributs de la grille, utiliser lors d'un changement de taille de la grille
+        """
+        self.grid_size = size
+        self.square_size = int(self.grid_size ** 0.5)
+        self.game.graphism.update_rect()
+        self.game.graphism.display_elements()
+
     def reverse_display_conflicts(self):
         """
         Cette fonction inverse l'état de la variable booléenne "self.do_display_conflicts"
