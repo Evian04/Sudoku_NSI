@@ -197,8 +197,7 @@ class Game:
                 if event.key == pygame.K_a:
                     print(self.sudoku.grid.get_group_values((0,0), "lines"))
 
-                if event.key in self.key_mapping:  # Si l'action est de modifier une case de la grille
-                    
+                if event.key in self.key_mapping and not (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]):  # Si l'action est de modifier une case de la grille
                     # Si aucune case n'est sélectionnée, ne rien faire
                     if self.sudoku.selected_cell == (-1, -1):
                         continue

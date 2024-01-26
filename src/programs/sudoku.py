@@ -417,7 +417,7 @@ class Sudoku:
                                                                 range(self.grid.size)])
                 self.game.update(do_display)
                 # définir les cases à laisser
-                prop_cells_to_let += 0.0#3  # augmente de 3% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
+                prop_cells_to_let += 0.03  # augmente de 3% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
                 number_of_cells_to_remove = round((1 - prop_cells_to_let) * self.grid.cells_count)
         
         self.game.update()
