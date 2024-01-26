@@ -1,13 +1,16 @@
-def test_errors(sudoku_size=0, **arguments):
+def test_errors(sudoku_size=0, possibles_values="", **arguments):
     """
     Fonction permettant de gérer les erreures potentielles lors de l'exécution du programme
     """
     
-    possible_sudoku_sizes = [4, 9, 16, 25]
+    possible_sudoku_sizes = [4, 9, 16]
     
     assert type(sudoku_size) == int, f'The "sudoku_size" argument must be an integer (type : {type(sudoku_size)})'
     assert sudoku_size == 0 or sudoku_size in possible_sudoku_sizes, \
         f'The "sudoku_size" argument must be 4, 9, 16 or 25 (value : {sudoku_size})'
+    
+    assert type(possibles_values) == str, f'The "possibles_values" argument must be an str (type: {type(possibles_values)}'
+
     
     if "coordinates" in arguments:
         assert sudoku_size != 0, 'You must pass a value for "sudoku_size" argument in order to verify "coordinates"'
@@ -52,7 +55,9 @@ def test_errors(sudoku_size=0, **arguments):
             f'The "format" argument must be "lines", "columns" or "squares" (value : {format})'
     
     if "list_values" in arguments:
-        assert sudoku_size != 0, 'You must pass a value for "sudoku_size" argument in order to verify "list_values"'
+        assert sudoku_size, 'You must pass a value for "sudoku_size" argument in order to verify "list_values"'
+        assert possibles_values, 'You must pass a value for "possibles_values" argument in order to verify "list_values"'
+
         
         list_values = arguments["list_values"]
         
@@ -68,8 +73,8 @@ def test_errors(sudoku_size=0, **arguments):
             for value in sub_list:
                 assert type(value) == str, \
                     f'The "list_values" argument must contains lists that contains strings (value : {list_values})'
-                assert 0 <= int(value) <= sudoku_size, \
-                    f'The "list_values" argument must contains lists that contains integers between 0 and {sudoku_size} (value : {list_values})'
+                assert value in "0" + possibles_values[:sudoku_size], \
+                    f'The "list_values" argument must contains lists that contains strings between 0 and {possibles_values[sudoku_size]} (value : {list_values})'
     
     if "list_states" in arguments:
         assert sudoku_size != 0, 'You must pass a value for "sudoku_size" argument in order to verify "list_states"'

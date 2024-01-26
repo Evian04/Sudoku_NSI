@@ -9,10 +9,11 @@ class Grid:
     
     def __init__(self, global_possibles_values: str, size: int = 9, content: list[list[Cell]] = None):
         test_errors(size)
-        self.size = size
+        self.size: int = size
         self.square_size = int(self.size ** 0.5)
         self.cells_count = self.size ** 2 #nombre de cellules
         self.global_possibles_values = global_possibles_values
+        self.is_editing = False
         if content:
             # Si le contenu du sudoku est précisé, sauvegarder ce contenu
             self.content = content.copy()
@@ -32,11 +33,8 @@ class Grid:
         if list_values:
             if not list_states:
                 list_states = [["unlocked" for _ in range(self.size)] for _ in range(self.size)]
-            test_errors(self.size, list_values=list_values, list_states=list_states)
+            test_errors(self.size, list_values=list_values, list_states=list_states, possibles_values=self.global_possibles_values)
             self.set_content(list_values, list_states)
-            
-        
-        
         
     def get_cell(self, coordinates: tuple[int, int]) -> Cell:
         """
@@ -52,7 +50,7 @@ class Grid:
         Remplace le contenu de la grille par "new content"
         """
         
-        test_errors(self.size, list_values = list_values, list_states = list_states)
+        test_errors(self.size, list_values = list_values, list_states = list_states, possibles_values=self.global_possibles_values)
         
         for x in range(self.size):
             for y in range(self.size):
@@ -77,7 +75,7 @@ class Grid:
         """
         
         test_errors(self.size, coordinates = coordinates, value = value)
-        if self.content[coordinates[0]][coordinates[1]].state == "unlocked":
+        if self.content[coordinates[0]][coordinates[1]].state == "unlocked" or self.get_is_editing():
             self.content[coordinates[0]][coordinates[1]].set_value(value)
         
         else:
@@ -92,6 +90,23 @@ class Grid:
         
         return self.content[coordinates[0]][coordinates[1]].value
     
+    def set_is_editing(self, state: bool=None):
+        """
+        défini si la grille est en édition, si c'est le cas, les cases superlocked peuvent être modifiées
+        :param state: état d'édition, si non spécifié, inversion d el'état
+        """
+        if not state:
+            self.is_editing = not self.get_is_editing()
+        else:
+            self.is_editing = state
+        
+    def get_is_editing(self):
+        """
+        Indique si la grile est en mode d'édition
+        :return: state
+        """
+        return self.is_editing
+        
     def set_cell_state(self, coordinates: tuple[int, int], state: str):
         """
         Met l'état de la case de coordonnées "coordinates" à "state"

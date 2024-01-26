@@ -23,7 +23,9 @@ class Game:
         self.is_solving = False
         
         self.do_display_during_solving = self.get_config_value("do_display_during_solving")
-        self.values = "123456789ABCDEFGHIJKLMNOP"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
+        self.do_display_during_generating = self.get_config_value("do_display_during_generating")
+        
+        self.values = "123456789ABCDEFG"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
         grid_size = self.get_config_value("grid_size")
         
         self.sudoku = Sudoku(self, grid_size = grid_size)
@@ -73,7 +75,10 @@ class Game:
             pygame.K_KP_0:      '0'
         }
         self.graphism.update_rect()
-    
+        self.max_click_time = 250  # temps maximal entre deux clics pour être considéré comme un double clic
+        self.current_time = 0
+        self.last_clic = 0
+
     def update(self, do_display: bool = True):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
@@ -101,33 +106,50 @@ class Game:
             if self.is_solving:
                 continue
             
-            # Si l'utilisateur effectue un clique gauche
+            # Si l'utilisateur effectue un clic gauche
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                # Vérifier si le curseur de la souris est sur une case de la grille
-                for x in range(self.sudoku.grid.size):
-                    for y in range(self.sudoku.grid.size):
-                        if self.graphism.all_cell_rect[x][y].collidepoint(pygame.mouse.get_pos()):
-                            # Sélectionner la case qui a été cliquée
-                            self.sudoku.select_cell((x, y))
+                self.current_time = pygame.time.get_ticks()
                 
-                if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.graphism.reverse_display_conflicts()
-                    self.update_config_file("do_check_values", self.graphism.do_display_conflicts)
-                    self.graphism.update_verification_rect()
-                
-                elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.sudoku.solve_grid(self.do_display_during_solving)
-                    self.sudoku.verify_grid()
-                
-                elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.sudoku.generate_grid(0.4, self.do_display_during_solving)
-                    self.sudoku.verify_grid()
-                
-                elif self.graphism.open_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.sudoku.open_grid()
-                
-                elif self.graphism.save_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.sudoku.save_grid()
+                if self.current_time - self.last_clic < self.max_click_time and self.graphism.all_cell_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]].collidepoint(pygame.mouse.get_pos()):
+                    # double clic gauche - verrouiller ou déverrouiller une case (identique à Ctrl + L)
+                    if self.sudoku.selected_cell == (-1, -1):
+                        continue
+
+                    state = self.sudoku.grid.get_cell_state(self.sudoku.selected_cell)
+
+                    if state == 'unlocked':
+                        self.sudoku.lock_selected_cell()
+
+                    elif state == 'locked':
+                        self.sudoku.unlock_selected_cell()
+                else:
+                    # clic gauche simple - selectionner une case
+                    self.last_clic = self.current_time
+                    # Vérifier si le curseur de la souris est sur une case de la grille
+                    for x in range(self.sudoku.grid.size):
+                        for y in range(self.sudoku.grid.size):
+                            if self.graphism.all_cell_rect[x][y].collidepoint(pygame.mouse.get_pos()):
+                                # Sélectionner la case qui a été cliquée
+                                self.sudoku.select_cell((x, y))
+                    
+                    if self.graphism.verification_button_rect.collidepoint(pygame.mouse.get_pos()):
+                        self.graphism.reverse_display_conflicts()
+                        self.update_config_file("do_check_values", self.graphism.do_display_conflicts)
+                        self.graphism.update_verification_rect()
+                    
+                    elif self.graphism.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
+                        self.sudoku.solve_grid(self.do_display_during_solving)
+                        self.sudoku.verify_grid()
+                    
+                    elif self.graphism.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
+                        self.sudoku.generate_grid(0.5, self.do_display_during_generating)
+                        self.sudoku.verify_grid()
+                    
+                    elif self.graphism.open_button_rect.collidepoint(pygame.mouse.get_pos()):
+                        self.sudoku.open_grid()
+                    
+                    elif self.graphism.save_button_rect.collidepoint(pygame.mouse.get_pos()):
+                        self.sudoku.save_grid()
             
             if event.type == pygame.KEYDOWN:
                 keys_pressed = pygame.key.get_pressed()
@@ -147,10 +169,12 @@ class Game:
                     self.sudoku.move_selected_cell("down")
                 
                 if (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_c]:
+                    # Ctrl + C - supprimer toutes les valeurs des cases déverrouillées
                     self.sudoku.clear()
                     self.sudoku.verify_grid()
                 
                 if (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_l]:
+                    # Ctrl + L - verrouiller ou déverrouiller une case (s=identique au double clic))
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
                     
@@ -161,21 +185,32 @@ class Game:
                     
                     elif state == 'locked':
                         self.sudoku.unlock_selected_cell()
-                
+
+                if (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_e]:
+                    # Ctrl + E - activer ou desactiver le mode Edition
+                    if self.sudoku.grid.get_is_editing():
+                        pygame.display.set_caption(self.title)
+                    else:
+                        pygame.display.set_caption(self.title + " (mode édition)")
+                    self.sudoku.grid.set_is_editing()
+
+                if event.key == pygame.K_a:
+                    print(self.sudoku.grid.get_group_values((0,0), "lines"))
+
                 if event.key in self.key_mapping:  # Si l'action est de modifier une case de la grille
                     
                     # Si aucune case n'est sélectionnée, ne rien faire
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
                     
-                    # Si la case sélectionnée est "superlocked", afficher un message console
+                    """# Si la case sélectionnée est "superlocked", afficher un message console
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "superlocked":
                         print(f"Cell {self.sudoku.selected_cell} is superlocked, you cannot change its value")
-                        continue
+                        continue"""
                     
                     # Si la case sélectionnée est "locked", afficher un message console
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "locked":
-                        print(f'Cell {self.sudoku.selected_cell} is locked (press Ctrl+L to unlock)')
+                        print(f'Cell {self.sudoku.selected_cell} is already locked (press Ctrl+L to unlock)')
                         continue
                     
                     # récupère la valeur a affecter à partir du dictionnaire self.key_mapping (chaque touche est associée à un entier entre 0 et 9)
@@ -209,7 +244,7 @@ class Game:
         for event in all_events:
             if event.type == pygame.QUIT:
                 self.do_quit = True
-                return
+                return False
             
             if event.type == pygame.WINDOWRESIZED:
                 self.graphism.update_rect()
