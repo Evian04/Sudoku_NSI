@@ -145,8 +145,8 @@ class Sudoku:
         self.game.graphism.update_grid_attributes(grid_size)  # mise à jour affichage
         
         self.game.title = f"{self.game.name} {grid_size}x{grid_size}"
-        pygame.display.set_caption(self.game.title)  # Nom de la fenêtre
-        
+        #pygame.display.set_caption(self.game.title)  # Nom de la fenêtre
+        self.game.set_title()
         self.game.update_config_file(key="grid_size", value=grid_size)
     
     def open_grid(self):
@@ -371,8 +371,8 @@ class Sudoku:
         print("generating...")
         starting_time = time.time()
         self.update_grid()  # vide la grille, déverrouille toutes les cases (attention, modifie le titre de la fenetre)
-        pygame.display.set_caption(self.game.title + " (génération...)")
-
+        #pygame.display.set_caption(self.game.title + " (génération...)")
+        self.game.set_title("(génération...)")
         # génère une grille valide aléatoirement
         if not self.backtracking_solving(do_display, do_choice_randomly=True):  # signifie fermeture de la fenetre
             print('closing')
@@ -430,7 +430,8 @@ class Sudoku:
                                                            f"{' ' * 20}temps d'éxecution: {executing_time}s\n"
                                                            f"{' ' * 20}cases restantes: {remaining_cells} cases ({percentage}%)\n"
                                                            f"{' ' * 100}")
-        pygame.display.set_caption(self.game.title)
+        #pygame.display.set_caption(self.game.title)
+        self.game.set_title()
     
     def solve_grid(self, do_display: bool = True):
         """
@@ -440,7 +441,8 @@ class Sudoku:
         assert type(do_display) == bool, f'The "do_display" argument must be a boolean (type : {type(do_display)})'
         
         starting_time = time.time()
-        pygame.display.set_caption(self.game.title + " (résolution...)")
+        #pygame.display.set_caption(self.game.title + " (résolution...)")
+        self.game.set_title("(résolution...)")
         print('solving...')
         # self.put_obvious_solutions()
         self.game.graphism.display_elements()
@@ -458,8 +460,9 @@ class Sudoku:
         else:
             print("Cannot solve the sudoku")
             print(f'solving executing time: {round(time.time() - starting_time, 2)}s')
-            
-        pygame.display.set_caption(self.game.title)
+         
+        self.game.set_title()
+        #pygame.display.set_caption(self.game.title)
     
     def solve_generated_grid(self):
         """

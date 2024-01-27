@@ -1,3 +1,5 @@
+import tkinter.messagebox
+
 import pygame
 
 import json
@@ -28,7 +30,7 @@ class Game:
         self.values = "123456789ABCDEFG"  # TEST # Valeurs possibles pour les symboles (chiffre puis lettre)
         grid_size = self.get_config_value("grid_size")
         
-        self.sudoku = Sudoku(self, grid_size = grid_size)
+        self.sudoku = Sudoku(self, grid_size=grid_size)
         self.graphism = Graphism(self, (0, 0, 0))
         
         self.title = f"{self.name} {self.sudoku.grid.size}x{self.sudoku.grid.size}"
@@ -78,7 +80,24 @@ class Game:
         self.max_click_time = 250  # temps maximal entre deux clics pour être considéré comme un double clic
         self.current_time = 0
         self.last_clic = 0
-
+    
+    def set_title(self, title: str = None, keep_base: bool = True):
+        """
+        defini le titre de la fenetre
+        :param title: nouveau titre de la fenetre, si non spécifié utilise self.title
+        :param keep_base: indique si self.title doit être utilisé, si c'est le cas, title sera ajouté à la fin
+        """
+        if title is None:
+            title = self.title
+            keep_base = False
+        if self.sudoku.grid.get_is_editing(): is_editing_text = " (mode edition)"
+        else: is_editing_text = ""
+        
+        if keep_base:
+            pygame.display.set_caption(self.title + is_editing_text + " " + title)
+        else:
+            pygame.display.set_caption(title + is_editing_text)
+    
     def update(self, do_display: bool = True):
         """
         Exécute les actions nécessaires au bon fonctionnement du jeu
@@ -110,16 +129,18 @@ class Game:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.current_time = pygame.time.get_ticks()
                 
-                if self.current_time - self.last_clic < self.max_click_time and self.graphism.all_cell_rect[self.sudoku.selected_cell[0]][self.sudoku.selected_cell[1]].collidepoint(pygame.mouse.get_pos()):
+                if self.current_time - self.last_clic < self.max_click_time and \
+                        self.graphism.all_cell_rect[self.sudoku.selected_cell[0]][
+                            self.sudoku.selected_cell[1]].collidepoint(pygame.mouse.get_pos()):
                     # double clic gauche - verrouiller ou déverrouiller une case (identique à Ctrl + L)
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
-
+                    
                     state = self.sudoku.grid.get_cell_state(self.sudoku.selected_cell)
-
+                    
                     if state == 'unlocked':
                         self.sudoku.lock_selected_cell()
-
+                    
                     elif state == 'locked':
                         self.sudoku.unlock_selected_cell()
                 else:
@@ -185,22 +206,40 @@ class Game:
                     
                     elif state == 'locked':
                         self.sudoku.unlock_selected_cell()
-
+                
                 if (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_e]:
                     # Ctrl + E - activer ou desactiver le mode Edition
-                    if self.sudoku.grid.get_is_editing():
-                        pygame.display.set_caption(self.title)
-                    else:
-                        pygame.display.set_caption(self.title + " (mode édition)")
                     self.sudoku.grid.set_is_editing()
-
-                if event.key == pygame.K_a:
-                    print(self.sudoku.grid.get_group_values((0,0), "lines"))
-
-                if event.key in self.key_mapping and not (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]):  # Si l'action est de modifier une case de la grille
+                    self.set_title()  # ajoute ou non le texte relatif à l'edition, se base sur is_editing
+                
+                if self.sudoku.grid.get_is_editing() and keys_pressed[pygame.K_s] and (not keys_pressed[pygame.K_LCTRL] and not keys_pressed[pygame.K_RCTRL]):
+                    # touche S et si la grille est en edition - superlock ou unlock la case selectionnée
+                    selected_cell = self.sudoku.selected_cell
+                    if selected_cell == (-1, -1):
+                        continue
+                    if self.sudoku.grid.get_cell_state(selected_cell) == "unlocked":
+                        if self.sudoku.grid.get_cell_value(selected_cell) != "0":
+                            self.sudoku.grid.set_cell_state(selected_cell, "superlocked")
+    
+                        else:
+                            print(f"a superlocked cell must contain a value (cell coordinates:{selected_cell}")
+                        
+                    elif self.sudoku.grid.get_cell_state(selected_cell) == "superlocked":
+                        self.sudoku.grid.set_cell_state(selected_cell, "unlocked")
+                
+                if self.sudoku.grid.get_is_editing() and (keys_pressed[pygame.K_LCTRL] or keys_pressed[pygame.K_RCTRL]) and keys_pressed[pygame.K_s]:
+                    response = tkinter.messagebox.askyesnocancel("Voulez-vous déverrouiller toutes les cases", "Voulez-vous déverrouillez toutes les cases (état: unlocked) ?")
+                    if response:
+                        for x in range(self.sudoku.grid.size):
+                            for y in range(self.sudoku.grid.size):
+                                self.sudoku.grid.set_cell_state((x, y), "unlocked")
+                        
+                if event.key in self.key_mapping and not (keys_pressed[pygame.K_LCTRL] or keys_pressed[
+                    pygame.K_RCTRL]):  # Si l'action est de modifier une case de la grille
                     # Si aucune case n'est sélectionnée, ne rien faire
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
+                
                     
                     """# Si la case sélectionnée est "superlocked", afficher un message console
                     if self.sudoku.grid.get_cell_state(self.sudoku.selected_cell) == "superlocked":
@@ -258,7 +297,7 @@ class Game:
         """
         
         with open(self.config_filepath) as file:
-            self.config_file = json.load(fp = file)
+            self.config_file = json.load(fp=file)
     
     def get_config_value(self, key: str):
         """
@@ -267,7 +306,7 @@ class Game:
         :return: valeur obtenue (différents types int, bool, etc)
         """
         
-        test_errors(config_file = self.config_file, config_key = key)
+        test_errors(config_file=self.config_file, config_key=key)
         
         return self.config_file[key]
     
@@ -278,7 +317,7 @@ class Game:
         :param value: nouvelle valeur
         """
         
-        test_errors(config_file = self.config_file, config_key = key)
+        test_errors(config_file=self.config_file, config_key=key)
         
         self.config_file[key] = value
         
