@@ -9,8 +9,8 @@ def test_errors(sudoku_size=0, possibles_values="", **arguments):
     assert sudoku_size == 0 or sudoku_size in possible_sudoku_sizes, \
         f'The "sudoku_size" argument must be 4, 9, 16 or 25 (value : {sudoku_size})'
     
-    assert type(possibles_values) == str, f'The "possibles_values" argument must be an str (type: {type(possibles_values)}'
-
+    assert type(
+        possibles_values) == str, f'The "possibles_values" argument must be an str (type: {type(possibles_values)}'
     
     if "coordinates" in arguments:
         assert sudoku_size != 0, 'You must pass a value for "sudoku_size" argument in order to verify "coordinates"'
@@ -57,7 +57,6 @@ def test_errors(sudoku_size=0, possibles_values="", **arguments):
     if "list_values" in arguments:
         assert sudoku_size, 'You must pass a value for "sudoku_size" argument in order to verify "list_values"'
         assert possibles_values, 'You must pass a value for "possibles_values" argument in order to verify "list_values"'
-
         
         list_values = arguments["list_values"]
         
@@ -95,6 +94,17 @@ def test_errors(sudoku_size=0, possibles_values="", **arguments):
                     f'The "list_values" argument must contains lists that contains strings (value : {list_states})'
                 assert state in ["unlocked", "locked", "superlocked"], \
                     f'The "list_values" argument must contains lists that contains "unlocked", "locked" or "superlocked" (value : {list_states})'
+    
+    if "index" in arguments:
+        assert "generic_list" in arguments, 'You must pass a value for "list" in order to verify "index"'
+        assert type(arguments["generic_list"]) == list
+        index = arguments["index"]
+        list_ = arguments["generic_list"]
+        
+        assert type(index) == int, \
+            f'the "index" argument must be an integer between -1 and {len(list_) - 1}, (type: {type(index)}, value: {index})'
+        assert -1 <= index < len(list_), \
+            f'the "index" argument must be an integer between -1 and {len(list_) - 1}, (value: {index}, type:{type(index)})'
     
     if "config_file" in arguments:
         config_file = arguments["config_file"]

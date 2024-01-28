@@ -108,8 +108,10 @@ class Sudoku:
         assert self.selected_cell != (-1, -1), "You must select a cell in order to set its value"
         test_errors(self.grid.size, coordinates=self.selected_cell, value=value)
         
-        # Code de la fonction
+        # Code de la fonction*
+        self.game.add_history_element(cell_coordinates=self.selected_cell, previous_value=self.grid.get_cell_value(self.selected_cell))
         self.grid.set_cell_value(self.selected_cell, value)
+        
     
     def set_selected_cell_color(self, color: tuple[int, int, int]):
         """
@@ -144,7 +146,7 @@ class Sudoku:
         self.grid.update_attributes(grid_size, list_values, list_states)
         self.game.graphism.update_grid_attributes(grid_size)  # mise à jour affichage
         
-        self.game.title = f"{self.game.name} {grid_size}x{grid_size}"
+        self.game._title = f"{self.game._name} {grid_size}x{grid_size}"
         #pygame.display.set_caption(self.game.title)  # Nom de la fenêtre
         self.game.set_title()
         self.game.update_config_file(key="grid_size", value=grid_size)
@@ -158,7 +160,7 @@ class Sudoku:
         file_path = askopenfilename(
             initialdir="src/save_folder",
             initialfile="model_2.sdk",
-            title=f"Ouvrir un {self.game.name} sous...",
+            title=f"Ouvrir un {self.game._name} sous...",
             filetypes=[("Sudoku file", "*.sdk")]
         )
         
@@ -211,7 +213,7 @@ class Sudoku:
         filepath = asksaveasfilename(
             initialdir="src/save_folder/",
             initialfile='saved_sudoku.sdk',
-            title=f"Enregistrer un {self.game.name} sous...",
+            title=f"Enregistrer un {self.game._name} sous...",
             filetypes=[("Sudoku file", "*.sdk")]
         )
         
@@ -621,14 +623,6 @@ class Sudoku:
             
         else:
             # récupère les valeurs possibles de toutes les cases qui sont sur la même ligne, colonne ou carré que la dernière case modifiée et/ou sur la même ligne, colonne, carrée que la dernière case modifiée (last_cell_coordinates)
-            """cells_to_fill = [
-                [self.grid.get_possible_values(coordinates), coordinates]
-                if self.grid.get_cell_state(coordinates) != 'superlocked' and self.grid.get_cell_value(coordinates) == '0'
-                else []
-                for cell in modified_cells_coordinates + [last_cell_coordinates]
-                for format in ["lines", "columns", "squares"]
-                for coordinates in self.grid.get_group_coordinates(cell, format)
-            ]"""
             grid_possibilities = grid_possibilities.copy()
             # défini grid_possibilities
             #print("last_cell_coordinates + modified_cells_coordinates",[last_cell_coordinates] + modified_cells_coordinates)
@@ -651,30 +645,6 @@ class Sudoku:
                 
             cells_to_fill = grid_possibilities
 
-            
-            """for coordinates in self.grid.get_all_coordinates_as(format):
-                possibles_values = self.grid.get_possible_values(coordinates)
-                if self.grid.get_cell_state(coordinates) != 'superlocked' and self.grid.get_cell_value(coordinates) == '0':
-                    grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = [possibles_values, coordinates]
-                else:
-                    grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = []
-            """
-                
-            
-            """ for cell in [last_cell_coordinates] + modified_cells_coordinates:
-                for format in ["lines", "columns", "squares"]:
-                    for coordinates in self.grid.get_group_coordinates(cell, format):
-                        print(i)
-                        i+=1
-                        possibles_values = self.grid.get_possible_values(coordinates)
-                        if self.grid.get_cell_state(coordinates) != 'superlocked' and self.grid.get_cell_value(coordinates) == '0':
-                            grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = [possibles_values, coordinates]
-                        else:
-                            grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = []"""
-
-            
-
-        
         # supprime tous les éléments [] = cases superlocked ou cases avec déjà des valeurs
         cells_to_fill = list(filter(lambda x: x != [], cells_to_fill))
         

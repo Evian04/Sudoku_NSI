@@ -29,11 +29,11 @@ class Grid:
         self.size = size
         self.square_size = int(self.size ** 0.5)
         self.cells_count = self.size ** 2
-        
         if list_values:
             if not list_states:
                 list_states = [["unlocked" for _ in range(self.size)] for _ in range(self.size)]
             test_errors(self.size, list_values=list_values, list_states=list_states, possibles_values=self.global_possibles_values)
+            print(self.size)
             self.set_content(list_values, list_states)
         
     def get_cell(self, coordinates: tuple[int, int]) -> Cell:
@@ -51,10 +51,13 @@ class Grid:
         """
         
         test_errors(self.size, list_values = list_values, list_states = list_states, possibles_values=self.global_possibles_values)
-        
+        self.content.clear()
         for x in range(self.size):
+            self.content.append(list())
             for y in range(self.size):
-                self.content[x][y] = Cell(list_values[x][y], list_states[x][y], self.size)
+                cell = Cell(list_values[x][y], list_states[x][y], self.size)
+                self.content[x].append(cell)
+    
     def get_all_values(self) -> list[list[str]]:
         """
         Retourne une double liste de toutes les valeurs de la grille
@@ -77,7 +80,6 @@ class Grid:
         test_errors(self.size, coordinates = coordinates, value = value)
         if self.content[coordinates[0]][coordinates[1]].state == "unlocked" or self.get_is_editing():
             self.content[coordinates[0]][coordinates[1]].set_value(value)
-        
         else:
             print(f"Grid.set_cell: cell {coordinates} is locked or superlocked")
         
