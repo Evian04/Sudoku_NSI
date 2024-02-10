@@ -3,7 +3,6 @@ import time
 import tkinter
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesnocancel
-import pygame
 
 from src.programs.grid import Grid
 from src.programs.test_errors import test_errors
@@ -16,27 +15,65 @@ class Sudoku:
     """
     
     def __init__(self, game, grid_size: int):
+        
+        # Test préconditions
         test_errors(grid_size)
         
+        self.is_saved = False
         self.game = game
-        self.grid = Grid(self.game.values, grid_size)
+        
+        self.game_mode = "editing"
+        
+        self.grid = Grid(grid_size)
+        
+        self.history: list[Grid] = [self.grid.copy()]
+        self.history_index = 0
+        
+        self.save_state_conversion = {"unlocked": "0", "locked": "1", "superlocked": "2"}
+        self.load_state_conversion = {"0": "unlocked", "1": "locked", "2": "superlocked"}
+        
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[int, int]] = list()
+    
+    def reverse_game_mode(self):
+        """
+        Met le mode de jeu sur "playing" s'il était sur "editing" et inversement
+        """
+        
+        if self.game_mode == "playing":
+            self.game_mode = "editing"
+            
+        else:
+            self.game_mode = "playing"
+        
+        # Test postconditions
+        test_errors(game_mode = self.game_mode)
+    
+    def set_game_mode(self, game_mode: str):
+        """
+        Attribue à la variable "game_mode" la valeur indiquée
+        """
+        
+        # Test préconditions
+        test_errors(game_mode = game_mode)
+        
+        self.game_mode = game_mode
+        print(f"The game mode was set to {game_mode}")
     
     def select_cell(self, coordinates: tuple[int, int]):
         """
         Selectionne la case de coordonnées (x, y)
         """
         
-        # Test des préconditions
-        test_errors(self.grid.size, coordinates=coordinates)
+        # Test préconditions
+        test_errors(self.grid.size, coordinates = coordinates)
         
         # Code de la fonction
         self.selected_cell = coordinates
     
     def deselect_cell(self):
         """
-        Dessélectionne la case sélectionnée
+        Déselectionne la case sélectionnée
         """
         
         # Code de la fonction
@@ -48,108 +85,185 @@ class Sudoku:
         """
         
         # Test des préconditions
-        assert type(direction) == str, f"The `direction` argument must be a string (type : {type(direction)})"
-        assert direction in ["left", "right", "up",
-                             "down"], f'The `direction` argument must be "left", "right", "up" or "down" (value : {direction})'
+        test_errors(direction = direction)
         
-        # Code de la fonction
         # Si aucune case n'est sélectionnée
         if self.selected_cell == (-1, -1):
-            # Ne rien faire
             return
         
         match direction:
             
             case "left":
-                # Si l'utilisateur demande de déplacer la sélection vers la gauche, mais qu'elle est déjà au maximum de cette direction
+                # Si la sélection est au bord de la grille dans la direction indiquée
                 if self.selected_cell[0] == 0:
-                    # Alors ne rien faire
                     return
                 
-                # Sinon déplacer la sélection d'un cran vers la gauche
+                # Déplacer la sélection d'une case vers la gauche
                 self.selected_cell = (self.selected_cell[0] - 1, self.selected_cell[1])
             
             case "right":
-                # Si l'utilisateur demande de déplacer la sélection vers la droite, mais qu'elle est déjà au maximum de cette direction
+                # Si la sélection est au bord de la grille dans la direction indiquée
                 if self.selected_cell[0] == self.grid.size - 1:
-                    # Alors ne rien faire
                     return
                 
-                # Sinon déplacer la sélection d'un cran vers la droite
+                # Déplacer la sélection d'une case vers la droite
                 self.selected_cell = (self.selected_cell[0] + 1, self.selected_cell[1])
             
             case "up":
-                # Si l'utilisateur demande de déplacer la sélection vers le haut, mais qu'elle est déjà au maximum de cette direction
+                # Si la sélection est au bord de la grille dans la direction indiquée
                 if self.selected_cell[1] == 0:
-                    # Alors ne rien faire
                     return
                 
-                # Sinon déplacer la sélection d'un cran vers le haut
+                # Déplacer la sélection d'une case vers le haut
                 self.selected_cell = (self.selected_cell[0], self.selected_cell[1] - 1)
             
             case "down":
-                # Si l'utilisateur demande de déplacer la sélection vers le bas, mais qu'elle est déjà au maximum de cette direction
+                # Si la sélection est au bord de la grille dans la direction indiquée
                 if self.selected_cell[1] == self.grid.size - 1:
-                    # Alors ne rien faire
                     return
                 
-                # Sinon déplacer la sélection d'un cran vers le bas
+                # Déplacer la sélection d'une case vers le bas
                 self.selected_cell = (self.selected_cell[0], self.selected_cell[1] + 1)
         
         # Test des postconditions
-        test_errors(self.grid.size, coordinates=self.selected_cell)
+        test_errors(self.grid.size, coordinates = self.selected_cell)
     
     def set_selected_cell_value(self, value: str):
         """
-        Met la valeur de la case sélectionnée à `value`
+        Met la valeur de la case sélectionnée à "value"
         """
         
         # Test des préconditions
-        assert self.selected_cell != (-1, -1), "You must select a cell in order to set its value"
-        test_errors(self.grid.size, coordinates=self.selected_cell, value=value)
+        test_errors(self.grid.size, coordinates = self.selected_cell, value = value)
         
-        # Code de la fonction*
-        self.game.add_history_element(cell_coordinates=self.selected_cell, previous_value=self.grid.get_cell_value(self.selected_cell))
+        if self.game_mode == "playing" and self.grid.get_cell_state(self.selected_cell) in ["locked", "superlocked"]:
+            print(
+                f"The cell {self.selected_cell} is {self.grid.get_cell_state(self.selected_cell)}, You cannot change its value while playing"
+            )
+            
+            return
+        
         self.grid.set_cell_value(self.selected_cell, value)
+        print(f"The value of the cell {self.selected_cell} was set to {value}")
         
+        self.save_grid_in_history()
+        self.is_saved = False
+     
+    def reverse_selected_cell_lock(self):
+        """
+        Inverse l'état de verrouillage de la case sélectionnée
+        """
+        
+        # Test préconditions
+        test_errors(coordinates = self.selected_cell)
+        
+        self.reverse_cell_lock(self.selected_cell)
     
-    def set_selected_cell_color(self, color: tuple[int, int, int]):
+    def reverse_cell_lock(self, coordinates: tuple[int, int]):
         """
-        Met la couleur de la case sélectionnée à `color`
-        """
-        
-        # Test des préconditions
-        test_errors(color=color)
-        
-        # Code de la fonction
-        self.grid.set_cell_color(self.selected_cell, color)
-    
-    def update_grid(self, list_values: list[list[str]] = None, list_states: list[list[str]] = None):
-        """
-        Modifie la taille de la grille
-        :param list_values: optionnel: valeurs des cellules de la grille
-        :param list_states: optionnel: états des cellules de la grille
+        Inverse l'état de verrouillage de la case indiquée
         """
         
-        if list_values:
-            grid_size = len(list_values)
+        # Test préconditions
+        test_errors(self.grid.size, coordinates = coordinates)
+        
+        # Si le mode de jeu est sur "playing"
+        if self.game_mode == "playing":
+            match self.grid.get_cell_state(coordinates):
+                
+                # Si la case est "unlocked"
+                case "unlocked":
+                    # Mettre l'état de la case à "locked"
+                    self.grid.set_cell_state(coordinates, "locked")
+                    print(f"The cell {coordinates} was locked")
+                
+                # Si la case est "locked"
+                case "locked":
+                    # Mettre l'état de la case à "unlocked"
+                    self.grid.set_cell_state(coordinates, "unlocked")
+                    print(f"The cell {coordinates} was unlocked")
+                
+                # Si la case est "superlocked"
+                case "superlocked":
+                    # Afficher un message d'erreur dans la console
+                    print(f'The cell {coordinates} is superlocked, you cannot change its value while being in "playing" gam mode')
+        
+        # Si le mode de jeu est sur "editing"
         else:
-            grid_size = self.grid.size
-            list_values = [['0' for _ in range(grid_size)] for _ in range(grid_size)]
+            match self.grid.get_cell_state(coordinates):
+                
+                # Si la case est "unlocked"
+                case "unlocked":
+                    # Mettre l'état de la case à "superlocked"
+                    self.grid.set_cell_state(coordinates, "superlocked")
+                    print(f"The cell {coordinates} was superlocked")
+                
+                # Si la case est "locked"
+                case "locked":
+                    # Mettre l'état de la case à "unlocked"
+                    self.grid.set_cell_state(coordinates, "unlocked")
+                    print(f"The cell {coordinates} was unlocked")
+                
+                # Si la case est "superlocked"
+                case "superlocked":
+                    # Mettre l'état de la case à "unlocked"
+                    self.grid.set_cell_state(coordinates, "unlocked")
+                    print(f"The cell {coordinates} was unlocked")
+    
+    def save_grid_in_history(self):
+        """
+        Sauvegarde la grille courante dans l'historique
+        """
         
-        test_errors(grid_size)
+        # Si l'utilisateur est remonté dans l'historique, effacer les états de la grille qui ont été annulés
+        if self.history_index < len(self.history) - 1:
+            self.history = self.history[:self.history_index + 1]
+            
+        self.history.append(self.grid.copy())
+        self.history_index = len(self.history) - 1
+    
+    def move_index_history(self, move: str):
+        """
+        Permet de se déplacer dans l'historique.
+        move = "backward"  : Annule la dernière action
+        move = "forward"   : Rétablie l'action annulée
+        """
         
-        if not list_states:
-            list_states = [['unlocked' for _ in range(grid_size)] for _ in range(grid_size)]
+        # Test préconditions
+        test_errors(history_move = move)
         
-        test_errors(grid_size, list_values=list_values, list_states=list_states, possibles_values=self.game.values)
-        self.grid.update_attributes(grid_size, list_values, list_states)
-        self.game.graphism.update_grid_attributes(grid_size)  # mise à jour affichage
+        if move == "backward":
+            self.history_index -= 1
+            
+            if self.history_index < 0:
+                self.history_index = 0
         
-        self.game._title = f"{self.game._name} {grid_size}x{grid_size}"
-        #pygame.display.set_caption(self.game.title)  # Nom de la fenêtre
-        self.game.set_title()
-        self.game.update_config_file(key="grid_size", value=grid_size)
+        elif move == "forward":
+            self.history_index += 1
+            
+            if self.history_index >= len(self.history):
+                self.history_index = len(self.history) -1
+            
+        self.grid = self.history[self.history_index].copy()
+    
+    def clear_history(self):
+        """
+        Vide l'historique.
+        Fonction utilisée lors du chargement / génération d'une nouvelle grille
+        """
+        
+        self.history = [self.grid.copy()]
+        self.history_index = 0
+    
+    def new_empty_grid(self, grid_size: int):
+        """
+        Génère une nouvelle grille vide avec la taille indiquée
+        """
+        
+        # Test préconditions
+        test_errors(sudoku_size = grid_size)
+        
+        self.grid = Grid(grid_size)
     
     def open_grid(self):
         """
@@ -158,151 +272,92 @@ class Sudoku:
         
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
         file_path = askopenfilename(
-            initialdir="src/save_folder",
-            initialfile="model_2.sdk",
-            title=f"Ouvrir un {self.game._name} sous...",
+            initialdir = "src/save_folder",
+            initialfile = "model_2.sdk",
+            title = "Ouvrir",
             filetypes=[("Sudoku file", "*.sdk")]
         )
         
         # Dans le cas où l'utilisateur n'a pas sélectionné de fichier
         if not file_path:
             # Affiche un message en console et ne fait rien d'autre
-            print("No file selected for opening, Empty grid...")
+            print("No file selected")
             return
         
         # Récupère le contenu du fichier sélectionné
-        with open(file_path, "rt") as file:
+        with open(file_path, "r") as file:
             file_content = file.read()
         
-        # Sépare les valeurs et les états des cases dans deux sous-listes
-        file_content = file_content.split("\n\n")
-        # Formate la liste des valeurs au format list[list[int]]
-        list_values = [
-            [line[i] for line in file_content[0].split("\n")]
-            for i in range(len(file_content[0].split("\n")[0]))
-        ]
-        # Formate la liste des états au format list[list[str]]
-        convert_state = {"0": "unlocked", "1": "locked", "2": "superlocked"}
-        list_states = [
-            [convert_state.get(line[i], "unlocked") for line in file_content[1].split("\n")]
-            for i in range(len(file_content[1].split("\n")[0]))
-        ]
+        # Formate le contenu du fichier dans les variables grid_size, all_values et all_states
         
-        if len(list_values) != self.grid.size:
-            response = askyesnocancel("Changement taille Sudoku",
-                                      f"Voulez-vous changer la taille du sudoku\nLes données non sauvegardées seront perdues")
-            if not response:
-                return None  # signifie que l'utilisateur souhaite garder la taille actuelle de son sudoku
-            else:
-                self.update_grid(list_values, list_states)
+        file_content = file_content.split("\n\n")
+        
+        grid_size = int(file_content[0])
+        
+        all_values = [[value for value in line] for line in file_content[1].split("\n")]
+        all_states = [[self.load_state_conversion[state] for state in line] for line in file_content[2].split("\n")]
         
         # Test postconditions
-        test_errors(self.grid.size, list_values=list_values, list_states=list_states, possibles_values=self.game.values)
+        test_errors(grid_size, list_values = all_values, list_states = all_states)
         
         # Remplace le contenu de la grille par le contenu lu dans le fichier
-        self.grid.set_content(list_values, list_states)
+        self.grid.set_content(all_values, all_states)
+        
+        print("Grid succesfully opened")
+        
+        self.is_saved = True
         self.verify_grid()
-        print("fin open")
+        self.set_game_mode("playing")
+        self.game.update_title()
     
     def save_grid(self):
         """
-        /!\ Enregistre la grille actuelle dans un fichier Avec ou sans les valeurs saisies par utilisateur
+        Enregistre la grille actuelle dans un fichier
         """
         
         # Récupère le chemin du fichier à sauvegarder
         filepath = asksaveasfilename(
-            initialdir="src/save_folder/",
-            initialfile='saved_sudoku.sdk',
-            title=f"Enregistrer un {self.game._name} sous...",
-            filetypes=[("Sudoku file", "*.sdk")]
+            initialdir = "src/save_folder/",
+            initialfile = 'saved_sudoku.sdk',
+            title = f"Enregistrer",
+            filetypes = [("Sudoku file", "*.sdk")]
         )
         
         # Si l'utilisateur n'a rien entré
         if not filepath:
-            # Afficher un message dans la console et ne rien faire d'autre
-            print('No file selected for saving')
-            return False
+            return
         
-        # convertit toutes les valeurs des cases en string
-        double_list_values = [
-            [str(line[i].value) for line in self.grid.content]
-            for i in range(len(self.grid.content))
-        ]
-        # convertit la double liste en liste simple (une string par linee)
-        list_values = ["".join(line) for line in double_list_values]
+        # Formate les valeurs des cases de la grille en chaine de charactère
+        all_values = "\n".join(["".join(line) for line in self.grid.get_all_values()])
         
-        # convertit la liste en une string
-        str_content = "\n".join(list_values)
+        # Formate les états des cases de la grille en chaine de charactère
+        all_states = "\n".join(["".join([self.save_state_conversion[state] for state in line]) for line in self.grid.get_all_states()])
         
-        convert_state = {"unlocked": "0", "locked": "1", "superlocked": "2"}  # Dictionnaire de conversion
+        all_content = str(self.grid.size) + "\n\n" + all_values + "\n\n" + all_states
         
-        # convertit toutes les valeurs des celules en string avec le dictionnaire de conversion
-        double_list_state = [
-            [convert_state[line[i].state] for line in self.grid.content]
-            for i in range(len(self.grid.content))
-        ]
-        # convertit la double liste en liste simple (une string par ligne)
-        list_state = ["".join(line) for line in double_list_state]
-        
-        # additionne les deux (valeurs, états)
-        str_content += "\n\n" + "\n".join(list_state)  # "\n\n" pour séparer les valeurs et les états des cases
-        
-        # écrit le contenu obtenu dans un fichier
+        # Ecrit le contenu obtenu dans un fichier
         with open(filepath, "w") as file:
-            file.write(str_content)
-    
-    def lock_selected_cell(self):
-        """
-        Verrouille la case sélectionnée, la valeur de la case ne pourra plus être modifiée
-        """
-        
-        # Test de préconditions
-        assert self.selected_cell != (-1, -1), "You must select a cell in order to lock it"
-        test_errors(self.grid.size, coordinates=self.selected_cell)
-
-        print(f"Cell {self.selected_cell} is locked")
-        # Code de la fonction
-        # Si la case sélectionnée est "superlocked"
-        if self.grid.get_cell_state(self.selected_cell) == "superlocked":
-            # Ne rien faire
-            return
-        
-        # Sinon, mettre l'état de la case sélectionnée à "locked"
-        self.grid.set_cell_state(self.selected_cell, "locked")
-    
-    def unlock_selected_cell(self):
-        """
-        Déverrouille la case sélectionnée, la valeur de la case pourra de nouveau être modifiée
-        """
-        
-        # Test de préconditions
-        assert self.selected_cell != (-1, -1), "You must select a cell in order to unlock it"
-        test_errors(self.grid.size, coordinates=self.selected_cell)
-        
-        print(f"cell {self.selected_cell} is unlocked")
-
-        # Code de la fonction
-        # Si la case sélectionnée est "superlocked"
-        if self.grid.get_cell_state(self.selected_cell) == "superlocked":
-            # Ne rien faire
-            return
-        
-        # Sinon, mettre l'état de la case sélectionnée à "unlocked"
-        self.grid.set_cell_state(self.selected_cell, "unlocked")
+            file.write(all_content)
+            
+        self.is_saved = True
+        print("Grid saved succesfully")
     
     def is_valid(self) -> bool:
         """
-        Renvoi True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
+        Renvoie True si la grille ne comporte aucune erreurs, et False si elle en comporte au moins une
         """
         
-        # Pour tout les formats de grille possibles (lignes, colonnes et carrés)
-        for grid_format in [self.grid.get_all_values_as(format) for format in ["lines", "columns", "squares"]]:
-            for x in range(self.grid.size):
-                # for n in range(1, 1 + self.grid.size):
-                for n in self.game.values[:self.grid.size]:
-                    # Si l'un des sous-groupes de ce format compte plusieur fois le même chiffre
-                    if grid_format[x].count(n) > 1:
-                        # Renvoyer False
+        # Pour toutes les organisations de grille possibles (en lignes, en colonnes et en carrés)
+        for all_values in [self.grid.get_all_values_as(format) for format in ["lines", "columns", "squares"]]:
+            
+            # Parcourir les sous-listes de cet ensemble de valeurs
+            for sub_all_values in all_values:
+                
+                # Pour toutes les valeurs de case possible
+                for value in self.game.possible_values[:self.grid.size]:
+                    
+                    # Si la valeur apparait plusieur fois dans la sous-liste
+                    if sub_all_values.count(value) > 1:
                         return False
         
         # Si aucun doublon n'a été trouvé, renvoyer True
@@ -310,7 +365,7 @@ class Sudoku:
     
     def verify_grid(self):
         """
-        Vérifie dans toute la grille si des cases sont en conflit
+        Enregistre dans la variable "self.conflicting_cells" l'ensemble des coordonnées des cases en conflit
         """
         
         tmp_conflicting_cells = list()  # Liste temporaire dans laquelle seront stockées les coordonnées des cases en conflits
@@ -320,22 +375,32 @@ class Sudoku:
             all_values = self.grid.get_all_values_as(format)
             all_coordinates = self.grid.get_all_coordinates_as(format)
             
+            # Parcourir les coordonnées en x possibles
             for x in range(self.grid.size):
+                
+                # Récupérer les groupes de valeurs et de coordonnées correspondant
                 group_values = all_values[x]
                 groupe_coordinates = all_coordinates[x]
                 
-                for n in self.game.values[:self.grid.size]:
-                    if group_values.count(n) > 1 and n != 0:
+                # Pour toutes les valeurs possibles
+                for value in self.game.possible_values[:self.grid.size]:
+                    
+                    # Si cette valeur apparait plusieur fois dans le groupe de valeurs
+                    if group_values.count(value) > 1:
                         
+                        # Enregistrer dans "tmp_conflicting_cells" les coordonnées des cases ayant la valeur doublon
                         for y in range(self.grid.size):
-                            if group_values[y] == n and not groupe_coordinates[y] in tmp_conflicting_cells:
+                            if group_values[y] == value and not groupe_coordinates[y] in tmp_conflicting_cells:
                                 tmp_conflicting_cells.append(groupe_coordinates[y])
                     
+                    # Si la valeur n'apparait pas plusieur fois dans le groupe de valeurs
                     else:
+                        # Supprimer les coordonnées des cases ayant cette valeur de la variable "self.conflicting_cells"
                         for y in range(self.grid.size):
-                            if group_values[y] == n and groupe_coordinates[y] in self.conflicting_cells:
+                            if group_values[y] == value and groupe_coordinates[y] in self.conflicting_cells:
                                 self.conflicting_cells.remove(groupe_coordinates[y])
         
+        # Mise en commun de "tmp_conflicting_cells" et de "self.conflicting_cells"
         for x in range(self.grid.size):
             for y in range(self.grid.size):
                 
@@ -345,45 +410,55 @@ class Sudoku:
         self.update_cells_conflicting_state()
     
     def update_cells_conflicting_state(self):
+        """
+        Met à jour la variable "is_in_conflict" de toutes les cases de la grille
+        """
+        
         for x in range(self.grid.size):
             for y in range(self.grid.size):
                 self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
     
-    def generate_grid(self, prop_cells_to_let, do_display: bool, do_show_messagebox: bool = True):
+    def generate_grid(self, cell_frequency: float, do_show_messagebox: bool = True):
         """
-        Génère une grille de sudoku résolu
-        :param prop_cells_to_let: proportion de cases à laisser (= difficulté)
-        :param do_display: mettre à jour graphiquement les cases lors de la génération
+        Génère une grille de sudoku
+        :param cells_frequency: proportion de cases à laisser (= difficulté)
         met à jour self.grid
         """
         
-        assert type(
-            prop_cells_to_let) == float, f'The "prop_cells_to_let" argument must be a float between 0 and 1 (type: {type(prop_cells_to_let)})'
-        assert 0 <= prop_cells_to_let <= 1, f'The "prop_cells_to_let" argument must be a float between 0 and 1 (value: {prop_cells_to_let})'
-        assert type(do_display) == bool, f'The "do_display" argument must be a boolean (type : {type(do_display)})'
+        # Test préconditions
+        test_errors(frequency = cell_frequency)
         
-        if len(self.grid.get_all_empty_cells()) != self.grid.cells_count:  # verifie si la grille contient des données
-            is_to_discard = askyesnocancel("Sauvegarde grille ?",
-                                           "Voulez vous continuer SANS sauvegarder la grille avant la génération ?\nLes données non sauvegardées seront perdues")
-            if is_to_discard is False:  # bouton oui
+        if not self.is_saved and len(self.grid.get_all_empty_cells()) < self.grid.cells_count:  # verifie si la grille contient des données
+            do_save = askyesnocancel(
+                "Sauvegarde",
+                "Voulez vous générer une nouvelle grille sans sauvegarder ?\nLes données non sauvegardées seront perdues"
+            )
+            
+            # Boutton annuler
+            if do_save == None:
+                return
+            
+            # Boutton oui
+            if do_save:
                 self.save_grid()
-            elif is_to_discard is None:  # bouton cancel
-                return False  # annulation opération
         
         print("generating...")
+        self.game.update_title("Génération ...")
         starting_time = time.time()
-        self.update_grid()  # vide la grille, déverrouille toutes les cases (attention, modifie le titre de la fenetre)
-        #pygame.display.set_caption(self.game.title + " (génération...)")
-        self.game.set_title("(génération...)")
-        # génère une grille valide aléatoirement
-        if not self.backtracking_solving(do_display, do_choice_randomly=True):  # signifie fermeture de la fenetre
-            print('closing')
-            return False
+        
+        # Génère une nouvelle grille vide
+        self.new_empty_grid(self.grid.size)
+        
+        # génère une grille complète et valide aléatoirement
+        self.backtracking_solving(False, do_choice_randomly = True)
+        
+        if self.game.do_quit:
+            return
         
         # Pochoir (test plusieurs configurattion jusqu'a en trouver une correct)
         backup_grid = self.grid.get_all_values()  # copie la grille (sauvegarde)
         # définir les cases à laisser
-        number_of_cells_to_remove = round((1 - prop_cells_to_let) * self.grid.cells_count)
+        number_of_cells_to_remove = round((1 - cell_frequency) * self.grid.cells_count)
         resolved = False
         while not resolved:
             cells_to_remove_list = list()  # liste des cellules modifiées
@@ -395,9 +470,9 @@ class Sudoku:
                     cell = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
                 
                 self.grid.set_cell_value(cell, "0")
-                self.game.cell_update(cell, do_display)
+                self.game.cell_update(cell, False)
                 cells_to_remove_list.append(cell)
-            solutions_numbers = self.count_possible_solutions(do_display=do_display, do_stop_sup_1=True)
+            solutions_numbers = self.count_possible_solutions(True)
             if self.game.do_quit:
                 return False
             
@@ -405,35 +480,39 @@ class Sudoku:
                 for cell in self.grid.get_all_coordinates_simple_list():
                     if cell in cells_to_remove_list:
                         self.grid.set_cell_value(cell, "0")
-                        self.game.cell_update(cell, do_display)
+                        self.game.cell_update(cell, False)
                     
                     else:
                         self.grid.set_cell_state(cell, "superlocked")
-                        self.game.cell_update(cell, do_display)
+                        self.game.cell_update(cell, False)
                     resolved = True
             
             else:
-                # print(f"grille contient plus d'une solution ({solutions_numbers} solutions), génération d'un nouveauu pochoir")
                 # restaure la grille
-                self.grid.set_content(backup_grid, list_states=[['unlocked' for _ in range(self.grid.size)] for _ in
-                                                                range(self.grid.size)])
-                self.game.update(do_display)
+                self.grid.set_content(
+                    backup_grid, list_states=[['unlocked' for _ in range(self.grid.size)] for _ in range(self.grid.size)]
+                )
+                self.game.update(False)
                 # définir les cases à laisser
-                prop_cells_to_let += 0.03  # augmente de 3% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
-                number_of_cells_to_remove = round((1 - prop_cells_to_let) * self.grid.cells_count)
+                cell_frequency += 0.03  # augmente de 3% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
+                number_of_cells_to_remove = round((1 - cell_frequency) * self.grid.cells_count)
         
+        self.set_game_mode("playing")
+        self.game.update_title()
         self.game.update()
+        
         executing_time = round(time.time() - starting_time, 2)
         remaining_cells = self.grid.cells_count - number_of_cells_to_remove
         percentage = round(100 - ((number_of_cells_to_remove / self.grid.cells_count) * 100), 2)
-        print(f'generating executing time: {executing_time}s - {remaining_cells} cases restantes ({percentage}%)')
-        if do_show_messagebox: tkinter.messagebox.showinfo("Génération terminée",
-                                                           f"{' ' * 20}Génération effectué avec succès\n"
-                                                           f"{' ' * 20}temps d'éxecution: {executing_time}s\n"
-                                                           f"{' ' * 20}cases restantes: {remaining_cells} cases ({percentage}%)\n"
-                                                           f"{' ' * 100}")
-        #pygame.display.set_caption(self.game.title)
-        self.game.set_title()
+        print(f'Temps de génération: {executing_time}s - {remaining_cells} cases restantes ({percentage}%)')
+        
+        if do_show_messagebox: tkinter.messagebox.showinfo(
+            "Génération terminée",
+            f"{' ' * 20}Génération effectué avec succès\n"
+            f"{' ' * 20}temps d'éxecution: {executing_time}s\n"
+            f"{' ' * 20}cases restantes: {remaining_cells} cases ({percentage}%)\n"
+            f"{' ' * 100}"
+        )
     
     def solve_grid(self, do_display: bool = True):
         """
@@ -443,10 +522,11 @@ class Sudoku:
         assert type(do_display) == bool, f'The "do_display" argument must be a boolean (type : {type(do_display)})'
         
         starting_time = time.time()
-        #pygame.display.set_caption(self.game.title + " (résolution...)")
-        self.game.set_title("(résolution...)")
+        
+        if do_display:
+            self.game.update_title("Résolution ...")
+        
         print('solving...')
-        # self.put_obvious_solutions()
         self.game.graphism.display_elements()
         
         self.clear_inputs()
@@ -456,19 +536,18 @@ class Sudoku:
         
         elif self.backtracking_solving(do_display):
             print("Sudoku solved successfully")
-            print(f'solving executing time: {round(time.time() - starting_time, 2)}s')
-        
+            print(f'Solving executing time: {round(time.time() - starting_time, 2)}s')
         
         else:
             print("Cannot solve the sudoku")
-            print(f'solving executing time: {round(time.time() - starting_time, 2)}s')
+            print(f'Solving executing time: {round(time.time() - starting_time, 2)}s')
          
-        self.game.set_title()
+        self.game.update_title()
         #pygame.display.set_caption(self.game.title)
     
     def solve_generated_grid(self):
         """
-        Résout le Sudoku, tient compte ou non des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
+        Résout le Sudoku, ne tient pas compte des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
         """
         
         if not self.is_valid():
@@ -527,11 +606,11 @@ class Sudoku:
         
         return modified_cells
     
-    def count_possible_solutions(self, do_display: bool = False, do_stop_sup_1: bool = False) -> int:
+    def count_possible_solutions(self, do_stop_sup_1: bool = False) -> int:
         """
         Fonction récurusive qui compte le nombre de solutions possibles dans le sudoku
         Renvoi -1 si la fenêtre doit être fermée, et le nombre de solutions possibles dans les autres cas
-        :param: do_stop_sup_1: indique si le programme doit s'arreter si il dépasse 1 (indique rapidement si il y a plus d'une solutionn)
+        :param: do_stop_sup_1: indique si le programme doit s'arreter si il dépasse 1 (indique rapidement si il y a plus d'une solution)
         """
         if self.game.do_quit:
             return -1
@@ -563,7 +642,7 @@ class Sudoku:
         for value in cell_possible_values:
             # Mettre la valeur dans la case
             self.grid.set_cell_value(cell_coordinates, value)
-            self.game.cell_update(cell_coordinates, do_display)
+            self.game.cell_update(cell_coordinates, False)
             
             # Si la grille est complète et valide, ajouter 1 au compteur des solutions rencontrées
             if self.grid.is_full():
@@ -574,8 +653,7 @@ class Sudoku:
             else:
                 if do_stop_sup_1 and encountered_solutions > 1:
                     return encountered_solutions
-                encountered_solutions += self.count_possible_solutions(do_display=do_display,
-                                                                       do_stop_sup_1=do_stop_sup_1)
+                encountered_solutions += self.count_possible_solutions(do_stop_sup_1)
                 if self.game.do_quit:
                     # Arrêter le programme
                     return -1
@@ -584,7 +662,7 @@ class Sudoku:
                     return encountered_solutions
             
             self.grid.set_cell_value(cell_coordinates, "0")
-            self.game.cell_update(cell_coordinates, do_display)
+            self.game.cell_update(cell_coordinates, False)
         
         return encountered_solutions
     
@@ -636,10 +714,10 @@ class Sudoku:
                             #print(i)
                             #i += 1
                             coordinates_list.append(coordinates)
-                            possibles_values = self.grid.get_possible_values(coordinates)
+                            possible_values = self.grid.get_possible_values(coordinates)
                             if self.grid.get_cell_state(coordinates) != 'superlocked' and self.grid.get_cell_value(
                                     coordinates) == '0':
-                                grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = [possibles_values, coordinates]
+                                grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = [possible_values, coordinates]
                             else:
                                 grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = []
                 

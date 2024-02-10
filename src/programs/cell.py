@@ -7,6 +7,7 @@ class Cell:
     
     def __init__(self, value: str, state: str, sudoku_size: int):
         
+        # Test préconditions
         test_errors(sudoku_size, value = value, state = state)
         
         self.value = value
@@ -20,6 +21,7 @@ class Cell:
         Met la valeur de la case à "value"
         """
         
+        # Test préconditions
         test_errors(self.sudoku_size, value = value)
         
         self.value = value
@@ -29,6 +31,7 @@ class Cell:
         Met l'état de la case à "state"
         """
         
+        # Test préconditions
         test_errors(state = state)
         
         self.state = state
@@ -38,6 +41,7 @@ class Cell:
         Met la variable "is_in_conflict" à "conflicting_state"
         """
         
-        assert type(conflicting_state) == bool, 'The "conflicting_state" argument must be a boolean'
+        # Test préconditions
+        test_errors(boolean = conflicting_state)
         
         self.is_in_conflict = conflicting_state

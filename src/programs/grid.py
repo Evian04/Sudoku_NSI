@@ -7,34 +7,48 @@ class Grid:
     La class "Grid" permet de stocker et de gérer le contenu de la grille du sudoku
     """
     
-    def __init__(self, global_possibles_values: str, size: int = 9, content: list[list[Cell]] = None):
+    def __init__(self, size: int):
         test_errors(size)
-        self.size: int = size
-        self.square_size = int(self.size ** 0.5)
-        self.cells_count = self.size ** 2 #nombre de cellules
-        self.global_possibles_values = global_possibles_values
-        self.is_editing = False
-        if content:
-            # Si le contenu du sudoku est précisé, sauvegarder ce contenu
-            self.content = content.copy()
         
-        else:
-            # Sinon créer une grille vierge
-            self.content = [[Cell('0', "unlocked", self.size) for y in range(self.size)] for x in range(self.size)]
-
-    def update_attributes(self, size:int, list_values:list[list[str]] = None, list_states: list[list[str]] = None):
-        """
-        met à jour les attributs de la grille, utiliser lors d'un changement de taille de la grille
-        """
         self.size = size
         self.square_size = int(self.size ** 0.5)
-        self.cells_count = self.size ** 2
-        if list_values:
-            if not list_states:
-                list_states = [["unlocked" for _ in range(self.size)] for _ in range(self.size)]
-            test_errors(self.size, list_values=list_values, list_states=list_states, possibles_values=self.global_possibles_values)
-            print(self.size)
-            self.set_content(list_values, list_states)
+        self.cells_count = self.size ** 2 # nombre total de cases
+        self.possible_values = "123456789ABCDEFG"
+        
+        self.content = [[Cell("0", "unlocked", self.size) for y in range(self.size)] for x in range(self.size)]
+    
+    def copy(self):
+        """
+        Renvoie une copie de la grille
+        Permet de créer un nouvel objet Grid avec les mêmes attributs
+        """
+        
+        copied_grid = Grid(self.size)
+        copied_grid.set_content(self.get_all_values(), self.get_all_states())
+        
+        # Test postconditions
+        test_errors(self.size, list_values = copied_grid.get_all_values(), list_states = copied_grid.get_all_states())
+        
+        return copied_grid
+    
+    def reset_attributes(self, size: int, list_values: list[list[str]] = [], list_states: list[list[str]] = []):
+        """
+        Met à jour les attributs de la grille, utilisé lors d'un changement de taille de la grille
+        """
+        
+        if list_values == []:
+            list_values = [["0" for y in range(self.size)] for x in range(self.size)]
+            
+        if list_states == []:
+            list_states = [["unlocked" for y in range(self.size)] for x in range(self.size)]
+        
+        test_errors(size, list_values = list_values, list_states = list_states)
+        
+        self.size = size
+        self.square_size = int(size ** 0.5)
+        self.cells_count = size ** 2        
+        
+        self.set_content(list_values, list_states)
         
     def get_cell(self, coordinates: tuple[int, int]) -> Cell:
         """
@@ -50,21 +64,28 @@ class Grid:
         Remplace le contenu de la grille par "new content"
         """
         
-        test_errors(self.size, list_values = list_values, list_states = list_states, possibles_values=self.global_possibles_values)
+        test_errors(self.size, list_values = list_values, list_states = list_states)
+        
         self.content.clear()
         for x in range(self.size):
-            self.content.append(list())
+            self.content.append([])
             for y in range(self.size):
                 cell = Cell(list_values[x][y], list_states[x][y], self.size)
                 self.content[x].append(cell)
     
     def get_all_values(self) -> list[list[str]]:
         """
-        Retourne une double liste de toutes les valeurs de la grille
-        (identique à self.content, mais remplace les cases pas les valeurs des cases)
+        Renvoie une double liste contenant toutes les valeurs de la grille
         """
         
         return [[cell.value for cell in line] for line in self.content]
+
+    def get_all_states(self) -> list[list[str]]:
+        """
+        Renvois une double liste contenant toutes les états des cases de la grille
+        """
+        
+        return [[cell.state for cell in line] for line in self.content]
     
     def get_all_coordinates_simple_list(self) -> list[tuple[int, int]]:
         """
@@ -77,11 +98,10 @@ class Grid:
         Met la case de coordonnées (x, y) à la valeur "value"
         """
         
+        # Test préconditions
         test_errors(self.size, coordinates = coordinates, value = value)
-        if self.content[coordinates[0]][coordinates[1]].state == "unlocked" or self.get_is_editing():
-            self.content[coordinates[0]][coordinates[1]].set_value(value)
-        else:
-            print(f"Grid.set_cell: cell {coordinates} is locked or superlocked")
+        
+        self.content[coordinates[0]][coordinates[1]].set_value(value)
         
     def get_cell_value(self, coordinates: tuple[int, int]) -> str:
         """
@@ -91,23 +111,6 @@ class Grid:
         test_errors(self.size, coordinates = coordinates)
         
         return self.content[coordinates[0]][coordinates[1]].value
-    
-    def set_is_editing(self, state: bool=None):
-        """
-        défini si la grille est en édition, si c'est le cas, les cases superlocked peuvent être modifiées
-        :param state: état d'édition, si non spécifié, inversion d el'état
-        """
-        if not state:
-            self.is_editing = not self.get_is_editing()
-        else:
-            self.is_editing = state
-        
-    def get_is_editing(self):
-        """
-        Indique si la grile est en mode d'édition
-        :return: state
-        """
-        return self.is_editing
         
     def set_cell_state(self, coordinates: tuple[int, int], state: str):
         """
@@ -144,12 +147,7 @@ class Grid:
         test_errors(self.size, coordinates = coordinates)
         
         x, y = coordinates
-        conflicting_state = self.content[x][y].is_in_conflict
-        
-        assert type(conflicting_state) == bool, \
-            f'The "is_in_conflict" variable of the cell {coordinates} must be a boolean (type : {type(conflicting_state)})'
-            
-        return conflicting_state
+        return self.content[x][y].is_in_conflict
     
     def get_coordinates_as(self, coordinates: tuple[int, int], input_format: str, output_format: str) -> tuple[int, int]:
         """
@@ -210,18 +208,6 @@ class Grid:
             ] for x in range(self.size)
         ]
     
-    def get_group_coordinates(self, coordinates: tuple[int, int], format: str) -> list[tuple[int, int]]:
-        """
-        Renvoi la liste des coordonnées des cases appartenant au même groupe que la case "coordinates"
-        l'argument "format" indique le type de groupe à prendre en compte (ligne, colonne ou carré)
-        """
-        
-        test_errors(self.size, coordinates = coordinates, format = format)
-        
-        formated_coordinates = self.get_coordinates_as(coordinates, "lines", format)
-        
-        return [self.get_coordinates_as((formated_coordinates[0], y), format, "lines") for y in range(self.size)]
-    
     def get_group_values(self, coordinates: tuple[int, int], format: str) -> list[str]:
         """
         Renvoi la liste des valeurs des cases appartenant au même groupe que la case "coordinates"
@@ -235,6 +221,18 @@ class Grid:
         return [
             self.get_cell_value(self.get_coordinates_as((formated_coordinates[0], y), format, "lines")) for y in range(self.size)
         ]
+    
+    def get_group_coordinates(self, coordinates: tuple[int, int], format: str) -> list[tuple[int, int]]:
+        """
+        Renvoi la liste des coordonnées des cases appartenant au même groupe que la case "coordinates"
+        l'argument "format" indique le type de groupe à prendre en compte (ligne, colonne ou carré)
+        """
+        
+        test_errors(self.size, coordinates = coordinates, format = format)
+        
+        formated_coordinates = self.get_coordinates_as(coordinates, "lines", format)
+        
+        return [self.get_coordinates_as((formated_coordinates[0], y), format, "lines") for y in range(self.size)]
     
     def get_all_empty_cells(self) -> list[tuple[int, int]]:
         """
@@ -273,9 +271,10 @@ class Grid:
         Renvoi les valeurs possibles (de 1 à "self.size") de la case en fonctions des autres chiffres de la même ligne, colomne ou carré
         """
         
+        # Test préconditions
         test_errors(self.size, coordinates = coordinates)
-        #possible_values = [str(n + 1) for n in range(self.size)]
-        possible_values = [digit for digit in self.global_possibles_values[:self.size]]
+        
+        possible_values = [digit for digit in self.possible_values[:self.size]]
         
         # Pour tout les formats existants
         for format in ["lines", "columns", "squares"]:
