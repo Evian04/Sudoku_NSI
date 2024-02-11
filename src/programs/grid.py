@@ -135,7 +135,8 @@ class Grid:
         Met la variable indiquant si la case est en conflit ou non à l'état indiqué
         """
 
-        assert type(conflicting_state) == bool, 'The "conflicting_state" argument must be a boolean'
+        # Test préconditions
+        test_errors(boolean = conflicting_state)
         
         self.content[coordinates[0]][coordinates[1]].set_conflicting_state(conflicting_state)
     

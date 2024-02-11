@@ -519,7 +519,8 @@ class Sudoku:
         Résout le Sudoku, tient compte des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
         """
         
-        assert type(do_display) == bool, f'The "do_display" argument must be a boolean (type : {type(do_display)})'
+        # Test préconditions
+        test_errors(boolean = do_display)
         
         starting_time = time.time()
         
