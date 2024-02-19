@@ -10,8 +10,11 @@ screen_size = (1080, 720)  # Dimensions de la fenêtre
 screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE)  # Création de la fenêtre
 
 game = Game(screen)
+clock = pygame.time.Clock()
 
 while True:
+    # Limitation du nombre d'image par secondes
+    clock.tick(60)
     
     # Mettre à jour le jeu
     game.update()

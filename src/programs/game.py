@@ -171,15 +171,16 @@ class Game:
                     self.sudoku.move_selected_cell("down")
                 
                 if event.key == pygame.K_c and is_ctrl_pressed:
-                    # Ctrl + C - supprimer toutes les valeurs des cases déverrouillées
+                    # Ctrl + C - supprime toutes les valeurs des cases déverrouillées
                     self.sudoku.clear()
                     self.sudoku.verify_grid()
                 
                 if event.key == pygame.K_l and is_ctrl_pressed:
-                    # Ctrl + L - verrouiller ou déverrouiller une case (s=identique au double clic))
+                    # Si aucune case n'est sélectionnées, ne rien faire
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
                     
+                    # Ctrl + L - Verrouille ou déverrouille une case (identique au clique droit)
                     self.sudoku.reverse_selected_cell_lock()
                 
                 if event.key == pygame.K_z and is_ctrl_pressed:
