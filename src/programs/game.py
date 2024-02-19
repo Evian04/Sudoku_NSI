@@ -34,7 +34,7 @@ class Game:
         self.name: str = "Sudokool"
         self.update_title()
         
-        self._key_mapping: dict[str] = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une case
+        self.key_mapping: dict[str] = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une case
             pygame.K_1:         '1',
             pygame.K_KP_1:      '1',
             pygame.K_2:         '2',
@@ -194,13 +194,17 @@ class Game:
                     self.sudoku.reverse_game_mode()
                     self.update_title()
                 
-                if event.key in self._key_mapping and not is_ctrl_pressed:
+                if event.key in self.key_mapping and not is_ctrl_pressed:
                     # Si aucune case n'est sélectionnée, ne rien faire
                     if self.sudoku.selected_cell == (-1, -1):
                         continue
                     
+                    # Si la valeur n'est pas compatible avec la taille de la grille actuelle, ne rien faire
+                    if not self.key_mapping[event.key] in "0" + self.possible_values[:self.sudoku.grid.size]:
+                        continue
+                    
                     # récupère la valeur à affecter à partir du dictionnaire self.key_mapping
-                    value = self._key_mapping[event.key]
+                    value = self.key_mapping[event.key]
                     
                     # modifie la valeur de la case selectionnée
                     self.sudoku.set_selected_cell_value(value)
