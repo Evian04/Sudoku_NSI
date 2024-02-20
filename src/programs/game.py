@@ -129,16 +129,17 @@ class Game:
                         if self.graphism.dimensions_button_rect.collidepoint(mouse_pos):
                             
                             if self.sudoku.grid.size == 4:
-                                self.sudoku.new_empty_grid(9)
+                                is_action_successful = self.sudoku.new_empty_grid(9)
                             
                             elif self.sudoku.grid.size == 9:
-                                self.sudoku.new_empty_grid(16)
+                                is_action_successful = self.sudoku.new_empty_grid(16)
                             
                             else:
-                                self.sudoku.new_empty_grid(4)
+                                is_action_successful = self.sudoku.new_empty_grid(4)
                             
-                            self.graphism.update_grid_attributes(self.sudoku.grid.size)
-                            self.graphism.update_dimensions_button_rect()
+                            if is_action_successful:
+                                self.graphism.update_grid_attributes(self.sudoku.grid.size)
+                                self.graphism.update_dimensions_button_rect()
                         
                         elif self.graphism.generate_button_rect.collidepoint(mouse_pos):
                             self.sudoku.generate_grid(0.5)

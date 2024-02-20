@@ -258,6 +258,7 @@ class Sudoku:
     def new_empty_grid(self, grid_size: int):
         """
         Génère une nouvelle grille vide avec la taille indiquée
+        Renvois True si la grille a bien été crée, et False si l'action a été annulée
         """
         
         # Test préconditions
@@ -266,17 +267,17 @@ class Sudoku:
         if not self.is_grid_saved and not self.grid.is_empty():
             do_save = askyesnocancel(
                 "Sauvegarder la grille",
-                f"Une nouvelle grille vierge de taille {grid_size}x{grid_size} va être générer \
-                et les données de la grille actuelle seront définitivement perdues.\nVoulez-vous sauvegarder la grille ?"
+                f"Une nouvelle grille vierge de taille {grid_size}x{grid_size} va être générer et les données de la grille actuelle seront définitivement perdues.\nVoulez-vous sauvegarder la grille ?"
             )
             
             if do_save == None:
-                return
+                return False
             
             if do_save:
                 self.save_grid()
         
         self.grid = Grid(grid_size)
+        return True
     
     def open_grid(self):
         """

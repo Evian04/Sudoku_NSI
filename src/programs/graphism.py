@@ -27,8 +27,7 @@ class Graphism:
         """
         self.grid_size = size
         self.square_size = int(self.grid_size ** 0.5)
-        self.game.graphism.update_rect()
-        self.game.graphism.display_elements()
+        self.update_rect()
 
     def reverse_display_conflicts(self):
         """
