@@ -289,12 +289,24 @@ class Grid:
     
     def is_full(self) -> bool:
         """
-        Renvoi True si la grille est remplie, et False si elle ne l'est pas
+        Renvoie True si la grille est remplie, et False si elle ne l'est pas
         """
         
         for x in range(self.size):
             for y in range(self.size):
-                if self.get_cell_value((x, y)) == '0':
+                if self.get_cell_value((x, y)) == "0":
+                    return False
+        
+        return True
+
+    def is_empty(self) -> bool:
+        """
+        Renvoie True si la grille est vide, et False si elle ne l'est pas
+        """
+        
+        for x in range(self.size):
+            for y in range(self.size):
+                if self.get_cell_value((x, y)) != "0":
                     return False
         
         return True

@@ -19,7 +19,7 @@ class Sudoku:
         # Test préconditions
         test_errors(grid_size)
         
-        self.is_saved = False
+        self.is_grid_saved = False
         self.game = game
         
         self.game_mode = "editing"
@@ -147,7 +147,7 @@ class Sudoku:
         print(f"The value of the cell {self.selected_cell} was set to {value}")
         
         self.save_grid_in_history()
-        self.is_saved = False
+        self.is_grid_saved = False
      
     def reverse_selected_cell_lock(self):
         """
@@ -263,6 +263,19 @@ class Sudoku:
         # Test préconditions
         test_errors(sudoku_size = grid_size)
         
+        if not self.is_grid_saved and not self.grid.is_empty():
+            do_save = askyesnocancel(
+                "Sauvegarder la grille",
+                f"Une nouvelle grille vierge de taille {grid_size}x{grid_size} va être générer \
+                et les données de la grille actuelle seront définitivement perdues.\nVoulez-vous sauvegarder la grille ?"
+            )
+            
+            if do_save == None:
+                return
+            
+            if do_save:
+                self.save_grid()
+        
         self.grid = Grid(grid_size)
     
     def open_grid(self):
@@ -305,7 +318,7 @@ class Sudoku:
         
         print("Grid succesfully opened")
         
-        self.is_saved = True
+        self.is_grid_saved = True
         self.verify_grid()
         self.set_game_mode("playing")
         self.game.update_title()
@@ -339,7 +352,7 @@ class Sudoku:
         with open(filepath, "w") as file:
             file.write(all_content)
             
-        self.is_saved = True
+        self.is_grid_saved = True
         print("Grid saved succesfully")
     
     def is_valid(self) -> bool:
@@ -428,7 +441,7 @@ class Sudoku:
         # Test préconditions
         test_errors(frequency = cell_frequency)
         
-        if not self.is_saved and len(self.grid.get_all_empty_cells()) < self.grid.cells_count:  # verifie si la grille contient des données
+        if not self.is_grid_saved and len(self.grid.get_all_empty_cells()) < self.grid.cells_count:  # verifie si la grille contient des données
             do_save = askyesnocancel(
                 "Sauvegarde",
                 "Voulez vous générer une nouvelle grille sans sauvegarder ?\nLes données non sauvegardées seront perdues"
