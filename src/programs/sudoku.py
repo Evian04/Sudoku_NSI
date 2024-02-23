@@ -167,6 +167,8 @@ class Sudoku:
         # Test préconditions
         test_errors(self.grid.size, coordinates = coordinates)
         
+        is_grid_changed = False
+        
         # Si le mode de jeu est sur "playing"
         if self.game_mode == "playing":
             match self.grid.get_cell_state(coordinates):
@@ -176,12 +178,14 @@ class Sudoku:
                     # Mettre l'état de la case à "locked"
                     self.grid.set_cell_state(coordinates, "locked")
                     print(f"The cell {coordinates} was locked")
+                    is_grid_changed = True
                 
                 # Si la case est "locked"
                 case "locked":
                     # Mettre l'état de la case à "unlocked"
                     self.grid.set_cell_state(coordinates, "unlocked")
                     print(f"The cell {coordinates} was unlocked")
+                    is_grid_changed = True
                 
                 # Si la case est "superlocked"
                 case "superlocked":
@@ -197,18 +201,24 @@ class Sudoku:
                     # Mettre l'état de la case à "superlocked"
                     self.grid.set_cell_state(coordinates, "superlocked")
                     print(f"The cell {coordinates} was superlocked")
+                    is_grid_changed = True
                 
                 # Si la case est "locked"
                 case "locked":
                     # Mettre l'état de la case à "unlocked"
                     self.grid.set_cell_state(coordinates, "unlocked")
                     print(f"The cell {coordinates} was unlocked")
+                    is_grid_changed = True
                 
                 # Si la case est "superlocked"
                 case "superlocked":
                     # Mettre l'état de la case à "unlocked"
                     self.grid.set_cell_state(coordinates, "unlocked")
                     print(f"The cell {coordinates} was unlocked")
+                    is_grid_changed = True
+        
+        self.save_grid_in_history()
+        self.is_grid_saved = False
     
     def save_grid_in_history(self):
         """
@@ -221,6 +231,20 @@ class Sudoku:
             
         self.history.append(self.grid.copy())
         self.history_index = len(self.history) - 1
+    
+    def is_history_move_possible(self, move: str) -> bool:
+        """
+        Permet de savoir si il est possible d'aller en avant ou en arrière dans l'historique
+        """
+        
+        # Test préconditions
+        test_errors(history_move = move)
+        
+        if move == "backward":
+            return self.history_index != 0
+        
+        elif move == "forward":
+            return self.history_index != len(self.history) - 1
     
     def move_index_history(self, move: str):
         """
@@ -544,6 +568,7 @@ class Sudoku:
         print('solving...')
         self.game.graphism.display_elements()
         
+        self.set_game_mode("playing")
         self.clear_inputs()
         
         if not self.is_valid():
@@ -574,27 +599,48 @@ class Sudoku:
         else:
             return False
     
-    def clear_inputs(self):
-        """
-        Supprime toutes les valeurs entrées par l'utilisateur
-        """
-        
-        for x in range(self.grid.size):
-            for y in range(self.grid.size):
-                
-                if self.grid.get_cell_state((x, y)) != "superlocked":
-                    self.grid.set_cell_state((x, y), "unlocked")
-                    self.grid.set_cell_value((x, y), '0')
-    
     def clear(self):
         """
         supprime toutes les valeurs des cases autres que les superlocked et les locked
         """
+        
+        is_grid_changed = False
+        
         for x in range(self.grid.size):
             for y in range(self.grid.size):
                 
-                if self.grid.get_cell_state((x, y)) == "unlocked":
-                    self.grid.set_cell_value((x, y), '0')
+                if self.grid.get_cell_state((x, y)) == "unlocked" and self.grid.get_cell_value((x, y)) != "0":
+                    self.grid.set_cell_value((x, y), "0")
+                    is_grid_changed = True
+        
+        if is_grid_changed:
+            print("\nThe grid was cleared")
+            self.save_grid_in_history()
+            self.is_grid_saved = False
+    
+    def clear_inputs(self, do_save_in_history: bool):
+        """
+        Supprime toutes les valeurs entrées par l'utilisateur
+        """
+        
+        # Test préconditions
+        test_errors(boolean = do_save_in_history)
+        
+        is_grid_changed = False
+        
+        for x in range(self.grid.size):
+            for y in range(self.grid.size):
+                
+                if self.game_mode == "editing" or self.grid.get_cell_state((x, y)) != "superlocked":
+                    if self.grid.get_cell_state((x, y)) != "unlocked" or self.grid.get_cell_value((x, y)) != "0":
+                        self.grid.set_cell_state((x, y), "unlocked")
+                        self.grid.set_cell_value((x, y), '0')
+                        is_grid_changed = True
+        
+        if is_grid_changed and do_save_in_history:
+            print("\nThe grid was cleared")
+            self.save_grid_in_history()
+            self.is_grid_saved = False
     
     def put_obvious_solutions(self, do_display: bool = True) -> list[tuple[int, int]]:
         """

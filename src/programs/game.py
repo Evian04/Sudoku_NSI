@@ -28,7 +28,6 @@ class Game:
         self.graphism = Graphism(
             self,
             self.sudoku.grid.size,
-            (0, 0, 0),
             self.get_config_value("texture_pack"),
             self.get_config_value("do_display_conflicts")
         )
@@ -126,7 +125,10 @@ class Game:
                     # S'il s'agit d'un clique gauche
                     if event.button == pygame.BUTTON_LEFT:
                         
-                        if self.graphism.dimensions_button_rect.collidepoint(mouse_pos):
+                        if self.graphism.cross_options_button_rect.collidepoint(mouse_pos):
+                            self.is_options_open = False
+                        
+                        elif self.graphism.dimensions_button_rect.collidepoint(mouse_pos):
                             
                             if self.sudoku.grid.size == 4:
                                 is_action_successful = self.sudoku.new_empty_grid(9)
@@ -172,7 +174,16 @@ class Game:
                                     # Sélectionner la case qui a été cliquée
                                     self.sudoku.select_cell((x, y))
                         
-                        if self.graphism.solve_button_rect.collidepoint(mouse_pos):
+                        if self.graphism.cross_button_rect.collidepoint(mouse_pos):
+                            self.sudoku.clear_inputs(True)
+                        
+                        elif self.graphism.arrow_left_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("backward"):
+                            self.sudoku.move_index_history("backward")
+                        
+                        elif self.graphism.arrow_right_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("forward"):
+                            self.sudoku.move_index_history("forward")
+                        
+                        elif self.graphism.solve_button_rect.collidepoint(mouse_pos):
                             self.sudoku.solve_grid(self.do_display_during_solving)
                             self.sudoku.verify_grid()
                         

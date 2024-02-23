@@ -9,14 +9,12 @@ class Graphism:
     La classe "Graphism" permet de gérer l'affichage des éléments sur la fenêtre
     """
     
-    def __init__(self, game, grid_size: int, background_color: tuple[int, int, int], texture_pack: str, do_display_conflicts: bool):
+    def __init__(self, game, grid_size: int, texture_pack: str, do_display_conflicts: bool):
         self.screen: pygame.Surface = game.screen
         self.game = game
         
         self.grid_size = grid_size
         self.square_size = int(self.grid_size ** 0.5)
-        
-        self.background_color = background_color
         
         self.texture_pack = texture_pack
         self.do_display_conflicts = do_display_conflicts
@@ -62,25 +60,46 @@ class Graphism:
         """
         
         # Affichage du fond d'écran
-        self.screen.fill(self.background_color)
+        self.screen.blit(self.background, self.background_rect)
         
         # Affichage des bouttons
-        if self.solve_button_rect.collidepoint(pygame.mouse.get_pos()):
+        mouse_pos = pygame.mouse.get_pos()
+        
+        if not self.game.sudoku.is_history_move_possible("backward"):
+            self.screen.blit(self.arrow_left_disabled_button, self.arrow_left_button_rect)
+        elif self.arrow_left_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.arrow_left_selected_button, self.arrow_left_button_rect)
+        else:
+            self.screen.blit(self.arrow_left_button, self.arrow_left_button_rect)
+        
+        if self.cross_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.cross_selected_button, self.cross_button_rect)
+        else:
+            self.screen.blit(self.cross_button, self.cross_button_rect)
+        
+        if not self.game.sudoku.is_history_move_possible("forward"):
+            self.screen.blit(self.arrow_right_disabled_button, self.arrow_right_button_rect)
+        elif self.arrow_right_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.arrow_right_selected_button, self.arrow_right_button_rect)
+        else:
+            self.screen.blit(self.arrow_right_button, self.arrow_right_button_rect)
+        
+        if self.solve_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.solve_selected_button, self.solve_button_rect)
         else:
             self.screen.blit(self.solve_button, self.solve_button_rect)
         
-        if self.save_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.save_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.save_selected_button, self.save_button_rect)
         else:
             self.screen.blit(self.save_button, self.save_button_rect)
         
-        if self.open_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.open_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.open_selected_button, self.open_button_rect)
         else:
             self.screen.blit(self.open_button, self.open_button_rect)
         
-        if self.options_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.options_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.options_selected_button, self.options_button_rect)
         else:
             self.screen.blit(self.options_button, self.options_button_rect)
@@ -124,37 +143,46 @@ class Graphism:
         """
         
         # Affichage du fond d'écran
-        self.screen.fill(self.background_color)
+        self.screen.blit(self.background, self.background_rect)
         
-        if self.dimensions_button_rect.collidepoint(pygame.mouse.get_pos()):
+        # Affichage des bouttons
+        
+        mouse_pos = pygame.mouse.get_pos()
+        
+        if self.dimensions_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.dimensions_selected_button, self.dimensions_button_rect)
         else:
             self.screen.blit(self.dimensions_button, self.dimensions_button_rect)
             
-        if self.generate_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.generate_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.generate_selected_button, self.generate_button_rect)
         else:
             self.screen.blit(self.generate_button, self.generate_button_rect)
             
-        if self.game_mode_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.game_mode_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.game_mode_selected_button, self.game_mode_button_rect)
         else:
             self.screen.blit(self.game_mode_button, self.game_mode_button_rect)
             
-        if self.change_textures_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.change_textures_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.change_textures_selected_button, self.change_textures_button_rect)
         else:
             self.screen.blit(self.change_textures_button, self.change_textures_button_rect)
             
-        if self.display_errors_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.display_errors_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.display_errors_selected_button, self.display_errors_button_rect)
         else:
             self.screen.blit(self.display_errors_button, self.display_errors_button_rect)
             
-        if self.display_solving_button_rect.collidepoint(pygame.mouse.get_pos()):
+        if self.display_solving_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.display_solving_selected_button, self.display_solving_button_rect)
         else:
             self.screen.blit(self.display_solving_button, self.display_solving_button_rect)
+            
+        if self.cross_options_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.cross_selected_options_button, self.cross_options_button_rect)
+        else:
+            self.screen.blit(self.cross_options_button, self.cross_options_button_rect)
     
     def display_cell_elements(self, coordinates: tuple[int, int]):
         """
@@ -209,6 +237,12 @@ class Graphism:
         
         else:
             self.rect_ref_distance = self.screen.get_width() * (2 / 3)
+        
+        if self.screen.get_width() > self.screen.get_height():
+            background_dimensions = [self.screen.get_width()] * 2
+        
+        else:
+            background_dimensions = [self.screen.get_height()] * 2
             
         self.rect_ref_distance *= 0.9
         self.outline_thickness = self.rect_ref_distance / 30 # Ratio entre la longueur du grand carré et de la marge
@@ -218,6 +252,13 @@ class Graphism:
         self.update_main_buttons_rect()
         self.update_options_buttons_rect()
         self.update_digits_rect()
+        
+        self.background = pygame.image.load(f"src/graphics/{self.texture_pack}/background.png")
+        self.background = pygame.transform.smoothscale(self.background, background_dimensions)
+        
+        self.background_rect = self.background.get_rect()
+        self.background_rect.x = self.screen.get_width() / 2 - background_dimensions[0] / 2
+        self.background_rect.y = self.screen.get_height() / 2 - background_dimensions[1] / 2
         
         self.grid_background = pygame.image.load(f"src/graphics/{self.texture_pack}/grid_background.png")
         self.grid_background = pygame.transform.smoothscale(self.grid_background, [self.rect_ref_distance] * 2)
@@ -305,7 +346,7 @@ class Graphism:
             self.screen.get_height() / 2 - self.rect_ref_distance / 2
         ]
         
-        buttons_gap = (self.rect_ref_distance - self.menu_buttons_dimensions[1]) / 3
+        buttons_gap = (self.rect_ref_distance - self.menu_buttons_dimensions[1]) / 4
         
         self.solve_button = pygame.transform.smoothscale(self.solve_button, self.menu_buttons_dimensions)
         
@@ -314,7 +355,8 @@ class Graphism:
         
         self.solve_button_rect = self.solve_button.get_rect()
         self.solve_button_rect.x = ref_coordinates[0]
-        self.solve_button_rect.y = ref_coordinates[1]
+        self.solve_button_rect.y = ref_coordinates[1] + buttons_gap
+        
         
         self.save_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/save.png")
         self.save_button = pygame.transform.smoothscale(self.save_button, self.menu_buttons_dimensions)
@@ -324,7 +366,8 @@ class Graphism:
         
         self.save_button_rect = self.save_button.get_rect()
         self.save_button_rect.x = ref_coordinates[0]
-        self.save_button_rect.y = ref_coordinates[1] + buttons_gap
+        self.save_button_rect.y = ref_coordinates[1] + buttons_gap * 2
+        
         
         self.open_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/open.png")
         self.open_button = pygame.transform.smoothscale(self.open_button, self.menu_buttons_dimensions)
@@ -334,7 +377,8 @@ class Graphism:
         
         self.open_button_rect = self.open_button.get_rect()
         self.open_button_rect.x = ref_coordinates[0]
-        self.open_button_rect.y = ref_coordinates[1] + buttons_gap * 2
+        self.open_button_rect.y = ref_coordinates[1] + buttons_gap * 3
+        
         
         self.options_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/options.png")
         self.options_button = pygame.transform.smoothscale(self.options_button, self.menu_buttons_dimensions)
@@ -344,8 +388,47 @@ class Graphism:
         
         self.options_button_rect = self.options_button.get_rect()
         self.options_button_rect.x = ref_coordinates[0]
-        self.options_button_rect.y = ref_coordinates[1] + buttons_gap * 3
+        self.options_button_rect.y = ref_coordinates[1] + buttons_gap * 4
         
+        
+        self.arrow_left_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_left.png")
+        self.arrow_left_button = pygame.transform.smoothscale(self.arrow_left_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.arrow_left_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_left_selected.png")
+        self.arrow_left_selected_button = pygame.transform.smoothscale(self.arrow_left_selected_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.arrow_left_disabled_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_left_disabled.png")
+        self.arrow_left_disabled_button = pygame.transform.smoothscale(self.arrow_left_disabled_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.arrow_left_button_rect = self.arrow_left_button.get_rect()
+        self.arrow_left_button_rect.x = ref_coordinates[0]
+        self.arrow_left_button_rect.y = ref_coordinates[1]
+        
+        
+        self.cross_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/cross.png")
+        self.cross_button = pygame.transform.smoothscale(self.cross_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.cross_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/cross_selected.png")
+        self.cross_selected_button = pygame.transform.smoothscale(self.cross_selected_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.cross_button_rect = self.cross_button.get_rect()
+        self.cross_button_rect.x = ref_coordinates[0] + self.menu_buttons_dimensions[0] / 2 - self.menu_buttons_dimensions[1] / 2
+        self.cross_button_rect.y = ref_coordinates[1]
+        
+        
+        self.arrow_right_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_right.png")
+        self.arrow_right_button = pygame.transform.smoothscale(self.arrow_right_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.arrow_right_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_right_selected.png")
+        self.arrow_right_selected_button = pygame.transform.smoothscale(self.arrow_right_selected_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.arrow_right_disabled_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_right_disabled.png")
+        self.arrow_right_disabled_button = pygame.transform.smoothscale(self.arrow_right_disabled_button, [self.menu_buttons_dimensions[1]] * 2)
+        
+        self.arrow_right_button_rect = self.arrow_right_button.get_rect()
+        self.arrow_right_button_rect.x = ref_coordinates[0] + self.menu_buttons_dimensions[0] - self.menu_buttons_dimensions[1]
+        self.arrow_right_button_rect.y = ref_coordinates[1]
+    
     def update_options_buttons_rect(self):
         """
         Calcule les dimensions et les coordonnées des bouttons du menu d'options
@@ -354,8 +437,8 @@ class Graphism:
         self.dimensions_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/options/dimensions_{self.grid_size}.png")
         
         self.options_buttons_dimensions = [
-            self.rect_ref_distance,
-            self.rect_ref_distance * self.dimensions_button.get_height() / self.dimensions_button.get_width()
+            self.rect_ref_distance - self.outline_thickness,
+            (self.rect_ref_distance - self.outline_thickness) * self.dimensions_button.get_height() / self.dimensions_button.get_width()
         ]
         
         ref_coordinates = [
@@ -428,3 +511,14 @@ class Graphism:
         self.display_solving_button_rect = self.display_solving_button.get_rect()
         self.display_solving_button_rect.x = ref_coordinates[0]
         self.display_solving_button_rect.y = ref_coordinates[1] + buttons_gap * 5
+        
+        
+        self.cross_options_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/options/cross.png")
+        self.cross_options_button = pygame.transform.smoothscale(self.cross_options_button, [self.options_buttons_dimensions[1]] * 2)
+        
+        self.cross_selected_options_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/options/cross_selected.png")
+        self.cross_selected_options_button = pygame.transform.smoothscale(self.cross_selected_options_button, [self.options_buttons_dimensions[1]] * 2)
+        
+        self.cross_options_button_rect = self.cross_options_button.get_rect()
+        self.cross_options_button_rect.x = self.outline_thickness
+        self.cross_options_button_rect.y = ref_coordinates[1]
