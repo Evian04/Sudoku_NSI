@@ -42,6 +42,9 @@ class Graphism:
         while True:
             path = askdirectory(initialdir = "src/graphics", title = "Sélectionnez un Pack de Textures")
             
+            if not path:
+                return
+            
             path = path.split("/")[-1]
             
             if not path in os.listdir("src/graphics"):

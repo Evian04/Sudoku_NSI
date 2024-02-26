@@ -154,6 +154,7 @@ class Game:
                         
                         elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
                             self.graphism.ask_texture_pack()
+                            self.set_config_value("texture_pack", self.graphism.texture_pack)
                         
                         elif self.graphism.display_errors_button_rect.collidepoint(mouse_pos):
                             self.graphism.reverse_display_conflicts()
@@ -197,6 +198,7 @@ class Game:
                         
                         elif self.graphism.open_button_rect.collidepoint(mouse_pos):
                             self.sudoku.open_grid()
+                            self.graphism.update_grid_attributes(self.sudoku.grid.size)
                         
                         elif self.graphism.options_button_rect.collidepoint(mouse_pos):
                             self.is_options_open = True
