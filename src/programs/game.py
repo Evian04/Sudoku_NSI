@@ -77,7 +77,9 @@ class Game:
         """
         
         if title == "":
-            pygame.display.set_caption(self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + self.sudoku.game_mode)
+            pygame.display.set_caption(
+                self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + ("joueur" if self.sudoku.game_mode == "playing" else "éditeur")
+            )
             
         else:
             pygame.display.set_caption(title)
