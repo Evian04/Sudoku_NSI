@@ -31,17 +31,12 @@ class Grid:
         
         return copied_grid
     
-    def reset_attributes(self, size: int, list_values: list[list[str]] = [], list_states: list[list[str]] = []):
+    def reset_attributes(self, size: int, list_values: list[list[str]], list_states: list[list[str]]):
         """
         Met à jour les attributs de la grille, utilisé lors d'un changement de taille de la grille
         """
         
-        if list_values == []:
-            list_values = [["0" for y in range(self.size)] for x in range(self.size)]
-            
-        if list_states == []:
-            list_states = [["unlocked" for y in range(self.size)] for x in range(self.size)]
-        
+        # Test préconditions
         test_errors(size, list_values = list_values, list_states = list_states)
         
         self.size = size

@@ -77,7 +77,7 @@ class Game:
         """
         
         if title == "":
-            pygame.display.set_caption(self.name + f"{self.sudoku.grid.size}x{self.sudoku.grid.size} - " + self.sudoku.game_mode)
+            pygame.display.set_caption(self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + self.sudoku.game_mode)
             
         else:
             pygame.display.set_caption(title)
@@ -149,6 +149,7 @@ class Game:
                         
                         elif self.graphism.game_mode_button_rect.collidepoint(mouse_pos):
                             self.sudoku.reverse_game_mode()
+                            self.update_title()
                             self.graphism.update_game_mode_button_rect()
                         
                         elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
@@ -175,7 +176,11 @@ class Game:
                                     self.sudoku.select_cell((x, y))
                         
                         if self.graphism.cross_button_rect.collidepoint(mouse_pos):
-                            self.sudoku.clear_inputs(True)
+                            if is_ctrl_pressed:
+                                self.sudoku.clear_inputs(True)
+                            
+                            else:
+                                self.sudoku.clear()
                         
                         elif self.graphism.arrow_left_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("backward"):
                             self.sudoku.move_index_history("backward")

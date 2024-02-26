@@ -339,12 +339,13 @@ class Sudoku:
         test_errors(grid_size, list_values = all_values, list_states = all_states)
         
         # Remplace le contenu de la grille par le contenu lu dans le fichier
-        self.grid.set_content(all_values, all_states)
+        self.grid.reset_attributes(grid_size, all_values, all_states)
         
         print("Grid succesfully opened")
         
         self.is_grid_saved = True
         self.verify_grid()
+        self.clear_history()
         self.set_game_mode("playing")
         self.game.update_title()
     
@@ -566,10 +567,10 @@ class Sudoku:
             self.game.update_title("Résolution ...")
         
         print('solving...')
-        self.game.graphism.display_elements()
+        self.game.graphism.display_main_elements()
         
         self.set_game_mode("playing")
-        self.clear_inputs()
+        self.clear_inputs(False)
         
         if not self.is_valid():
             print("Invalid input, cannot solve the sudoku")

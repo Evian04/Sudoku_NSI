@@ -514,11 +514,11 @@ class Graphism:
         
         
         self.cross_options_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/options/cross.png")
-        self.cross_options_button = pygame.transform.smoothscale(self.cross_options_button, [self.options_buttons_dimensions[1]] * 2)
+        self.cross_options_button = pygame.transform.smoothscale(self.cross_options_button, [self.options_buttons_dimensions[1] * (2 / 3)] * 2)
         
         self.cross_selected_options_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/options/cross_selected.png")
-        self.cross_selected_options_button = pygame.transform.smoothscale(self.cross_selected_options_button, [self.options_buttons_dimensions[1]] * 2)
+        self.cross_selected_options_button = pygame.transform.smoothscale(self.cross_selected_options_button, [self.options_buttons_dimensions[1] * (2/3)] * 2)
         
         self.cross_options_button_rect = self.cross_options_button.get_rect()
-        self.cross_options_button_rect.x = self.outline_thickness
-        self.cross_options_button_rect.y = ref_coordinates[1]
+        self.cross_options_button_rect.x = self.outline_thickness * 2
+        self.cross_options_button_rect.y = ref_coordinates[1] * (4/3)
