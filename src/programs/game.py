@@ -166,6 +166,7 @@ class Game:
                         elif self.graphism.display_solving_button_rect.collidepoint(mouse_pos):
                             self.do_display_during_solving = not self.do_display_during_solving
                             self.graphism.update_display_solving_button_rect()
+                            self.set_config_value("do_display_during_solving", self.do_display_during_solving)
                 
                 # Si le menu principal est affiché
                 else:
@@ -184,6 +185,8 @@ class Game:
                             
                             else:
                                 self.sudoku.clear()
+                            
+                            self.sudoku.verify_grid()
                         
                         elif self.graphism.arrow_left_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("backward"):
                             self.sudoku.move_index_history("backward")
