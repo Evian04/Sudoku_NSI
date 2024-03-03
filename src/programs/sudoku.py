@@ -199,11 +199,11 @@ class Sudoku:
                 # Si la case est "unlocked"
                 case "unlocked":
                     # Mettre l'état de la case à "superlocked" si la case est deverrouillé et qu'elle contiiient une valeur
-                    if self.grid.get_cell_value(coordinates) != 0:
+                    if self.grid.get_cell_value(coordinates) != '0':
                         self.grid.set_cell_state(coordinates, "superlocked")
                         print(f"The cell {coordinates} was superlocked")
                         is_grid_changed = True
-                    
+                     
                 
                 # Si la case est "locked"
                 case "locked":
@@ -219,7 +219,8 @@ class Sudoku:
                     print(f"The cell {coordinates} was unlocked")
                     is_grid_changed = True
         
-        self.save_grid_in_history()
+        if is_grid_changed: # verifie la modification ou non de la grille
+            self.save_grid_in_history()
         self.is_grid_saved = False
     
     def save_grid_in_history(self):
