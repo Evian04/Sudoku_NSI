@@ -350,7 +350,34 @@ class Graphism:
         ]
         
         buttons_gap = (self.rect_ref_distance - self.menu_buttons_dimensions[1]) / 4
+
+        #bouton 'ouvrir'
+        self.open_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/open.png")
+        self.open_button = pygame.transform.smoothscale(self.open_button, self.menu_buttons_dimensions)
+
+        self.open_selected_button = pygame.image.load(
+            f"src/graphics/{self.texture_pack}/buttons/main/open_selected.png")
+        self.open_selected_button = pygame.transform.smoothscale(self.open_selected_button,
+                                                                 self.menu_buttons_dimensions)
+
+        self.open_button_rect = self.open_button.get_rect()
+        self.open_button_rect.x = ref_coordinates[0]
+        self.open_button_rect.y = ref_coordinates[1] + buttons_gap
+
+        # bouton 'enregistrer'
+        self.save_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/save.png")
+        self.save_button = pygame.transform.smoothscale(self.save_button, self.menu_buttons_dimensions)
+
+        self.save_selected_button = pygame.image.load(
+            f"src/graphics/{self.texture_pack}/buttons/main/save_selected.png")
+        self.save_selected_button = pygame.transform.smoothscale(self.save_selected_button,
+                                                                 self.menu_buttons_dimensions)
+
+        self.save_button_rect = self.save_button.get_rect()
+        self.save_button_rect.x = ref_coordinates[0]
+        self.save_button_rect.y = ref_coordinates[1] + buttons_gap * 2
         
+        #bouton 'resoudre'
         self.solve_button = pygame.transform.smoothscale(self.solve_button, self.menu_buttons_dimensions)
         
         self.solve_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/solve_selected.png")
@@ -358,31 +385,9 @@ class Graphism:
         
         self.solve_button_rect = self.solve_button.get_rect()
         self.solve_button_rect.x = ref_coordinates[0]
-        self.solve_button_rect.y = ref_coordinates[1] + buttons_gap
+        self.solve_button_rect.y = ref_coordinates[1] + buttons_gap * 3
         
-        
-        self.save_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/save.png")
-        self.save_button = pygame.transform.smoothscale(self.save_button, self.menu_buttons_dimensions)
-        
-        self.save_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/save_selected.png")
-        self.save_selected_button = pygame.transform.smoothscale(self.save_selected_button, self.menu_buttons_dimensions)
-        
-        self.save_button_rect = self.save_button.get_rect()
-        self.save_button_rect.x = ref_coordinates[0]
-        self.save_button_rect.y = ref_coordinates[1] + buttons_gap * 2
-        
-        
-        self.open_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/open.png")
-        self.open_button = pygame.transform.smoothscale(self.open_button, self.menu_buttons_dimensions)
-        
-        self.open_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/open_selected.png")
-        self.open_selected_button = pygame.transform.smoothscale(self.open_selected_button, self.menu_buttons_dimensions)
-        
-        self.open_button_rect = self.open_button.get_rect()
-        self.open_button_rect.x = ref_coordinates[0]
-        self.open_button_rect.y = ref_coordinates[1] + buttons_gap * 3
-        
-        
+        # bouton 'options'
         self.options_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/options.png")
         self.options_button = pygame.transform.smoothscale(self.options_button, self.menu_buttons_dimensions)
         
@@ -393,7 +398,7 @@ class Graphism:
         self.options_button_rect.x = ref_coordinates[0]
         self.options_button_rect.y = ref_coordinates[1] + buttons_gap * 4
         
-        
+        # bouton 'flèche gauche'
         self.arrow_left_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_left.png")
         self.arrow_left_button = pygame.transform.smoothscale(self.arrow_left_button, [self.menu_buttons_dimensions[1]] * 2)
         
@@ -407,7 +412,7 @@ class Graphism:
         self.arrow_left_button_rect.x = ref_coordinates[0]
         self.arrow_left_button_rect.y = ref_coordinates[1]
         
-        
+        # bouton 'croix'
         self.cross_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/cross.png")
         self.cross_button = pygame.transform.smoothscale(self.cross_button, [self.menu_buttons_dimensions[1]] * 2)
         
@@ -418,7 +423,7 @@ class Graphism:
         self.cross_button_rect.x = ref_coordinates[0] + self.menu_buttons_dimensions[0] / 2 - self.menu_buttons_dimensions[1] / 2
         self.cross_button_rect.y = ref_coordinates[1]
         
-        
+        # bouton 'flèche droit'
         self.arrow_right_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/arrow_right.png")
         self.arrow_right_button = pygame.transform.smoothscale(self.arrow_right_button, [self.menu_buttons_dimensions[1]] * 2)
         
