@@ -170,7 +170,7 @@ class Grid:
                 return coordinates
             
             case "columns":
-                return (coordinates[1], coordinates[0])
+                return coordinates[1], coordinates[0]
             
             case "squares":
                 return (
