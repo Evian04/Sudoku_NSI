@@ -466,6 +466,8 @@ class Sudoku:
         
         # Test préconditions
         test_errors(frequency = cell_frequency)
+        self.game.is_options_open = False
+        self.game.update()
         
         if not self.is_grid_saved and len(self.grid.get_all_empty_cells()) < self.grid.cells_count:  # verifie si la grille contient des données
             do_save = askyesnocancel(
@@ -489,7 +491,7 @@ class Sudoku:
         self.new_empty_grid(self.grid.size)
         
         # génère une grille complète et valide aléatoirement
-        self.backtracking_solving(False, do_choice_randomly = True)
+        self.backtracking_solving(False, do_choice_randomly=True)
         
         if self.game.do_quit:
             return
@@ -730,7 +732,7 @@ class Sudoku:
     
     def backtracking_solving(self, do_display: bool, do_choice_randomly: bool = False, last_cell_coordinates: tuple[int, int]=None, grid_possibilities: list[list[list,tuple[int, int]]] = None) -> bool:
         """
-        Fonction récursive qui résout le Sudoku en testant toutes les possibilités
+        Méthode récursive qui résout le Sudoku en testant toutes les possibilités
         Renvoi True si la grille courante est possible à résoudre, et False si elle ne l'est pas
         :param do_choice_randomly: place les valeurs
         """

@@ -13,7 +13,7 @@ class Cell:
         self.value = value
         self.state = state
         self.sudoku_size = sudoku_size
-        
+        self.notes = []
         self.is_in_conflict = False
     
     def set_value(self, value: str):
@@ -45,3 +45,13 @@ class Cell:
         test_errors(boolean = conflicting_state)
         
         self.is_in_conflict = conflicting_state
+    
+    def reset_notes(self, grid_size:int):
+        test_errors(grid_size)
+        self.notes = ['0' for _ in range(grid_size)]
+    
+    def set_notes(self, index:int, value:str):
+        self.notes[index] = value
+    
+    def get_notes(self):
+        return self.notes

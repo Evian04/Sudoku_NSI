@@ -66,6 +66,7 @@ class Grid:
             self.content.append([])
             for y in range(self.size):
                 cell = Cell(list_values[x][y], list_states[x][y], self.size)
+                cell.reset_notes(self.size)
                 self.content[x].append(cell)
     
     def get_all_values(self) -> list[list[str]]:
@@ -77,9 +78,8 @@ class Grid:
 
     def get_all_states(self) -> list[list[str]]:
         """
-        Renvois une double liste contenant toutes les états des cases de la grille
+        Renvoi une double liste contenant tous les états des cases de la grille
         """
-        
         return [[cell.state for cell in line] for line in self.content]
     
     def get_all_coordinates_simple_list(self) -> list[tuple[int, int]]:
