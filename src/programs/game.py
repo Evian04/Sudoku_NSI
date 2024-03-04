@@ -16,8 +16,9 @@ class Game:
         self.do_quit = False
         self.screen: pygame.Surface = screen
         
-        self.is_solving = False
+        self.current_menu = "main"
         self.is_options_open = False
+        self.is_solving = False
         
         self.load_config_file()  # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.do_display_during_solving = self.get_config_value("do_display_during_solving")
@@ -89,12 +90,58 @@ class Game:
         Exécute les actions nécessaires au bon fonctionnement du jeu
         """
         
+        if self.is_options_open:
+            self.update_options(do_display)
+        
+        elif self.current_menu == "main":
+            self.update_main(do_display)
+        
+        elif self.current_menu == "game":
+            self.update_game(do_display)
+    
+    def update_main(self, do_display: bool):
+        """
+        Met à jour l'état du jeu lorsque le menu de démarrage est ouvert
+        """
+        
         if do_display:
-            if self.is_options_open:
-                self.graphism.display_options_elements()
+            self.graphism.display_main_elements()
+
+        all_events = pygame.event.get()
+        
+        for event in all_events:
+            
+            if event.type == pygame.QUIT:
+                self.do_quit = True
+                return
+            
+            # Si la fenètre est redimensionnée
+            if event.type == pygame.WINDOWRESIZED:
+                # Mettre à jour la position / dimensions des éléments de la fenêtre
+                self.graphism.update_rect()
+                pygame.display.flip()
+            
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
                 
-            else:
-                self.graphism.display_main_elements()
+                mouse_pos = pygame.mouse.get_pos()
+                
+                if self.graphism.play_button_rect.collidepoint(mouse_pos):
+                    self.current_menu = "game"
+                
+                elif self.graphism.options_main_button_rect.collidepoint(mouse_pos):
+                    self.is_options_open = True
+                
+                elif self.graphism.quit_button_rect.collidepoint(mouse_pos):
+                    self.do_quit = True
+                    return
+    
+    def update_game(self, do_display: bool):
+        """
+        Met à jour l'état du jeu lorsque le menu de jeu est affiché
+        """
+        
+        if do_display:
+            self.graphism.display_game_elements()
         
         all_events = pygame.event.get()
         is_ctrl_pressed = pygame.key.get_pressed()[pygame.K_LCTRL] or pygame.key.get_pressed()[pygame.K_RCTRL]
@@ -121,104 +168,58 @@ class Game:
                 
                 mouse_pos = pygame.mouse.get_pos()
                 
-                # Si le menu d'options est ouvert
-                if self.is_options_open:
+                # S'il s'agit d'un clique gauche
+                if event.button == pygame.BUTTON_LEFT:
+                    # Si le curseur de la souris est sur une case de la grille
+                    for x in range(self.sudoku.grid.size):
+                        for y in range(self.sudoku.grid.size):
+                            if self.graphism.all_cell_rect[x][y].collidepoint(mouse_pos):
+                                # Sélectionner la case qui a été cliquée
+                                self.sudoku.select_cell((x, y))
                     
-                    # S'il s'agit d'un clique gauche
-                    if event.button == pygame.BUTTON_LEFT:
+                    if self.graphism.cross_button_rect.collidepoint(mouse_pos):
+                        if is_ctrl_pressed:
+                            self.sudoku.clear_inputs(do_save_in_history = True)
                         
-                        if self.graphism.cross_options_button_rect.collidepoint(mouse_pos):
-                            self.is_options_open = False
+                        else:
+                            self.sudoku.clear()
                         
-                        elif self.graphism.dimensions_button_rect.collidepoint(mouse_pos):
-                            
-                            if self.sudoku.grid.size == 4:
-                                is_action_successful = self.sudoku.new_empty_grid(9)
-                            
-                            elif self.sudoku.grid.size == 9:
-                                is_action_successful = self.sudoku.new_empty_grid(16)
-                            
-                            else:
-                                is_action_successful = self.sudoku.new_empty_grid(4)
-                            
-                            if is_action_successful:
-                                self.graphism.update_grid_attributes(self.sudoku.grid.size)
-                                self.graphism.update_dimensions_button_rect()
-                        
-                        elif self.graphism.generate_button_rect.collidepoint(mouse_pos):
-                            self.sudoku.generate_grid(0.5)
-                            self.sudoku.verify_grid()
-                        
-                        elif self.graphism.game_mode_button_rect.collidepoint(mouse_pos):
-                            self.sudoku.reverse_game_mode()
-                            self.update_title()
-                            self.graphism.update_game_mode_button_rect()
-                        
-                        elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
-                            self.graphism.ask_texture_pack()
-                            self.set_config_value("texture_pack", self.graphism.texture_pack)
-                        
-                        elif self.graphism.display_errors_button_rect.collidepoint(mouse_pos):
-                            self.graphism.reverse_display_conflicts()
-                            self.graphism.update_display_errors_button_rect()
-                            self.set_config_value("do_display_conflicts", self.graphism.do_display_conflicts)
-                        
-                        elif self.graphism.display_solving_button_rect.collidepoint(mouse_pos):
-                            self.do_display_during_solving = not self.do_display_during_solving
-                            self.graphism.update_display_solving_button_rect()
-                            self.set_config_value("do_display_during_solving", self.do_display_during_solving)
-                
-                # Si le menu principal est affiché
-                else:
-                    # S'il s'agit d'un clique gauche
-                    if event.button == pygame.BUTTON_LEFT:
-                        # Si le curseur de la souris est sur une case de la grille
-                        for x in range(self.sudoku.grid.size):
-                            for y in range(self.sudoku.grid.size):
-                                if self.graphism.all_cell_rect[x][y].collidepoint(mouse_pos):
-                                    # Sélectionner la case qui a été cliquée
-                                    self.sudoku.select_cell((x, y))
-                        
-                        if self.graphism.cross_button_rect.collidepoint(mouse_pos):
-                            if is_ctrl_pressed:
-                                self.sudoku.clear_inputs(True)
-                            
-                            else:
-                                self.sudoku.clear()
-                            
-                            self.sudoku.verify_grid()
-                        
-                        elif self.graphism.arrow_left_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("backward"):
-                            self.sudoku.move_index_history("backward")
-                        
-                        elif self.graphism.arrow_right_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("forward"):
-                            self.sudoku.move_index_history("forward")
-                        
-                        elif self.graphism.solve_button_rect.collidepoint(mouse_pos):
-                            self.sudoku.solve_grid(self.do_display_during_solving)
-                            self.sudoku.verify_grid()
-                        
-                        elif self.graphism.save_button_rect.collidepoint(mouse_pos):
-                            self.sudoku.save_grid()
-                        
-                        elif self.graphism.open_button_rect.collidepoint(mouse_pos):
-                            self.sudoku.open_grid()
-                            self.graphism.update_grid_attributes(self.sudoku.grid.size)
-                        
-                        elif self.graphism.options_button_rect.collidepoint(mouse_pos):
-                            self.is_options_open = True
+                        self.sudoku.verify_grid()
+                    
+                    elif self.graphism.arrow_left_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("backward"):
+                        self.sudoku.move_index_history("backward")
+                    
+                    elif self.graphism.arrow_right_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("forward"):
+                        self.sudoku.move_index_history("forward")
+                    
+                    elif self.graphism.solve_button_rect.collidepoint(mouse_pos):
+                        self.sudoku.solve_grid(self.do_display_during_solving)
+                        self.sudoku.verify_grid()
+                    
+                    elif self.graphism.save_button_rect.collidepoint(mouse_pos):
+                        self.sudoku.save_grid()
+                    
+                    elif self.graphism.open_button_rect.collidepoint(mouse_pos):
+                        self.sudoku.open_grid()
+                        self.graphism.update_grid_attributes(self.sudoku.grid.size)
+                    
+                    elif self.graphism.options_button_rect.collidepoint(mouse_pos):
+                        self.is_options_open = True
+                    
+                    elif self.graphism.return_button_rect.collidepoint(mouse_pos):
+                        self.current_menu = "main"
 
-                    # Si l'utilisateur effectue un clique droit
-                    elif event.button == pygame.BUTTON_RIGHT:
-                        
-                        for x in range(self.sudoku.grid.size):
-                            for y in range(self.sudoku.grid.size):
+                # Si l'utilisateur effectue un clique droit
+                elif event.button == pygame.BUTTON_RIGHT:
+                    
+                    for x in range(self.sudoku.grid.size):
+                        for y in range(self.sudoku.grid.size):
+                            
+                            # Si la souris est sur l'une des cases de la grille
+                            if self.graphism.all_cell_rect[x][y].collidepoint(mouse_pos):
                                 
-                                # Si la souris est sur l'une des cases de la grille
-                                if self.graphism.all_cell_rect[x][y].collidepoint(mouse_pos):
-                                    
-                                    # Inverser l'état de verrouillage de la case en question
-                                    self.sudoku.reverse_cell_lock((x, y))
+                                # Inverser l'état de verrouillage de la case en question
+                                self.sudoku.reverse_cell_lock((x, y))
             
             if event.type == pygame.KEYDOWN:
                 
@@ -284,8 +285,72 @@ class Game:
                     
                     # vérifie si cette valeur entre en conflit avec d'autres valeurs de la grille
                     self.sudoku.verify_grid()
+    
+    def update_options(self, do_display: bool):
+        """
+        Met à jour l'état du jeu lorsque le menu d'options est ouvert
+        """
         
-        if do_display: pygame.display.flip()
+        if do_display:
+            self.graphism.display_options_elements()
+        
+        all_events = pygame.event.get()
+        
+        for event in all_events:
+            
+            if event.type == pygame.QUIT:
+                self.do_quit = True
+                return
+            
+            # Si la fenètre est redimensionnée
+            if event.type == pygame.WINDOWRESIZED:
+                # Mettre à jour la position / dimensions des éléments de la fenêtre
+                self.graphism.update_rect()
+                pygame.display.flip()
+            
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+                
+                mouse_pos = pygame.mouse.get_pos()
+                
+                if self.graphism.cross_options_button_rect.collidepoint(mouse_pos):
+                    self.is_options_open = False
+                
+                if self.graphism.dimensions_button_rect.collidepoint(mouse_pos):
+                    
+                    if self.sudoku.grid.size == 4:
+                        is_action_successful = self.sudoku.new_empty_grid(9)
+                    
+                    elif self.sudoku.grid.size == 9:
+                        is_action_successful = self.sudoku.new_empty_grid(16)
+                    
+                    else:
+                        is_action_successful = self.sudoku.new_empty_grid(4)
+                    
+                    if is_action_successful:
+                        self.graphism.update_grid_attributes(self.sudoku.grid.size)
+                
+                elif self.graphism.generate_button_rect.collidepoint(mouse_pos):
+                    self.sudoku.generate_grid(0.5)
+                    self.sudoku.verify_grid()
+                
+                elif self.graphism.game_mode_button_rect.collidepoint(mouse_pos):
+                    self.sudoku.reverse_game_mode()
+                    self.update_title()
+                    self.graphism.update_game_mode_button_rect()
+                
+                elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
+                    self.graphism.ask_texture_pack()
+                    self.set_config_value("texture_pack", self.graphism.texture_pack)
+                
+                elif self.graphism.display_errors_button_rect.collidepoint(mouse_pos):
+                    self.graphism.reverse_display_conflicts()
+                    self.graphism.update_display_errors_button_rect()
+                    self.set_config_value("do_display_conflicts", self.graphism.do_display_conflicts)
+                
+                elif self.graphism.display_solving_button_rect.collidepoint(mouse_pos):
+                    self.do_display_during_solving = not self.do_display_during_solving
+                    self.graphism.update_display_solving_button_rect()
+                    self.set_config_value("do_display_during_solving", self.do_display_during_solving)
     
     def cell_update(self, coordinates: tuple[int, int], do_display: bool = True):
         """
@@ -296,7 +361,6 @@ class Game:
         
         if do_display:
             self.graphism.display_cell_elements(coordinates)
-            pygame.display.flip()
         
         all_events = pygame.event.get()
         
@@ -307,9 +371,7 @@ class Game:
             
             if event.type == pygame.WINDOWRESIZED:
                 self.graphism.update_rect()
-                self.graphism.display_main_elements()
-                
-                pygame.display.flip()
+                self.graphism.display_game_elements()
     
     def load_config_file(self):
         """

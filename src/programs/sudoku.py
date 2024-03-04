@@ -1,8 +1,7 @@
 import random
 import time
-import tkinter
 from tkinter.filedialog import askopenfilename, asksaveasfilename
-from tkinter.messagebox import askyesnocancel
+from tkinter.messagebox import askyesnocancel, showinfo
 
 from src.programs.grid import Grid
 from src.programs.test_errors import test_errors
@@ -545,7 +544,7 @@ class Sudoku:
         percentage = round(100 - ((number_of_cells_to_remove / self.grid.cells_count) * 100), 2)
         print(f'Temps de génération: {executing_time}s - {remaining_cells} cases restantes ({percentage}%)')
         
-        if do_show_messagebox: tkinter.messagebox.showinfo(
+        if do_show_messagebox: showinfo(
             "Génération terminée",
             f"{' ' * 20}Génération effectué avec succès\n"
             f"{' ' * 20}temps d'éxecution: {executing_time}s\n"
