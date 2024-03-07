@@ -1,17 +1,18 @@
 import pygame
+from src.programs.game import Game
 
 # Initialisation de pygame
 pygame.init()
 
-from src.programs.game import Game
-
-# Mise en place de la fenêtre
+# Création et initialisation de la fenêtre
 screen_size = (1080, 720)  # Dimensions de la fenêtre
 screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE)  # Création de la fenêtre
 
+# création de l'instance Game, il s'agit du conteneur du jeu
 game = Game(screen)
 clock = pygame.time.Clock()
 
+#boucle permettant au jeu de fonctionner, boucle infinie sous condition
 while True:
     # Limitation du nombre d'image par secondes
     clock.tick(60)
