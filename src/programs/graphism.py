@@ -259,7 +259,7 @@ class Graphism:
         if not self.game.sudoku.grid.is_cell_in_conflict(coordinates) or not self.do_display_conflicts:
             digit_image = self.all_digits_image[self.game.possible_values.index(digit)]
         else:
-            digit_image = self.all_digits_image[self.game.possible_values.index(digit) + self.grid_size]
+            digit_image = self.all_digits_image[self.game.possible_values.index(digit) + len(self.game.possible_values)]
         x, y = coordinates
         
         self.screen.blit(

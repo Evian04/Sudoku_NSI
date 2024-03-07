@@ -18,25 +18,28 @@ class Sudoku:
         # Test préconditions
         test_errors(grid_size)
         
-        self.is_grid_saved = True  # indique si la grille a été enregistrée, autrement dit si des modifications ont été appliquée depuis le dernier enregistrement
+        # indique si la grille a été enregistrée, autrement dit si des modifications ont été appliquée depuis le dernier enregistrement
+        self.is_grid_saved = True
         self.game = game  # contient la classe game
         
-        self.game_mode = "editing"  # défini le mode entre 'editing' et 'playing'
+        # défini le mode entre 'editing' et 'playing'
+        self.game_mode = "editing"
         
-        self.grid = Grid(grid_size)  # contient la grille avec les cellules
+        # contient la grille avec les cellules
+        self.grid = Grid(grid_size)
         
-        self.history: list[Grid] = [
-            self.grid.copy()]  # historique de la grille, permet de revenir en arrière, et/ou de rétablir
-        self.history_index = 0  # indique à quel index on se situe dans l'historique
+        # historique de la grille, permet de revenir en arrière, et/ou de rétablir
+        self.history: list[Grid] = [self.grid.copy()]
+        # indique à quel index on se situe dans l'historique
+        self.history_index = 0
         
-        self.save_state_conversion = {"unlocked":    "0", "locked": "1",
-                                      "superlocked": "2"}  # dictionnaire permettant de convertir un état en en chiffre entre 0 et 2 pour l'enregistrement dans un fichier
-        self.load_state_conversion = {"0": "unlocked", "1": "locked",
-                                      "2": "superlocked"}  # dictionnaire permettant de convertir un chiffre entre 0 et 2 pour l'ouverture d'un fichier
+        # dictionnaire permettant de convertir un état en en chiffre entre 0 et 2 pour l'enregistrement dans un fichier
+        self.save_state_conversion = {"unlocked": "0", "locked": "1", "superlocked": "2"}
+        # dictionnaire permettant de convertir un chiffre entre 0 et 2 pour l'ouverture d'un fichier
+        self.load_state_conversion = {"0": "unlocked", "1": "locked", "2": "superlocked"}
         
         self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
-        self.conflicting_cells: list[tuple[
-            int, int]] = list()  # liste des celeules en conflit, c'est à dire dont au moins une ligne, une colonne ou un carré admet deux valeurs identiques
+        self.conflicting_cells: list[tuple[int, int]] = list()  # liste des celeules en conflit, c'est à dire dont au moins une ligne, une colonne ou un carré admet deux valeurs identiques
     
     def reverse_game_mode(self):
         """
