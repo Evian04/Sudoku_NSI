@@ -272,7 +272,7 @@ class Sudoku:
     def clear_history(self):
         """
         Vide l'historique.
-        Fonction utilisée lors du chargement / génération d'une nouvelle grille
+        Fonction utilisée lors du chargement / génération d'une nouvelle grille / ouverture d'une nouvelle grille
         """
         
         self.history = [self.grid.copy()]
@@ -299,6 +299,7 @@ class Sudoku:
             if do_save:
                 self.save_grid()
         
+        self.clear_history()
         self.grid = Grid(grid_size)
         return True
     
