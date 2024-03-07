@@ -10,18 +10,15 @@ screen = pygame.display.set_mode(screen_size, pygame.RESIZABLE)  # Création de 
 
 # création de l'instance Game, il s'agit du conteneur du jeu
 game = Game(screen)
-clock = pygame.time.Clock()
 
-#boucle permettant au jeu de fonctionner, boucle infinie sous condition
-while True:
+# boucle permettant au jeu de fonctionner, boucle infinie sous condition
+while not game.do_quit:
+    
     # Limitation du nombre d'image par secondes
-    clock.tick(60)
+    pygame.time.Clock().tick(60)
     
     # Mettre à jour le jeu
     game.update()
-    
-    # Si l'utilisateur ferme la fenêtre
-    if game.do_quit:
-        # Arrêter le programme
-        pygame.quit()
-        break
+
+pygame.quit()
+print("Programed quitted")
