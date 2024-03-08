@@ -1,7 +1,7 @@
 import pygame
 import os
 from tkinter.filedialog import askdirectory
-
+from typing import Union
 from src.programs.test_errors import test_errors
 
 class Graphism:
@@ -294,7 +294,7 @@ class Graphism:
             self.all_cell_rect[x][y]
         )
     
-    def load_image(self, path: str, dimensions: list[int, int]) -> pygame.Surface:
+    def load_image(self, path: str, dimensions: Union[list[int, int], list[float]]) -> pygame.Surface:
         """
         Charge une image redimensionnnée à la bonne taille de puis un chemin d'accès
         :param path: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
@@ -332,7 +332,8 @@ class Graphism:
         
         # calcul la taille de chaque cellule
         self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
-
+        print(self.cell_dimensions)
+        
         # Calcule les dimensions et les coordonnées des boutons du menu de démarrage
         self.update_start_buttons_rect()
         # Calcule les dimensions et les coordonnées des boutons du menu principal
