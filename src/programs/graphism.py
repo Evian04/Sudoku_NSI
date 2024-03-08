@@ -332,7 +332,6 @@ class Graphism:
         
         # calcul la taille de chaque cellule
         self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
-        print(self.cell_dimensions)
         
         # Calcule les dimensions et les coordonnées des boutons du menu de démarrage
         self.update_start_buttons_rect()
@@ -617,7 +616,6 @@ class Graphism:
             self.rect_ref_distance - self.outline_thickness,
             (self.rect_ref_distance - self.outline_thickness) * self.dimensions_button.get_height() / self.dimensions_button.get_width()
         ]
-        print(self.options_buttons_dimensions)
         
         # coordonnées des boutons
         ref_coordinates = [
