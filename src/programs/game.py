@@ -14,29 +14,40 @@ class Game:
     
     def __init__(self, screen: pygame.Surface):
         self.do_quit = False
+        # enregistre l'écran
         self.screen: pygame.Surface = screen
         
-        self.current_menu = "main"
+        # menu actuel, par défaut, menu de démarrage (bouton jouer)
+        self.current_menu = "start"
+        # inidque si le menu options est ouvert
         self.is_options_open = False
+        # indique si unue résolution est en cours
         self.is_solving = False
-        
-        self.load_config_file()  # charge le fichier de configuration et met à jour l'attribut self.config_file
+
+        # charge le fichier de configuration et met à jour l'attribut self.config_file
+        self.load_config_file()
+        # indique si l'affichage doit être fait pendant la résoltion // récupèrre ce paramètre dans config file
         self.do_display_during_solving = self.get_config_value("do_display_during_solving")
+
+        # Valeurs possibles pour les symboles (chiffre puis lettre)
+        self.possible_values = "123456789ABCDEFG"
         
-        self.possible_values = "123456789ABCDEFG"  # Valeurs possibles pour les symboles (chiffre puis lettre)
-        
+        # créé l'instance sudoku
         self.sudoku = Sudoku(self, 9)
+        # créé l'instance graphism
         self.graphism = Graphism(
-            self,
-            self.sudoku.grid.size,
-            self.get_config_value("texture_pack"),
-            self.get_config_value("do_display_conflicts")
+            self,  # passe game
+            self.sudoku.grid.size,  # passe la taille de la grille
+            self.get_config_value("texture_pack"),  # le texture pack actuel
+            self.get_config_value("do_display_conflicts")  # la valeur qui indique si il faut afficher les cases en conflit
         )
         
         self.name = "Sudokool"
+        # mettre à jour le titre de la fenêtre
         self.update_title()
-        
-        self.key_mapping: dict[str] = {  # mapping des touches du clavier pour ajouter/modifier la valeur d'une case
+
+        # mapping des touches du clavier pour ajouter/modifier la valeur d'une case // remplace une touche par une valeur
+        self.key_mapping: dict[str] = {
             pygame.K_1:         '1',
             pygame.K_KP_1:      '1',
             pygame.K_2:         '2',
@@ -62,13 +73,15 @@ class Game:
             pygame.K_e:         "E",
             pygame.K_f:         "F",
             pygame.K_g:         "G",
-            
-            pygame.K_BACKSPACE: "0",  # 0 correspond à une case vide (supprime la valeur de la case)
+    
+            # 0 correspond à une case vide (supprime la valeur de la case)
+            pygame.K_BACKSPACE: "0",
             pygame.K_DELETE:    "0",
             pygame.K_0:         "0",
             pygame.K_KP_0:      "0"
         }
         
+        # met à jour la taille des images // pas d'affichage
         self.graphism.update_rect()
     
     def update_title(self, title: str = ""):
@@ -78,34 +91,36 @@ class Game:
         """
         
         if title == "":
+            # redefini le titre à partir du nom du jeu, de la taille et du mode de jeu
             pygame.display.set_caption(
                 self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + ("joueur" if self.sudoku.game_mode == "playing" else "éditeur")
             )
             
         else:
+            # défini le nom à partir de l'argument
             pygame.display.set_caption(title)
     
     def update(self, do_display: bool = True):
         """
-        Exécute les actions nécessaires au bon fonctionnement du jeu
+        Met à jour l'affichage du jeu
         """
         
         if self.is_options_open:
             self.update_options(do_display)
         
-        elif self.current_menu == "main":
-            self.update_main(do_display)
+        elif self.current_menu == "start":
+            self.update_start(do_display)
         
         elif self.current_menu == "game":
             self.update_game(do_display)
     
-    def update_main(self, do_display: bool):
+    def update_start(self, do_display: bool):
         """
         Met à jour l'état du jeu lorsque le menu de démarrage est ouvert
         """
         
         if do_display:
-            self.graphism.display_main_elements()
+            self.graphism.display_start_elements()
 
         all_events = pygame.event.get()
         
@@ -128,7 +143,7 @@ class Game:
                 if self.graphism.play_button_rect.collidepoint(mouse_pos):
                     self.current_menu = "game"
                 
-                elif self.graphism.options_main_button_rect.collidepoint(mouse_pos):
+                elif self.graphism.options_start_button_rect.collidepoint(mouse_pos):
                     self.is_options_open = True
                 
                 elif self.graphism.quit_button_rect.collidepoint(mouse_pos):
@@ -207,7 +222,7 @@ class Game:
                         self.is_options_open = True
                     
                     elif self.graphism.return_button_rect.collidepoint(mouse_pos):
-                        self.current_menu = "main"
+                        self.current_menu = "start"
 
                 # Si l'utilisateur effectue un clique droit
                 elif event.button == pygame.BUTTON_RIGHT:

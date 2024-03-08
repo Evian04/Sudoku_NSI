@@ -648,7 +648,7 @@ class Sudoku:
         
         print('solving...')
         # affiche les boutons du menu demarrer
-        self.game.graphism.display_main_elements()
+        self.game.graphism.display_start_elements()
         
         # défini le mode de jeu sur joueur
         self.set_game_mode("playing")

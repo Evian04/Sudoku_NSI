@@ -57,7 +57,7 @@ class Graphism:
         self.update_rect()
         return
     
-    def display_main_elements(self):
+    def display_start_elements(self):
         """
         Affiche les éléments du menu de démarrage
         """
@@ -72,10 +72,10 @@ class Graphism:
         else:
             self.screen.blit(self.play_button, self.play_button_rect)
             
-        if self.options_main_button_rect.collidepoint(mouse_pos):
-            self.screen.blit(self.options_main_selected_button, self.options_main_button_rect)
+        if self.options_start_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.options_start_selected_button, self.options_start_button_rect)
         else:
-            self.screen.blit(self.options_main_button, self.options_main_button_rect)
+            self.screen.blit(self.options_start_button, self.options_start_button_rect)
         
         if self.quit_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.quit_selected_button, self.quit_button_rect)
@@ -269,7 +269,7 @@ class Graphism:
     
     def update_rect(self):
         """
-        Calcule de la dimensions et des coordonnées des éléments de la fenêtre
+        Calcule des dimensions et des coordonnées des éléments de la fenêtre
         """
         
         # Test si la longueur de référence doit être la longueur ou la largeur de l'écran
@@ -290,7 +290,7 @@ class Graphism:
         
         self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
         
-        self.update_main_buttons_rect()
+        self.update_start_buttons_rect()
         self.update_game_buttons_rect()
         self.update_options_buttons_rect()
         self.update_digits_rect()
@@ -371,51 +371,51 @@ class Graphism:
         self.display_solving_selected_button = pygame.image.load("src/graphics/{0}/buttons/options/display_solving_{1}_selected.png".format(self.texture_pack, "on" if self.game.do_display_during_solving else "off"))
         self.display_solving_selected_button = pygame.transform.smoothscale(self.display_solving_selected_button, self.options_buttons_dimensions)
     
-    def update_main_buttons_rect(self):
+    def update_start_buttons_rect(self):
         """
         Calcule les dimensions et les coordonnées des bouttons du menu de démarrage
         """
         
-        self.play_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/play.png")
+        self.play_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/start/play.png")
         
-        self.main_buttons_dimensions = [
+        self.start_buttons_dimensions = [
             self.rect_ref_distance - self.outline_thickness,
             (self.rect_ref_distance - self.outline_thickness) * (self.play_button.get_height() / self.play_button.get_width())
         ]
         
         ref_coordinates = [
-            self.screen.get_width() / 2 - self.main_buttons_dimensions[0] / 2,
+            self.screen.get_width() / 2 - self.start_buttons_dimensions[0] / 2,
             self.screen.get_height() / 2 - self.rect_ref_distance / 2
         ]
         
-        buttons_gap = (self.rect_ref_distance - self.main_buttons_dimensions[1]) / 4
+        buttons_gap = (self.rect_ref_distance - self.start_buttons_dimensions[1]) / 4
         
-        self.play_button = pygame.transform.smoothscale(self.play_button, self.main_buttons_dimensions)
+        self.play_button = pygame.transform.smoothscale(self.play_button, self.start_buttons_dimensions)
         
-        self.play_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/play_selected.png")
-        self.play_selected_button = pygame.transform.smoothscale(self.play_selected_button, self.main_buttons_dimensions)
+        self.play_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/start/play_selected.png")
+        self.play_selected_button = pygame.transform.smoothscale(self.play_selected_button, self.start_buttons_dimensions)
         
         self.play_button_rect = self.play_button.get_rect()
         self.play_button_rect.x = ref_coordinates[0]
         self.play_button_rect.y = ref_coordinates[1] + buttons_gap
         
         
-        self.options_main_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/options.png")
-        self.options_main_button = pygame.transform.smoothscale(self.options_main_button, self.main_buttons_dimensions)
+        self.options_start_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/start/options.png")
+        self.options_start_button = pygame.transform.smoothscale(self.options_start_button, self.start_buttons_dimensions)
         
-        self.options_main_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/options_selected.png")
-        self.options_main_selected_button = pygame.transform.smoothscale(self.options_main_selected_button, self.main_buttons_dimensions)
+        self.options_start_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/start/options_selected.png")
+        self.options_start_selected_button = pygame.transform.smoothscale(self.options_start_selected_button, self.start_buttons_dimensions)
         
-        self.options_main_button_rect = self.options_main_button.get_rect()
-        self.options_main_button_rect.x = ref_coordinates[0]
-        self.options_main_button_rect.y = ref_coordinates[1] + buttons_gap * 2
+        self.options_start_button_rect = self.options_start_button.get_rect()
+        self.options_start_button_rect.x = ref_coordinates[0]
+        self.options_start_button_rect.y = ref_coordinates[1] + buttons_gap * 2
         
         
-        self.quit_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/quit.png")
-        self.quit_button = pygame.transform.smoothscale(self.quit_button, self.main_buttons_dimensions)
+        self.quit_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/start/quit.png")
+        self.quit_button = pygame.transform.smoothscale(self.quit_button, self.start_buttons_dimensions)
         
-        self.quit_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/main/quit_selected.png")
-        self.quit_selected_button = pygame.transform.smoothscale(self.quit_selected_button, self.main_buttons_dimensions)
+        self.quit_selected_button = pygame.image.load(f"src/graphics/{self.texture_pack}/buttons/start/quit_selected.png")
+        self.quit_selected_button = pygame.transform.smoothscale(self.quit_selected_button, self.start_buttons_dimensions)
         
         self.quit_button_rect = self.quit_button.get_rect()
         self.quit_button_rect.x = ref_coordinates[0]
