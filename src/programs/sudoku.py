@@ -530,6 +530,10 @@ class Sudoku:
                 self.save_grid()
         
         print("generating...")
+        # quitter le menu options
+        self.game.is_options_open = False
+        self.game.update()
+        
         # met à jour le titre de la fenêtre
         self.game.update_title("Génération ...")
         starting_time = time.time()
@@ -642,13 +646,11 @@ class Sudoku:
         # enregistrmeent du temps de départ
         starting_time = time.time()
         
-        # mise @ jour du titre
+        # mise à jour du titre
         if do_display:
             self.game.update_title("Résolution ...")
         
         print('solving...')
-        # affiche les boutons du menu demarrer
-        self.game.graphism.display_start_elements()
         
         # défini le mode de jeu sur joueur
         self.set_game_mode("playing")
