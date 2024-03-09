@@ -1,7 +1,8 @@
-import tkinter.messagebox
+# import des librairies
+import os
 import pygame
 import json
-
+# nos modules
 from src.programs.sudoku import Sudoku
 from src.programs.graphism import Graphism
 from src.programs.test_errors import test_errors
@@ -16,6 +17,9 @@ class Game:
         self.do_quit = False
         # enregistre l'écran
         self.screen: pygame.Surface = screen
+
+        # chemin du fichier à ouvrir pour le bouton aide (Notice)
+        self.help_filepath = "Notice Sudokool.pdf"
         
         # menu actuel, par défaut, menu de démarrage (bouton jouer)
         self.current_menu = "start"
@@ -23,12 +27,12 @@ class Game:
         self.is_options_open = False
         # indique si unue résolution est en cours
         self.is_solving = False
-
+        
         # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.load_config_file()
         # indique si l'affichage doit être fait pendant la résoltion // récupèrre ce paramètre dans config file
         self.do_display_during_solving = self.get_config_value("do_display_during_solving")
-
+        
         # Valeurs possibles pour les symboles (chiffre puis lettre)
         self.possible_values = "123456789ABCDEFG"
         
@@ -39,13 +43,14 @@ class Game:
             self,  # passe game
             self.sudoku.grid.size,  # passe la taille de la grille
             self.get_config_value("texture_pack"),  # le texture pack actuel
-            self.get_config_value("do_display_conflicts")  # la valeur qui indique si il faut afficher les cases en conflit
+            self.get_config_value("do_display_conflicts")
+            # la valeur qui indique si il faut afficher les cases en conflit
         )
         
         self.name = "Sudokool"
         # mettre à jour le titre de la fenêtre
         self.update_title()
-
+        
         # mapping des touches du clavier pour ajouter/modifier la valeur d'une case // remplace une touche par une valeur
         self.key_mapping: dict[str] = {
             pygame.K_1:         '1',
@@ -73,7 +78,7 @@ class Game:
             pygame.K_e:         "E",
             pygame.K_f:         "F",
             pygame.K_g:         "G",
-    
+            
             # 0 correspond à une case vide (supprime la valeur de la case)
             pygame.K_BACKSPACE: "0",
             pygame.K_DELETE:    "0",
@@ -93,9 +98,10 @@ class Game:
         if title == "":
             # redefini le titre à partir du nom du jeu, de la taille et du mode de jeu
             pygame.display.set_caption(
-                self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + ("joueur" if self.sudoku.game_mode == "playing" else "éditeur")
+                self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + (
+                    "joueur" if self.sudoku.game_mode == "playing" else "éditeur")
             )
-            
+        
         else:
             # défini le nom à partir de l'argument
             pygame.display.set_caption(title)
@@ -125,7 +131,7 @@ class Game:
         # si on souahite afficher
         if do_display:
             self.graphism.display_start_elements()
-
+        
         # récupère les evenements en cours
         all_events = pygame.event.get()
         
@@ -152,6 +158,9 @@ class Game:
                 # si le bouton options est selectionnée
                 elif self.graphism.options_start_button_rect.collidepoint(mouse_pos):
                     self.is_options_open = True
+                
+                elif self.graphism.help_button_rect.collidepoint(mouse_pos):
+                    self.open_file(self.help_filepath)
                 
                 # si le bouton quitter est selectionnée
                 elif self.graphism.quit_button_rect.collidepoint(mouse_pos):
@@ -206,7 +215,7 @@ class Game:
                         # si la touche controle est pressé
                         if is_ctrl_pressed:
                             # supprimer toutes les valeurs de la grilles
-                            self.sudoku.clear_inputs(do_save_in_history = True)
+                            self.sudoku.clear_inputs(do_save_in_history=True)
                         
                         else:
                             # supprimer les cases déverrouillées
@@ -216,18 +225,20 @@ class Game:
                         self.sudoku.verify_grid()
                     
                     # bouton annuler dernière action
-                    elif self.graphism.arrow_left_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("backward"):
+                    elif self.graphism.arrow_left_button_rect.collidepoint(
+                            mouse_pos) and self.sudoku.is_history_move_possible("backward"):
                         self.sudoku.move_index_history("backward")
                     
                     # bouton retablir la dernière action
-                    elif self.graphism.arrow_right_button_rect.collidepoint(mouse_pos) and self.sudoku.is_history_move_possible("forward"):
+                    elif self.graphism.arrow_right_button_rect.collidepoint(
+                            mouse_pos) and self.sudoku.is_history_move_possible("forward"):
                         self.sudoku.move_index_history("forward")
-
+                    
                     # bouton ouvrir
                     elif self.graphism.open_button_rect.collidepoint(mouse_pos):
                         self.sudoku.open_grid()
                         self.graphism.update_grid_attributes(self.sudoku.grid.size)
-
+                    
                     # bouton enregistrer
                     elif self.graphism.save_button_rect.collidepoint(mouse_pos):
                         self.sudoku.save_grid()
@@ -244,7 +255,7 @@ class Game:
                     # bouton retour (au menu démarrer)
                     elif self.graphism.return_button_rect.collidepoint(mouse_pos):
                         self.current_menu = "start"
-
+                
                 # Si l'utilisateur effectue un clique droit
                 elif event.button == pygame.BUTTON_RIGHT:
                     # boucle sur toutes les cases
@@ -253,7 +264,6 @@ class Game:
                             
                             # Si la souris est sur l'une des cases de la grille
                             if self.graphism.all_cell_rect[x][y].collidepoint(mouse_pos):
-                                
                                 # Inverser l'état de verrouillage de la case en question
                                 self.sudoku.reverse_cell_lock((x, y))
             
@@ -281,7 +291,7 @@ class Game:
                 # flèche bas
                 if event.key == pygame.K_DOWN:
                     self.sudoku.move_selected_cell("down")
-
+                
                 # Ctrl + C - supprime toutes les valeurs des cases déverrouillées
                 if event.key == pygame.K_c and is_ctrl_pressed:
                     self.sudoku.clear()
@@ -290,7 +300,7 @@ class Game:
                 
                 if event.key == pygame.K_z and is_ctrl_pressed:
                     self.sudoku.move_index_history("backward")
-                    
+                
                 # Ctrl + y : restaurer l'action annulée
                 if event.key == pygame.K_y and is_ctrl_pressed:
                     self.sudoku.move_index_history("forward")
@@ -411,6 +421,21 @@ class Game:
                 self.graphism.update_rect()
                 self.graphism.display_game_elements()
     
+    def open_file(self, filepath: str) -> bool:
+        """
+        Ouvre le fichier spécifié grâce à une application externe (non python)
+        :param filepath: chemin d'accès absolu ou relatif
+        :return: boolean indiquant la réusiste ou non de l'ouverture du fichier
+        """
+        # ouvre le fichier spécifié grâce à une commande cmd
+        result = os.system(f'start "" "{filepath}"')
+        # opération réussi - fichier ouvert
+        if result == 0:
+            return True
+        # échec opération - fichier non ouvert
+        else:
+            return False
+    
     def load_config_file(self):
         """
         Charge le fichier de configuration spécifié à self.config_filepath
@@ -418,7 +443,7 @@ class Game:
         """
         
         with open("src/config.json") as file:
-            self.config_file = json.load(fp = file)
+            self.config_file = json.load(fp=file)
     
     def get_config_value(self, key: str):
         """
@@ -427,7 +452,7 @@ class Game:
         :return: valeur obtenue (différents types int, bool, etc)
         """
         
-        test_errors(config_file = self.config_file, config_key = key)
+        test_errors(config_file=self.config_file, config_key=key)
         
         return self.config_file[key]
     
@@ -438,7 +463,7 @@ class Game:
         :param value: nouvelle valeur
         """
         
-        test_errors(config_file = self.config_file, config_key = key, config_value = value)
+        test_errors(config_file=self.config_file, config_key=key, config_value=value)
         
         self.config_file[key] = value
         

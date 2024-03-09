@@ -1,7 +1,9 @@
+# import des librairies
 import pygame
 import os
 from tkinter.filedialog import askdirectory
 from typing import Union
+# nos modules
 from src.programs.test_errors import test_errors
 
 class Graphism:
@@ -81,6 +83,11 @@ class Graphism:
         else:
             self.screen.blit(self.options_start_button, self.options_start_button_rect)
         
+        if self.help_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.help_button, self.help_button_rect)
+        else:
+            self.screen.blit(self.help_button, self.help_button_rect)
+            
         # boutons quitter
         if self.quit_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.quit_selected_button, self.quit_button_rect)
@@ -450,7 +457,7 @@ class Graphism:
         ]
         
         # espace vertical entre les boutons
-        buttons_gap = (self.rect_ref_distance - self.start_buttons_dimensions[1]) / 4
+        buttons_gap = (self.rect_ref_distance - self.start_buttons_dimensions[1]) / 5
         
         # redimensionnement du bouton
         self.play_button = pygame.transform.smoothscale(self.play_button, self.start_buttons_dimensions)
@@ -458,7 +465,7 @@ class Graphism:
         # bouton jouer sélectionné
         self.play_selected_button = self.load_image("buttons/start/play_selected.png", self.start_buttons_dimensions)
         
-        # rectangle du bouton play
+        # rectangle du bouton jouer
         self.play_button_rect = self.play_button.get_rect()
         self.play_button_rect.x = ref_coordinates[0]
         self.play_button_rect.y = ref_coordinates[1] + buttons_gap
@@ -474,6 +481,17 @@ class Graphism:
         self.options_start_button_rect.x = ref_coordinates[0]
         self.options_start_button_rect.y = ref_coordinates[1] + buttons_gap * 2
         
+        #image bouton aide
+        self.help_button = self.load_image("buttons/start/help.png", self.start_buttons_dimensions)
+        
+        # image bouotn aide séléctionnée
+        self.help_button_selected = self.load_image("buttons/start/help_selected.png", self.start_buttons_dimensions)
+        
+        # rectangle bouton aide
+        self.help_button_rect = self.help_button.get_rect()
+        self.help_button_rect.x = ref_coordinates[0]
+        self.help_button_rect.y = ref_coordinates[1] + buttons_gap * 3
+        
         # image bouton quitter
         self.quit_button = self.load_image("buttons/start/quit.png", self.start_buttons_dimensions)
         
@@ -483,7 +501,7 @@ class Graphism:
         # rectangle bouton quitter
         self.quit_button_rect = self.quit_button.get_rect()
         self.quit_button_rect.x = ref_coordinates[0]
-        self.quit_button_rect.y = ref_coordinates[1] + buttons_gap * 3
+        self.quit_button_rect.y = ref_coordinates[1] + buttons_gap * 4
     
     def update_game_buttons_rect(self):
         """

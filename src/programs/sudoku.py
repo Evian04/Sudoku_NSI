@@ -1,9 +1,9 @@
-#import des bibliothèques
+#import des libraires
 import random
 import time
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesnocancel, showinfo
-
+# nos modules
 from src.programs.grid import Grid
 from src.programs.test_errors import test_errors
 
