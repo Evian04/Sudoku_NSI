@@ -8,7 +8,7 @@ class Cell:
     def __init__(self, value: str, state: str, sudoku_size: int):
         
         # Test préconditions
-        test_errors(sudoku_size, value = value, state = state)
+        test_errors(sudoku_size, value=value, state=state)
         
         self.value = value
         self.state = state
@@ -22,7 +22,7 @@ class Cell:
         """
         
         # Test préconditions
-        test_errors(self.sudoku_size, value = value)
+        test_errors(self.sudoku_size, value=value)
         
         self.value = value
 
@@ -32,7 +32,7 @@ class Cell:
         """
         
         # Test préconditions
-        test_errors(state = state)
+        test_errors(state=state)
         
         self.state = state
         
@@ -42,6 +42,6 @@ class Cell:
         """
         
         # Test préconditions
-        test_errors(boolean = conflicting_state)
+        test_errors(boolean=conflicting_state)
         
         self.is_in_conflict = conflicting_state

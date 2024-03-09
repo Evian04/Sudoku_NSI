@@ -1,3 +1,4 @@
+# import des libraires
 import os
 
 def test_errors(sudoku_size = 0, **arguments):
@@ -5,20 +6,26 @@ def test_errors(sudoku_size = 0, **arguments):
     Fonction permettant de gérer les erreures potentielles lors de l'exécution du programme
     """
     
+    # tailles possible pour le sudoku
     possible_sudoku_sizes = [4, 9, 16]
+    # liste des valeurs possibles pour les sudokus (valeurs maximales)
     possible_values = "123456789ABCDEFG"
+    # listes de toutes les clés possible pour le fichier de configuration
     all_config_keys = ["texture_pack", "do_display_conflicts", "do_display_during_solving"]
-    
+
+    # test taille sudoku
     assert type(sudoku_size) == int, f'The "sudoku_size" argument must be an integer (type : {type(sudoku_size)})'
     if sudoku_size != 0:
         assert sudoku_size in possible_sudoku_sizes, \
             f'The "sudoku_size" argument must be 4, 9 or 16 (value : {sudoku_size})'
     
+    # test si argument est un boolean
     if "boolean" in arguments:
         boolean = arguments["boolean"]
         
         assert type(boolean) == bool, f"This argument must be a boolean (type : {type(boolean)})"
     
+    # test validité coordonnées - nécessite arguments `sudoku_size`
     if "coordinates" in arguments:
         assert sudoku_size != 0, 'You must pass a value for "sudoku_size" argument in order to verify "coordinates"'
         
@@ -30,6 +37,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert 0 <= coordinates[0] < sudoku_size and 0 <= coordinates[1] < sudoku_size, \
             f'The "coordinates" argument must be contains integers between 0 and grid_size - 1 (value : {coordinates})'
     
+    # test validité valeur passée - nécessite `sudoku_size`
     if "value" in arguments:
         assert sudoku_size != 0, 'You must pass a value for the "sudoku_size" argument in order to verify "value"'
         
@@ -38,6 +46,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert type(value) == str, f'The "value" argument must be a string (type : {type(value)})'
         assert value in "0" + possible_values[:sudoku_size], f'The "value" argument must be in "possible_values" (value : {value}, possible values : {possible_values[:sudoku_size]})'
     
+    # test validité état
     if "state" in arguments:
         state = arguments["state"]
         
@@ -45,6 +54,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert state in ["unlocked", "locked", "superlocked"], \
             f'The "state" argument must be "unlocked", "locked" or "superlocked" (value : {state})'
     
+    # test validité couleur
     if "color" in arguments:
         color = arguments["color"]
         
@@ -54,6 +64,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert 0 <= color[1] <= 255, f'The "color" argument must contains integers between 0 and 255 (values : {color})'
         assert 0 <= color[2] <= 255, f'The "color" argument must contains integers between 0 and 255 (values : {color})'
     
+    # test validité format (lignes, colonnes, carrés)
     if "format" in arguments:
         format = arguments["format"]
         
@@ -61,30 +72,36 @@ def test_errors(sudoku_size = 0, **arguments):
         assert format in ["lines", "columns", "squares"], \
             f'The "format" argument must be "lines", "columns" or "squares" (value : {format})'
     
+    # test validité fréquence (= proportion)
     if "frequency" in arguments:
         frequency = arguments["frequency"]
         
         assert type(frequency) == float, f'The "frequency" argument must be a float (type : {type(frequency)})'
         assert 0 <= frequency <= 1, f'The "frequency" argument must be between 0 and 1 (value : {frequency})'
 
+    # test validité direction (gauche, droite, haut ou bas)
     if "direction" in arguments:
         direction = arguments["direction"]
         
         assert type(direction) == str, f'The "direction" argument must be a string (type : {type(direction)})'
         assert direction in ["left", "right", "up", "down"], f'The "direction" argument must be "left", "right", "up" or "down" (value : {direction})'
     
+    # test validité action historique (avancer ou reculer)
     if "history_move" in arguments:
         history_move = arguments["history_move"]
         
         assert type(history_move) == str, f'The "history_move" argument must be a string (type : {type(history_move)})'
         assert history_move in ["forward", "backward"], f'The "history_move" argument must be "forward" or "backward" (value : {history_move})'
     
+    # test validité mode de jeu (editeur ou joueur)
     if "game_mode" in arguments:
         game_mode = arguments["game_mode"]
         
         assert type(game_mode) == str, f'The "game_mode" argument must be a string (type : {type(game_mode)})'
         assert game_mode in ["editing", "playing"], f'The "game_mode" argument must be "editing" or "playing" (value : {game_mode})'
     
+    # test validité list de valeurs, correpsond à une liste sous format [colonne, colonne, ...] (colonne est une liste de valeurs)
+    # nécessite `sudoku_size`
     if "list_values" in arguments:
         assert sudoku_size, 'You must pass a value for the "sudoku_size" argument in order to verify "list_values"'
         
@@ -100,8 +117,10 @@ def test_errors(sudoku_size = 0, **arguments):
                 f'The "list_values" argument must contains lists with lengths of {sudoku_size} (value : {list_values})'
             
             for value in sub_list_values:
-                test_errors(sudoku_size, value = value)
+                test_errors(sudoku_size, value=value)
     
+    # test validité liste états, correpsond à une liste sous format [colonne, colonne, ...] (colonne est une liste d'états)
+    # nécessite `sudoku_size`
     if "list_states" in arguments:
         assert sudoku_size != 0, 'You must pass a value for the "sudoku_size" argument in order to verify "list_states"'
         
@@ -117,8 +136,10 @@ def test_errors(sudoku_size = 0, **arguments):
                 f'The "list_states" argument must contains lists that have lengths of {sudoku_size} (value : {list_states})'
             
             for state in sub_list_values:
-                test_errors(state = state)
+                test_errors(state=state)
     
+    # test validité liste coordonnées, correpsond à une liste sous format [colonne, colonne, ...] (colonne est une liste de coordonnées)
+    # nécessite `sudoku_size`
     if "list_coordinates" in arguments:
         assert sudoku_size != 0, 'You must pass a value for the "sudoku_size" argument in order to verify "list_coordinates"'
         
@@ -129,6 +150,7 @@ def test_errors(sudoku_size = 0, **arguments):
         for coordinates in list_coordinates:
             test_errors(sudoku_size, coordinates = coordinates)
     
+    # test validité fichier de configuration
     if "config_file" in arguments:
         config_file = arguments["config_file"]
         
@@ -137,8 +159,9 @@ def test_errors(sudoku_size = 0, **arguments):
         for config_key in all_config_keys:
             assert config_key in config_file, f'The "config_file" argument must contains the "{config_key}" key (value : {config_file})'
 
-            test_errors(config_key = config_key, config_value = config_file[config_key])
+            test_errors(config_key=config_key, config_value=config_file[config_key])
     
+    # test validité clé du fichier de configuration
     if "config_key" in arguments:
         config_key = arguments["config_key"]
         
@@ -146,6 +169,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert config_key in all_config_keys, \
             f'The "config_key" argument must be "texture_pack", "do_display_conflicts" or "do_display_during_solvings" (value : {config_key})'
 
+    # test validité valeur du fichier de configuration - nécessite `config_key`
     if "config_value" in arguments:
         assert "config_key" in arguments, 'You must pass a value for the "config_key" argument in order to verify "config_value"'
         
