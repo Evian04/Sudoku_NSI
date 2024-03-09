@@ -18,6 +18,10 @@ class Game:
         # enregistre l'écran
         self.screen: pygame.Surface = screen
 
+        # défini l'icone du jeu
+        self.icon = pygame.image.load("src/graphics/icon.png")
+        pygame.display.set_icon(self.icon)
+        
         # chemin du fichier à ouvrir pour le bouton aide (Notice)
         self.help_filepath = "Notice Sudokool.pdf"
         

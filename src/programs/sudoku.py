@@ -191,10 +191,12 @@ class Sudoku:
                 
                 # Si la case est déverrouillée
                 case "unlocked":
-                    # Mettre l'état de la case à verrouillé
-                    self.grid.set_cell_state(coordinates, "locked")
-                    print(f"The cell {coordinates} was locked")
-                    is_grid_changed = True  # indique un changement de la grille
+                    # Mettre l'état de la case à verrouillé si la case contient une valeur
+                    if self.grid.get_cell_value(coordinates) != '0':
+                        self.grid.set_cell_state(coordinates, "locked")
+                        print(f"The cell {coordinates} was locked")
+                        is_grid_changed = True  # indique un changement de la grille
+                    else: print(f'The cell {coordinates} was NOT locked: empty cell')
                 
                 # Si la case est verrouillée
                 case "locked":
@@ -213,14 +215,17 @@ class Sudoku:
         # Si le mode de jeu est sur edition
         else:
             match self.grid.get_cell_state(coordinates):  # fonction match case
-                
-                # Si la case est editeur
+                # Si le mode de jeu est editeur
                 case "unlocked":
-                    # Mettre l'état de la case à superverrouille
-                    self.grid.set_cell_state(coordinates, "superlocked")
-                    print(f"The cell {coordinates} was superlocked")
-                    # indique un changement de la grille
-                    is_grid_changed = True
+                    # Mettre l'état de la case à superverrouillé si la case contient une valeur
+                    if self.grid.get_cell_value(coordinates) != '0':
+                        self.grid.set_cell_state(coordinates, "superlocked")
+                        print(f"The cell {coordinates} was superlocked")
+                        # indique un changement de la grille
+                        is_grid_changed = True
+                    else:
+                        print(f"The cell {coordinates} was NOT superlocked: empty cell")
+
                 
                 # Si la case est verrouillée
                 case "locked":
@@ -238,8 +243,9 @@ class Sudoku:
                     # indique un changement de la grille
                     is_grid_changed = True
         
-        # ajoute la ou les action(s) dans l'historique
-        self.save_grid_in_history()
+        # ajoute la ou les action(s) dans l'historique si une modification a eu lieu
+        if is_grid_changed:
+            self.save_grid_in_history()
         # indique que la grille a été modifiée depuis le dernier enregistrement
         self.is_grid_saved = False
     
