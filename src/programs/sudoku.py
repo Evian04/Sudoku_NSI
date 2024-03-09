@@ -329,7 +329,7 @@ class Sudoku:
             )
             
             # si l'utilisateur a cliqué sur cancel, sur la croix ou sur non
-            if not do_save:
+            if do_save is None:
                 return False
             
             # si l'utilisateur a cliqué sur ok
@@ -528,7 +528,7 @@ class Sudoku:
             )
             
             # Boutton annuler, croix ou non
-            if not do_save:
+            if do_save is None:
                 return
             
             # Boutton oui
