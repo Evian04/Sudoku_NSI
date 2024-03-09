@@ -355,7 +355,7 @@ class Sudoku:
             initialdir="src/save_folder",
             initialfile="model_2.sdk",
             title="Ouvrir",
-            filetypes=[("Sudoku file", "*.sdk")]
+            filetypes=[("Sudoku file", "*.sdk"), ("All files", "*")]
         )
         
         # Dans le cas où l'utilisateur n'a pas sélectionné de fichier
