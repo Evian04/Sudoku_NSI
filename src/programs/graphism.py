@@ -59,7 +59,7 @@ class Graphism:
         self.texture_pack = path
         # met à jour l'affichage
         self.update_rect()
-        return
+        #
     
     def display_start_elements(self):
         """
@@ -317,6 +317,9 @@ class Graphism:
         """
         Calcule des dimensions et des coordonnées des éléments de la fenêtre
         """
+        # défini l'icone du jeu
+        self.icon = pygame.image.load(f"src/graphics/{self.texture_pack}/icon.png")
+        pygame.display.set_icon(self.icon)
         
         # Test si la longueur de référence doit être la longueur ou la largeur de l'écran
         if self.screen.get_width() * (2 / 3) > self.screen.get_height():
