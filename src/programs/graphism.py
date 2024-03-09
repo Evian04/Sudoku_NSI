@@ -435,9 +435,10 @@ class Graphism:
         """
         Mettre à jour le bouton afficher / cacher l'affichage durant la résolution uniquement
         """
-        self.display_solving_button = self.load_image(f"buttons/options/display_solving_{1}.png".format(self.texture_pack, "on" if self.game.do_display_during_solving else "off"))
+        print("update_display_solving_button_rect:", self.game.do_display_during_solving )
+        self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
         
-        self.display_solving_selected_button = pygame.image.load(f"buttons/options/display_solving_{'on' if self.do_display_conflicts else 'off'}_selected.png", self.options_buttons_dimensions)
+        self.display_solving_selected_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}_selected.png", self.options_buttons_dimensions)
     
     def update_start_buttons_rect(self):
         """
@@ -703,10 +704,10 @@ class Graphism:
         self.display_errors_button_rect.y = ref_coordinates[1] + buttons_gap * 4
         
         # image bouton afficher solution pendant résolution
-        self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.do_display_conflicts else 'off'}.png", self.options_buttons_dimensions)
+        self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
         
         # image bouton afficher solution pendant résolution sélectionnée
-        self.display_solving_selected_button = self.load_image(f"buttons/options/display_solving_{'on' if self.do_display_conflicts else 'off'}_selected.png", self.options_buttons_dimensions)
+        self.display_solving_selected_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}_selected.png", self.options_buttons_dimensions)
         
         # rectangle bouton afficher solution pendant résolution
         self.display_solving_button_rect = self.display_solving_button.get_rect()

@@ -302,6 +302,9 @@ class Sudoku:
         
         # remplace la grille actuelle par la grille de l'historique
         self.grid = self.history[self.history_index].copy()
+        
+        # effectue la verification des cellules en conflit
+        self.update_cells_conflicting_state()
     
     def clear_history(self):
         """
