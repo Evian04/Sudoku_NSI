@@ -302,10 +302,10 @@ class Graphism:
             self.all_cell_rect[x][y]
         )
     
-    def load_image(self, path: str, dimensions: Union[list[int, int], list[float]]) -> pygame.Surface:
+    def load_image(self, filepath: str, dimensions: Union[list[int, int], list[float]]) -> pygame.Surface:
         """
         Charge une image redimensionnnée à la bonne taille de puis un chemin d'accès
-        :param path: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
+        :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
         :param dimensions: dimensions de sortie de l'image (redimensionnement)
         :return l'image redimensionnée spécifée dans `path`
         """
@@ -313,6 +313,25 @@ class Graphism:
         image = pygame.image.load(f"src/graphics/{self.texture_pack}/{path}")
         resized_image = pygame.transform.smoothscale(image, dimensions)
         return resized_image
+    
+    def load_audio(self, filepath: str):
+        """
+        Charge un fichier audio pour le jouer en tant que musique de fond
+        :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
+        """
+        # stop le son précédemment joué (s'il existe)
+        pygame.mixer.music.stop()
+        # charge le nouveau son d'ambiance
+        pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/" + filepath)
+        pygame.mixer.music.play(-1)
+    
+    def play_audio(self, repetitions: int = -1):
+        """
+        Jouer le son d'ambiance
+        :param repetitions: nombre de répétitions a faire pour ce son, -1 correspond à inifnie
+        """
+        pygame.mixer.music.play(repetitions)
+        
 
     def update_rect(self):
         """
@@ -352,6 +371,10 @@ class Graphism:
         self.update_options_buttons_rect()
         # Charge toutes les images possibles pour chaque cellule
         self.update_digits_rect()
+        
+        # chargemement et lecture du son d'ambiance
+        self.load_audio("audio/background_music.mp3")
+        self.play_audio()
         
         # image fond d'écran
         self.background = self.load_image("background.png", background_dimensions)
