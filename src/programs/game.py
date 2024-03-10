@@ -17,7 +17,7 @@ class Game:
         self.do_quit = False
         # enregistre l'écran
         self.screen: pygame.Surface = screen
-
+        
         # chemin du fichier à ouvrir pour le bouton aide (Notice)
         self.help_filepath = "Notice Sudokool.pdf"
         
@@ -228,11 +228,13 @@ class Game:
                     elif self.graphism.arrow_left_button_rect.collidepoint(
                             mouse_pos) and self.sudoku.is_history_move_possible("backward"):
                         self.sudoku.move_index_history("backward")
-                    
+                        print("Action canceled")
+
                     # bouton retablir la dernière action
                     elif self.graphism.arrow_right_button_rect.collidepoint(
                             mouse_pos) and self.sudoku.is_history_move_possible("forward"):
                         self.sudoku.move_index_history("forward")
+                        print('Action restored')
                     
                     # bouton ouvrir
                     elif self.graphism.open_button_rect.collidepoint(mouse_pos):
