@@ -539,7 +539,7 @@ class Graphism:
         # rectangle du bouton ouvrir
         self.open_button_rect = self.open_button.get_rect()
         self.open_button_rect.x = ref_coordinates[0]
-        self.open_button_rect.y = ref_coordinates[1] + buttons_gap * 3
+        self.open_button_rect.y = ref_coordinates[1] + buttons_gap
 
         # image bouton sauvegarder
         self.save_button = self.load_image("buttons/game/save.png", self.game_buttons_dimensions)
@@ -562,7 +562,7 @@ class Graphism:
         # rectangle bouton résoudre
         self.solve_button_rect = self.solve_button.get_rect()
         self.solve_button_rect.x = ref_coordinates[0]
-        self.solve_button_rect.y = ref_coordinates[1] + buttons_gap
+        self.solve_button_rect.y = ref_coordinates[1] + buttons_gap * 3
         
         # image bouton options
         self.options_button = self.load_image("buttons/game/options.png", self.game_buttons_dimensions)
