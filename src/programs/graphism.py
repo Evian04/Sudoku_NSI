@@ -83,8 +83,9 @@ class Graphism:
         else:
             self.screen.blit(self.options_start_button, self.options_start_button_rect)
         
+        # bouton aide
         if self.help_button_rect.collidepoint(mouse_pos):
-            self.screen.blit(self.help_button, self.help_button_rect)
+            self.screen.blit(self.help_button_selected, self.help_button_rect)
         else:
             self.screen.blit(self.help_button, self.help_button_rect)
             
@@ -309,7 +310,7 @@ class Graphism:
         :return l'image redimensionnée spécifée dans `path`
         """
         # image
-        image = pygame.image.load(f"src/graphics/{self.texture_pack + '/' + path}")
+        image = pygame.image.load(f"src/graphics/{self.texture_pack}/{path}")
         resized_image = pygame.transform.smoothscale(image, dimensions)
         return resized_image
 
