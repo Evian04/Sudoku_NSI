@@ -327,6 +327,8 @@ class Graphism:
         # charge le nouveau son d'ambiance
         pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/{filepath}")
         pygame.mixer.music.play(-1)
+        
+        pygame.mixer.music.set_volume(0.1)
     
     def play_audio(self, repetitions: int = -1):
         """
