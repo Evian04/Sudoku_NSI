@@ -83,8 +83,9 @@ class Graphism:
         else:
             self.screen.blit(self.options_start_button, self.options_start_button_rect)
         
+        # bouton aide
         if self.help_button_rect.collidepoint(mouse_pos):
-            self.screen.blit(self.help_button, self.help_button_rect)
+            self.screen.blit(self.help_button_selected, self.help_button_rect)
         else:
             self.screen.blit(self.help_button, self.help_button_rect)
             
@@ -308,8 +309,9 @@ class Graphism:
         :param dimensions: dimensions de sortie de l'image (redimensionnement)
         :return l'image redimensionnée spécifée dans `path`
         """
+        
         # image
-        image = pygame.image.load(f"src/graphics/{self.texture_pack + '/' + filepath}")
+        image = pygame.image.load(f"src/graphics/{self.texture_pack}/{filepath}")
         resized_image = pygame.transform.smoothscale(image, dimensions)
         return resized_image
     
@@ -318,8 +320,10 @@ class Graphism:
         Charge un fichier audio pour le jouer en tant que musique de fond
         :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
         """
+        
         # stop le son précédemment joué (s'il existe)
         pygame.mixer.music.stop()
+        
         # charge le nouveau son d'ambiance
         pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/" + filepath)
         # lance la lecture infinie du son
