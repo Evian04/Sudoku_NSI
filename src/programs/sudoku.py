@@ -29,8 +29,11 @@ class Sudoku:
         # contient la grille avec les cellules
         self.grid = Grid(grid_size)
         
+        # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
+        self.selected_cell = (-1, -1)
+        
         # historique de la grille, permet de revenir en arrière, et/ou de rétablir
-        self.history: list[Grid] = [self.grid.copy()]
+        self.history: list[tuple[Grid, tuple[int, int]]] = [(self.grid.copy(), self.selected_cell)]
         # indique à quel index on se situe dans l'historique
         self.history_index = 0
         
@@ -39,7 +42,6 @@ class Sudoku:
         # dictionnaire permettant de convertir un chiffre entre 0 et 2 pour l'ouverture d'un fichier
         self.load_state_conversion = {"0": "unlocked", "1": "locked", "2": "superlocked"}
         
-        self.selected_cell = (-1, -1)  # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
         self.conflicting_cells: list[tuple[
             int, int]] = list()  # liste des celeules en conflit, c'est à dire dont au moins une ligne, une colonne ou un carré admet deux valeurs identiques
     
@@ -152,15 +154,18 @@ class Sudoku:
             
             return
         
-        # defini la valeur de la case
-        self.grid.set_cell_value(self.selected_cell, value)
-        # affiche un message console
-        print(f"The value of the cell {self.selected_cell} was set to {value}")
-        
-        # enregisttre l'action dans l'historique
-        self.save_grid_in_history()
-        # indique que la grille a été modifiée depuis le dernier enregistrement
-        self.is_grid_saved = False
+        if self.grid.get_cell_value(self.selected_cell) != value:
+            # defini la valeur de la case
+            self.grid.set_cell_value(self.selected_cell, value)
+            # affiche un message console
+            print(f"The value of the cell {self.selected_cell} was set to {value}")
+            
+            # enregistre l'action dans l'historique
+            self.save_grid_in_history()
+            # indique que la grille a été modifiée depuis le dernier enregistrement
+            self.is_grid_saved = False
+        else:
+            print(f"Same value for cell {self.selected_cell}, cell NOT modified")
     
     def reverse_selected_cell_lock(self):
         """
@@ -259,7 +264,7 @@ class Sudoku:
             self.history = self.history[:self.history_index + 1]
         
         # copie la grille actuelle
-        self.history.append(self.grid.copy())
+        self.history.append((self.grid.copy(), self.selected_cell))
         # redefini l'index
         self.history_index = len(self.history) - 1
     
@@ -301,8 +306,8 @@ class Sudoku:
                 self.history_index = len(self.history) - 1
         
         # remplace la grille actuelle par la grille de l'historique
-        self.grid = self.history[self.history_index].copy()
-        
+        self.grid = self.history[self.history_index][0].copy()
+        self.selected_cell = self.history[self.history_index][1]
         # effectue la verification des cellules en conflit
         self.update_cells_conflicting_state()
     
