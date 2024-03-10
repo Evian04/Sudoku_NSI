@@ -46,7 +46,8 @@ class Game:
             self,  # passe game
             self.sudoku.grid.size,  # passe la taille de la grille
             self.get_config_value("texture_pack"),  # le texture pack actuel
-            self.get_config_value("do_display_conflicts")
+            self.get_config_value("do_display_conflicts"),
+            self.get_config_value("do_play_music")
             # la valeur qui indique si il faut afficher les cases en conflit
         )
         
@@ -119,7 +120,7 @@ class Game:
             self.have_focus = pygame.key.get_focused()
             print("focus", "in" if self.have_focus else "out")
             # joue ou arrete la lecture du son
-            self.graphism.pause_audio(pause=self.have_focus)
+            self.graphism.pause_audio(pause=not self.have_focus)
         
         # si le menu options est ouvert
         if self.is_options_open:
@@ -144,7 +145,7 @@ class Game:
         
         # récupère les evenements en cours
         all_events = pygame.event.get()
-            
+        
         # balaye dans les évenements
         for event in all_events:
             if event.type == pygame.QUIT:
@@ -399,6 +400,14 @@ class Game:
                 elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
                     self.graphism.ask_texture_pack()
                     self.set_config_value("texture_pack", self.graphism.texture_pack)
+                
+                # bouton activer / desactiver la musique
+                elif self.graphism.play_music_button_rect.collidepoint(mouse_pos):
+                    # actions a faire
+                    self.graphism.reverse_play_music()
+                    self.graphism.update_play_music_buton_rect()
+                    self.set_config_value("do_play_music", self.graphism.do_play_music)
+                    self.graphism.pause_audio(not self.graphism.do_play_music)
                 
                 # bouton afficher / cacher les erreurs
                 elif self.graphism.display_errors_button_rect.collidepoint(mouse_pos):
