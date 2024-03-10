@@ -28,6 +28,9 @@ class Game:
         # indique si unue résolution est en cours
         self.is_solving = False
         
+        # indique sii la fenetre a le focus
+        self.have_focus = False
+        
         # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.load_config_file()
         # indique si l'affichage doit être fait pendant la résoltion // récupèrre ce paramètre dans config file
@@ -111,6 +114,13 @@ class Game:
         Met à jour l'affichage du jeu
         """
         
+        # met en pause la lecture de la musique ou la reprend en fonction du focus
+        if self.have_focus is not pygame.key.get_focused():
+            self.have_focus = pygame.key.get_focused()
+            print("focus", "in" if self.have_focus else "out")
+            # joue ou arrete la lecture du son
+            self.graphism.pause_audio(pause=self.have_focus)
+        
         # si le menu options est ouvert
         if self.is_options_open:
             self.update_options(do_display)
@@ -134,7 +144,7 @@ class Game:
         
         # récupère les evenements en cours
         all_events = pygame.event.get()
-        
+            
         # balaye dans les évenements
         for event in all_events:
             if event.type == pygame.QUIT:

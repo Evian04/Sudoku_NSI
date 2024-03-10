@@ -322,7 +322,10 @@ class Graphism:
         pygame.mixer.music.stop()
         # charge le nouveau son d'ambiance
         pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/" + filepath)
+        # lance la lecture infinie du son
         pygame.mixer.music.play(-1)
+        # met en pause la musique si play est sur False
+        self.pause_audio(True)
     
     def play_audio(self, repetitions: int = -1):
         """
@@ -330,7 +333,17 @@ class Graphism:
         :param repetitions: nombre de répétitions a faire pour ce son, -1 correspond à inifnie
         """
         pygame.mixer.music.play(repetitions)
-        
+    
+    def pause_audio(self, pause: bool):
+        """
+        Mettre en pause ou enlever la pause
+        :param pause: True, met en pause, False, remet la lecture
+        """
+        if pause:
+            pygame.mixer.music.unpause()
+        else:
+            pygame.mixer.music.pause()
+            
 
     def update_rect(self):
         """
