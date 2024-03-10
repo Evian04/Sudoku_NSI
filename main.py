@@ -1,6 +1,7 @@
-# libraires
+# Import de pygame
 import pygame
-# nos modules
+
+# Import des autres programmes
 from src.programs.game import Game
 
 # Initialisation de pygame
