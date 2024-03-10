@@ -500,7 +500,6 @@ class Graphism:
         """
         Mettre à jour le bouton afficher / cacher l'affichage durant la résolution uniquement
         """
-        print("update_display_solving_button_rect:", self.game.do_display_during_solving )
         self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
         
         self.display_solving_selected_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}_selected.png", self.options_buttons_dimensions)
@@ -791,7 +790,7 @@ class Graphism:
         # rectangle bouton afficher solution pendant résolution
         self.display_solving_button_rect = self.display_solving_button.get_rect()
         self.display_solving_button_rect.x = ref_coordinates[0]
-        self.display_solving_button_rect.y = ref_coordinates[1] + buttons_gap * 5
+        self.display_solving_button_rect.y = ref_coordinates[1] + buttons_gap * 6
         
         # image bouton quitter
         self.cross_options_button = self.load_image("buttons/options/cross.png", [self.options_buttons_dimensions[1] * (2 / 3)] * 2)
