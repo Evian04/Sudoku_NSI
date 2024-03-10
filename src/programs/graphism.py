@@ -309,8 +309,9 @@ class Graphism:
         :param dimensions: dimensions de sortie de l'image (redimensionnement)
         :return l'image redimensionnée spécifée dans `path`
         """
+        
         # image
-        image = pygame.image.load(f"src/graphics/{self.texture_pack}/{path}")
+        image = pygame.image.load(f"src/graphics/{self.texture_pack}/{filepath}")
         resized_image = pygame.transform.smoothscale(image, dimensions)
         return resized_image
     
@@ -319,10 +320,12 @@ class Graphism:
         Charge un fichier audio pour le jouer en tant que musique de fond
         :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
         """
+        
         # stop le son précédemment joué (s'il existe)
         pygame.mixer.music.stop()
+        
         # charge le nouveau son d'ambiance
-        pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/" + filepath)
+        pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/{filepath}")
         pygame.mixer.music.play(-1)
     
     def play_audio(self, repetitions: int = -1):
