@@ -28,6 +28,9 @@ class Game:
         # indique si unue résolution est en cours
         self.is_solving = False
         
+        # indique sii la fenetre a le focus
+        self.have_focus = False
+        
         # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.load_config_file()
         # indique si l'affichage doit être fait pendant la résoltion // récupèrre ce paramètre dans config file
@@ -43,7 +46,8 @@ class Game:
             self,  # passe game
             self.sudoku.grid.size,  # passe la taille de la grille
             self.get_config_value("texture_pack"),  # le texture pack actuel
-            self.get_config_value("do_display_conflicts")
+            self.get_config_value("do_display_conflicts"),
+            self.get_config_value("do_play_music")
             # la valeur qui indique si il faut afficher les cases en conflit
         )
         
@@ -110,6 +114,13 @@ class Game:
         """
         Met à jour l'affichage du jeu
         """
+        
+        # met en pause la lecture de la musique ou la reprend en fonction du focus
+        if self.have_focus is not pygame.key.get_focused():
+            self.have_focus = pygame.key.get_focused()
+            print("focus", "in" if self.have_focus else "out")
+            # joue ou arrete la lecture du son
+            self.graphism.pause_audio(pause=not self.have_focus)
         
         # si le menu options est ouvert
         if self.is_options_open:
@@ -389,6 +400,14 @@ class Game:
                 elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
                     self.graphism.ask_texture_pack()
                     self.set_config_value("texture_pack", self.graphism.texture_pack)
+                
+                # bouton activer / desactiver la musique
+                elif self.graphism.play_music_button_rect.collidepoint(mouse_pos):
+                    # actions a faire
+                    self.graphism.reverse_play_music()
+                    self.graphism.update_play_music_buton_rect()
+                    self.set_config_value("do_play_music", self.graphism.do_play_music)
+                    self.graphism.pause_audio(not self.graphism.do_play_music)
                 
                 # bouton afficher / cacher les erreurs
                 elif self.graphism.display_errors_button_rect.collidepoint(mouse_pos):

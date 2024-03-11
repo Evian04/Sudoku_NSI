@@ -11,7 +11,7 @@ class Graphism:
     La classe "Graphism" permet de gérer l'affichage des éléments sur la fenêtre
     """
     
-    def __init__(self, game, grid_size: int, texture_pack: str, do_display_conflicts: bool):
+    def __init__(self, game, grid_size: int, texture_pack: str, do_display_conflicts: bool, do_play_music: bool):
         self.screen: pygame.Surface = game.screen
         self.game = game
         
@@ -19,7 +19,9 @@ class Graphism:
         self.square_size = int(self.grid_size ** 0.5)
         
         self.texture_pack = texture_pack
+        self.do_play_music = do_play_music
         self.do_display_conflicts = do_display_conflicts
+        
 
     def update_grid_attributes(self, size: int):
         """
@@ -33,8 +35,13 @@ class Graphism:
         """
         Cette fonction inverse l'état de la variable booléenne "self.do_display_conflicts"
         """
-        
         self.do_display_conflicts = not self.do_display_conflicts
+    
+    def reverse_play_music(self):
+        """
+        Cette fonction inverse l'état de la variable booléenne "self.do_play_music"
+        """
+        self.do_play_music = not self.do_play_music
     
     def ask_texture_pack(self):
         """
@@ -236,7 +243,13 @@ class Graphism:
             self.screen.blit(self.change_textures_selected_button, self.change_textures_button_rect)
         else:
             self.screen.blit(self.change_textures_button, self.change_textures_button_rect)
-            
+        
+        # bouton activer / désactiver la musique
+        if self.play_music_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.play_music_button, self.play_music_button_rect)
+        else:
+            self.screen.blit(self.play_music_button, self.play_music_button_rect)
+        
         # bouton afficher / cacher les erreurs
         if self.display_errors_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.display_errors_selected_button, self.display_errors_button_rect)
@@ -325,10 +338,15 @@ class Graphism:
         pygame.mixer.music.stop()
         
         # charge le nouveau son d'ambiance
-        pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/{filepath}")
+        pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/" + filepath)
+        # lance la lecture infinie du son
         pygame.mixer.music.play(-1)
-        
+
+        # régler le volume (echelle de 0 à 1)
         pygame.mixer.music.set_volume(0.1)
+        
+        # met en pasue la musique (réactivation de la lecture en fonction du focus de la fenêtre)
+        self.pause_audio(False)
     
     def play_audio(self, repetitions: int = -1):
         """
@@ -336,7 +354,17 @@ class Graphism:
         :param repetitions: nombre de répétitions a faire pour ce son, -1 correspond à inifnie
         """
         pygame.mixer.music.play(repetitions)
-        
+    
+    def pause_audio(self, pause: bool):
+        """
+        Mettre en pause ou enlever la pause
+        :param pause: True, met en pause, False, remet la lecture
+        """
+        if not pause and self.do_play_music:
+            pygame.mixer.music.unpause()
+        else:
+            pygame.mixer.music.pause()
+            
 
     def update_rect(self):
         """
@@ -452,6 +480,14 @@ class Graphism:
         
         self.game_mode_selected_button = self.load_image(f"buttons/options/game_mode_{self.game.sudoku.game_mode}_selected.png", self.options_buttons_dimensions)
     
+    def update_play_music_buton_rect(self):
+        """
+        Mettre à jour le bouton activer / désactiver la musique uniquement
+        """
+        self.play_music_button = self.load_image(f"buttons/options/play_music_{'on' if self.do_play_music else 'off'}.png", self.options_buttons_dimensions)
+    
+        self.play_music_selected_button = self.load_image(f"buttons/options/play_music_{'on' if self.do_play_music else 'off'}_selected.png", self.options_buttons_dimensions)
+    
     def update_display_errors_button_rect(self):
         """
         Mettre à jour le bouton afficher / cacher les erreurs uniquement
@@ -464,7 +500,6 @@ class Graphism:
         """
         Mettre à jour le bouton afficher / cacher l'affichage durant la résolution uniquement
         """
-        print("update_display_solving_button_rect:", self.game.do_display_during_solving )
         self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
         
         self.display_solving_selected_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}_selected.png", self.options_buttons_dimensions)
@@ -675,7 +710,7 @@ class Graphism:
         ]
         
         # espace vertical entre les boutons
-        buttons_gap = (self.rect_ref_distance - self.options_buttons_dimensions[1]) / 5
+        buttons_gap = (self.rect_ref_distance - self.options_buttons_dimensions[1]) / 6
         
         # redimensionnement du bouton dimensions
         self.dimensions_button = pygame.transform.smoothscale(self.dimensions_button, self.options_buttons_dimensions)
@@ -721,6 +756,20 @@ class Graphism:
         self.change_textures_button_rect.x = ref_coordinates[0]
         self.change_textures_button_rect.y = ref_coordinates[1] + buttons_gap * 3
         
+        # image bouton activer musique
+        self.play_music_button = self.load_image(f"buttons/options/play_music_{'on' if self.do_play_music else 'off'}.png",
+            self.options_buttons_dimensions)
+        
+        # image bouton activer musique sélectionnée
+        self.play_music_selected_button = self.load_image(f"buttons/options/play_music_{'on' if self.do_play_music else 'off'}_selected.png",
+            self.options_buttons_dimensions)
+        
+        # rectangle bouton activer musique
+        # rectangle bouton afficher erreurs
+        self.play_music_button_rect = self.play_music_button.get_rect()
+        self.play_music_button_rect.x = ref_coordinates[0]
+        self.play_music_button_rect.y = ref_coordinates[1] + buttons_gap * 4
+
         # image bouton afficher erreurs
         self.display_errors_button = self.load_image(f"buttons/options/display_errors_{'on' if self.do_display_conflicts else 'off'}.png", self.options_buttons_dimensions)
         
@@ -730,7 +779,7 @@ class Graphism:
         # rectangle bouton afficher erreurs
         self.display_errors_button_rect = self.display_errors_button.get_rect()
         self.display_errors_button_rect.x = ref_coordinates[0]
-        self.display_errors_button_rect.y = ref_coordinates[1] + buttons_gap * 4
+        self.display_errors_button_rect.y = ref_coordinates[1] + buttons_gap * 5
         
         # image bouton afficher solution pendant résolution
         self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
@@ -741,7 +790,7 @@ class Graphism:
         # rectangle bouton afficher solution pendant résolution
         self.display_solving_button_rect = self.display_solving_button.get_rect()
         self.display_solving_button_rect.x = ref_coordinates[0]
-        self.display_solving_button_rect.y = ref_coordinates[1] + buttons_gap * 5
+        self.display_solving_button_rect.y = ref_coordinates[1] + buttons_gap * 6
         
         # image bouton quitter
         self.cross_options_button = self.load_image("buttons/options/cross.png", [self.options_buttons_dimensions[1] * (2 / 3)] * 2)

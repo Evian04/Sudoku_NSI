@@ -11,7 +11,7 @@ def test_errors(sudoku_size = 0, **arguments):
     # liste des valeurs possibles pour les sudokus (valeurs maximales)
     possible_values = "123456789ABCDEFG"
     # listes de toutes les clés possible pour le fichier de configuration
-    all_config_keys = ["texture_pack", "do_display_conflicts", "do_display_during_solving"]
+    all_config_keys = ["texture_pack", "do_play_music", "do_display_conflicts", "do_display_during_solving"]
 
     # test taille sudoku
     assert type(sudoku_size) == int, f'The "sudoku_size" argument must be an integer (type : {type(sudoku_size)})'
@@ -167,7 +167,7 @@ def test_errors(sudoku_size = 0, **arguments):
         
         assert type(config_key) == str, f'The "config_key" argument must be a string (type : {type(config_key)})'
         assert config_key in all_config_keys, \
-            f'The "config_key" argument must be "texture_pack", "do_display_conflicts" or "do_display_during_solvings" (value : {config_key})'
+            f'The "config_key" argument must be "texture_pack", "do_play_music", "do_display_conflicts" or "do_display_during_solvings" (value : {config_key})'
 
     # test validité valeur du fichier de configuration - nécessite `config_key`
     if "config_value" in arguments:
