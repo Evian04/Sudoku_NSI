@@ -24,4 +24,4 @@ while not game.do_quit:
     game.update()
 
 pygame.quit()
-print("Programed quitted")
+print("Program quitted")
