@@ -420,7 +420,12 @@ class Game:
                     self.do_display_during_solving = not self.do_display_during_solving
                     self.graphism.update_display_solving_button_rect()
                     self.set_config_value("do_display_during_solving", self.do_display_during_solving)
-    
+            
+            elif event.type == pygame.KEYDOWN:
+                
+                if event.key == pygame.K_ESCAPE:
+                    self.is_options_open = False
+        
     def cell_update(self, coordinates: tuple[int, int], do_display: bool = True):
         """
         Met à jour une case uniquement (gain de performance), utilisée lors de la résolution

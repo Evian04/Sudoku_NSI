@@ -2,7 +2,7 @@
 import pygame
 import os
 from tkinter.filedialog import askdirectory
-from typing import Union
+
 # nos modules
 from src.programs.test_errors import test_errors
 
@@ -66,8 +66,59 @@ class Graphism:
         self.texture_pack = path
         # met à jour l'affichage
         self.update_rect()
-        #
     
+    
+    def load_image(self, filepath: str, dimensions: list[int, int] | list[float]) -> pygame.Surface:
+        """
+        Charge une image redimensionnnée à la bonne taille de puis un chemin d'accès
+        :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
+        :param dimensions: dimensions de sortie de l'image (redimensionnement)
+        :return l'image redimensionnée spécifée dans `path`
+        """
+        
+        # image
+        image = pygame.image.load(f"src/graphics/{self.texture_pack}/{filepath}")
+        resized_image = pygame.transform.smoothscale(image, dimensions)
+        return resized_image
+    
+    def load_audio(self, filepath: str):
+        """
+        Charge un fichier audio pour le jouer en tant que musique de fond
+        :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
+        """
+        
+        # stop le son précédemment joué (s'il existe)
+        pygame.mixer.music.stop()
+        
+        # charge le nouveau son d'ambiance
+        pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/" + filepath)
+        # lance la lecture infinie du son
+        pygame.mixer.music.play(-1)
+
+        # régler le volume (echelle de 0 à 1)
+        pygame.mixer.music.set_volume(0.1)
+        
+        # met en pasue la musique (réactivation de la lecture en fonction du focus de la fenêtre)
+        self.pause_audio(False)
+    
+    def play_audio(self, repetitions: int = -1):
+        """
+        Jouer le son d'ambiance
+        :param repetitions: nombre de répétitions a faire pour ce son, -1 correspond à inifnie
+        """
+        pygame.mixer.music.play(repetitions)
+    
+    def pause_audio(self, pause: bool):
+        """
+        Mettre en pause ou enlever la pause
+        :param pause: True, met en pause, False, remet la lecture
+        """
+        if not pause and self.do_play_music:
+            pygame.mixer.music.unpause()
+        else:
+            pygame.mixer.music.pause()
+
+
     def display_start_elements(self):
         """
         Affiche les éléments du menu de démarrage
@@ -219,7 +270,7 @@ class Graphism:
             self.screen.blit(self.cross_selected_options_button, self.cross_options_button_rect)
         else:
             self.screen.blit(self.cross_options_button, self.cross_options_button_rect)
-
+        
         # boutons dimension
         if self.dimensions_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.dimensions_selected_button, self.dimensions_button_rect)
@@ -313,58 +364,8 @@ class Graphism:
         self.screen.blit(
             digit_image,
             self.all_cell_rect[x][y]
-        )
-    
-    def load_image(self, filepath: str, dimensions: Union[list[int, int], list[float]]) -> pygame.Surface:
-        """
-        Charge une image redimensionnnée à la bonne taille de puis un chemin d'accès
-        :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
-        :param dimensions: dimensions de sortie de l'image (redimensionnement)
-        :return l'image redimensionnée spécifée dans `path`
-        """
-        
-        # image
-        image = pygame.image.load(f"src/graphics/{self.texture_pack}/{filepath}")
-        resized_image = pygame.transform.smoothscale(image, dimensions)
-        return resized_image
-    
-    def load_audio(self, filepath: str):
-        """
-        Charge un fichier audio pour le jouer en tant que musique de fond
-        :param filepath: chemin de l'image depuis le chemin relatif `src/graphics/{texture_pack}/`
-        """
-        
-        # stop le son précédemment joué (s'il existe)
-        pygame.mixer.music.stop()
-        
-        # charge le nouveau son d'ambiance
-        pygame.mixer.music.load(f"src/graphics/{self.texture_pack}/" + filepath)
-        # lance la lecture infinie du son
-        pygame.mixer.music.play(-1)
+        ) 
 
-        # régler le volume (echelle de 0 à 1)
-        pygame.mixer.music.set_volume(0.1)
-        
-        # met en pasue la musique (réactivation de la lecture en fonction du focus de la fenêtre)
-        self.pause_audio(False)
-    
-    def play_audio(self, repetitions: int = -1):
-        """
-        Jouer le son d'ambiance
-        :param repetitions: nombre de répétitions a faire pour ce son, -1 correspond à inifnie
-        """
-        pygame.mixer.music.play(repetitions)
-    
-    def pause_audio(self, pause: bool):
-        """
-        Mettre en pause ou enlever la pause
-        :param pause: True, met en pause, False, remet la lecture
-        """
-        if not pause and self.do_play_music:
-            pygame.mixer.music.unpause()
-        else:
-            pygame.mixer.music.pause()
-            
 
     def update_rect(self):
         """
@@ -388,8 +389,8 @@ class Graphism:
         else:
             background_dimensions = [self.screen.get_height()] * 2
         
-        #
-        self.rect_ref_distance *= 0.9
+        # Permet que les bouttons ne soient pas collés au bord de la fenêtre
+        self.rect_ref_distance *= 0.95
         # Ratio entre la longueur du grand carré et de la marge
         self.outline_thickness = self.rect_ref_distance / 30
         
@@ -407,7 +408,10 @@ class Graphism:
         
         # chargemement et lecture du son d'ambiance
         self.load_audio("audio/background_music.mp3")
-        self.play_audio()
+        
+        # Lancer la musique
+        if self.do_play_music:
+            self.play_audio()
         
         # image fond d'écran
         self.background = self.load_image("background.png", background_dimensions)
@@ -492,6 +496,7 @@ class Graphism:
         """
         Mettre à jour le bouton afficher / cacher les erreurs uniquement
         """
+        
         self.display_errors_button = self.load_image(f"buttons/options/display_errors_{'on' if self.do_display_conflicts else 'off'}.png", self.options_buttons_dimensions)
         
         self.display_errors_selected_button = self.load_image(f"buttons/options/display_errors_{'on' if self.do_display_conflicts else 'off'}_selected.png", self.options_buttons_dimensions)
@@ -699,18 +704,18 @@ class Graphism:
         
         # dimensions des boutons
         self.options_buttons_dimensions = [
-            self.rect_ref_distance - self.outline_thickness,
-            (self.rect_ref_distance - self.outline_thickness) * self.dimensions_button.get_height() / self.dimensions_button.get_width()
-        ]
-        
-        # coordonnées des boutons
-        ref_coordinates = [
-            self.screen.get_width() / 2 - self.options_buttons_dimensions[0] / 2,
-            self.screen.get_height() / 2 - self.rect_ref_distance / 2
+            (self.rect_ref_distance - self.outline_thickness) * (3 / 4),
+            (self.rect_ref_distance - self.outline_thickness) * (3 / 4) * self.dimensions_button.get_height() / self.dimensions_button.get_width()
         ]
         
         # espace vertical entre les boutons
-        buttons_gap = (self.rect_ref_distance - self.options_buttons_dimensions[1]) / 6
+        buttons_gap = (self.rect_ref_distance - self.options_buttons_dimensions[1]) / 5
+        
+        # coordonnées de référence des boutons de la colonne de gauche
+        ref_coordinates_left = [
+            self.screen.get_width() / 2 - self.rect_ref_distance * (3 / 4),
+            self.screen.get_height() / 2 - self.rect_ref_distance / 2
+        ]
         
         # redimensionnement du bouton dimensions
         self.dimensions_button = pygame.transform.smoothscale(self.dimensions_button, self.options_buttons_dimensions)
@@ -720,30 +725,8 @@ class Graphism:
         
         # rectangle bouton dimensions
         self.dimensions_button_rect = self.dimensions_button.get_rect()
-        self.dimensions_button_rect.x = ref_coordinates[0]
-        self.dimensions_button_rect.y = ref_coordinates[1]
-        
-        # image bouton générer
-        self.generate_button = self.load_image("buttons/options/generate.png", self.options_buttons_dimensions)
-        
-        # image bouton générer sélectionnée
-        self.generate_selected_button = self.load_image("buttons/options/generate_selected.png", self.options_buttons_dimensions)
-        
-        # rectangle  bouton générer
-        self.generate_button_rect = self.generate_button.get_rect()
-        self.generate_button_rect.x = ref_coordinates[0]
-        self.generate_button_rect.y = ref_coordinates[1] + buttons_gap
-        
-        # image bouton mode de jeu
-        self.game_mode_button = self.load_image(f"buttons/options/game_mode_{self.game.sudoku.game_mode}.png", self.options_buttons_dimensions)
-        
-        # image bouton mode de jeu sélectionnée
-        self.game_mode_selected_button = self.load_image(f"buttons/options/game_mode_{self.game.sudoku.game_mode}_selected.png", self.options_buttons_dimensions)
-        
-        # rectangle mode de jeu
-        self.game_mode_button_rect = self.game_mode_button.get_rect()
-        self.game_mode_button_rect.x = ref_coordinates[0]
-        self.game_mode_button_rect.y = ref_coordinates[1] + buttons_gap * 2
+        self.dimensions_button_rect.x = ref_coordinates_left[0]
+        self.dimensions_button_rect.y = ref_coordinates_left[1] + buttons_gap
         
         # image textures pack
         self.change_textures_button = self.load_image("buttons/options/change_textures.png", self.options_buttons_dimensions)
@@ -753,8 +736,37 @@ class Graphism:
         
         # rectangle textures pack
         self.change_textures_button_rect = self.change_textures_button.get_rect()
-        self.change_textures_button_rect.x = ref_coordinates[0]
-        self.change_textures_button_rect.y = ref_coordinates[1] + buttons_gap * 3
+        self.change_textures_button_rect.x = ref_coordinates_left[0]
+        self.change_textures_button_rect.y = ref_coordinates_left[1] + buttons_gap * 2
+        
+        # image bouton générer
+        self.generate_button = self.load_image("buttons/options/generate.png", self.options_buttons_dimensions)
+        
+        # image bouton générer sélectionnée
+        self.generate_selected_button = self.load_image("buttons/options/generate_selected.png", self.options_buttons_dimensions)
+        
+        # rectangle bouton générer
+        self.generate_button_rect = self.generate_button.get_rect()
+        self.generate_button_rect.x = ref_coordinates_left[0]
+        self.generate_button_rect.y = ref_coordinates_left[1] + buttons_gap * 3
+        
+        
+        # coordonnées de référence des boutons de la colonne de droite
+        ref_coordinates_right = [
+            self.screen.get_width() / 2 + self.rect_ref_distance * (3 / 4) - self.options_buttons_dimensions[0],
+            self.screen.get_height() / 2 - self.rect_ref_distance / 2
+        ]
+        
+        # image bouton mode de jeu
+        self.game_mode_button = self.load_image(f"buttons/options/game_mode_{self.game.sudoku.game_mode}.png", self.options_buttons_dimensions)
+        
+        # image bouton mode de jeu sélectionnée
+        self.game_mode_selected_button = self.load_image(f"buttons/options/game_mode_{self.game.sudoku.game_mode}_selected.png", self.options_buttons_dimensions)
+        
+        # rectangle mode de jeu
+        self.game_mode_button_rect = self.game_mode_button.get_rect()
+        self.game_mode_button_rect.x = ref_coordinates_right[0]
+        self.game_mode_button_rect.y = ref_coordinates_right[1] + buttons_gap
         
         # image bouton activer musique
         self.play_music_button = self.load_image(f"buttons/options/play_music_{'on' if self.do_play_music else 'off'}.png",
@@ -765,10 +777,9 @@ class Graphism:
             self.options_buttons_dimensions)
         
         # rectangle bouton activer musique
-        # rectangle bouton afficher erreurs
         self.play_music_button_rect = self.play_music_button.get_rect()
-        self.play_music_button_rect.x = ref_coordinates[0]
-        self.play_music_button_rect.y = ref_coordinates[1] + buttons_gap * 4
+        self.play_music_button_rect.x = ref_coordinates_right[0]
+        self.play_music_button_rect.y = ref_coordinates_right[1] + buttons_gap * 2
 
         # image bouton afficher erreurs
         self.display_errors_button = self.load_image(f"buttons/options/display_errors_{'on' if self.do_display_conflicts else 'off'}.png", self.options_buttons_dimensions)
@@ -778,8 +789,8 @@ class Graphism:
         
         # rectangle bouton afficher erreurs
         self.display_errors_button_rect = self.display_errors_button.get_rect()
-        self.display_errors_button_rect.x = ref_coordinates[0]
-        self.display_errors_button_rect.y = ref_coordinates[1] + buttons_gap * 5
+        self.display_errors_button_rect.x = ref_coordinates_right[0]
+        self.display_errors_button_rect.y = ref_coordinates_right[1] + buttons_gap * 3
         
         # image bouton afficher solution pendant résolution
         self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
@@ -789,8 +800,9 @@ class Graphism:
         
         # rectangle bouton afficher solution pendant résolution
         self.display_solving_button_rect = self.display_solving_button.get_rect()
-        self.display_solving_button_rect.x = ref_coordinates[0]
-        self.display_solving_button_rect.y = ref_coordinates[1] + buttons_gap * 6
+        self.display_solving_button_rect.x = ref_coordinates_right[0]
+        self.display_solving_button_rect.y = ref_coordinates_right[1] + buttons_gap * 4
+        
         
         # image bouton quitter
         self.cross_options_button = self.load_image("buttons/options/cross.png", [self.options_buttons_dimensions[1] * (2 / 3)] * 2)
@@ -800,5 +812,5 @@ class Graphism:
         
         # rectangle quitter
         self.cross_options_button_rect = self.cross_options_button.get_rect()
-        self.cross_options_button_rect.x = self.outline_thickness * 2
-        self.cross_options_button_rect.y = ref_coordinates[1] * (4/3)
+        self.cross_options_button_rect.x = self.screen.get_width() / 2 - self.cross_options_button.get_width() / 2
+        self.cross_options_button_rect.y = ref_coordinates_left[1]
