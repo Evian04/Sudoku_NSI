@@ -28,8 +28,8 @@ class Game:
         # indique si unue résolution est en cours
         self.is_solving = False
         
-        # indique sii la fenetre a le focus
-        self.have_focus = False
+        # indique si la fenetre a le focus
+        self.is_window_focused = False
         
         # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.load_config_file()
@@ -116,11 +116,11 @@ class Game:
         """
         
         # met en pause la lecture de la musique ou la reprend en fonction du focus
-        if self.have_focus is not pygame.key.get_focused():
-            self.have_focus = pygame.key.get_focused()
-            print("focus", "in" if self.have_focus else "out")
+        if self.is_window_focused is not pygame.key.get_focused():
+            self.is_window_focused = pygame.key.get_focused()
+            print("focus", "in" if self.is_window_focused else "out")
             # joue ou arrete la lecture du son
-            self.graphism.pause_audio(pause=not self.have_focus)
+            self.graphism.pause_audio(pause=not self.is_window_focused)
         
         # si le menu options est ouvert
         if self.is_options_open:

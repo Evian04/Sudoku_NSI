@@ -257,7 +257,7 @@ class Graphism:
         """
         Permet d'afficher les élément du menu d'options à l'écran
         """
-        
+        pass
         # Affichage du fond d'écran
         self.screen.blit(self.background, self.background_rect)
         
@@ -275,6 +275,7 @@ class Graphism:
         if self.dimensions_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.dimensions_selected_button, self.dimensions_button_rect)
         else:
+            
             self.screen.blit(self.dimensions_button, self.dimensions_button_rect)
             
         # bouton générer
@@ -300,7 +301,6 @@ class Graphism:
             self.screen.blit(self.play_music_button, self.play_music_button_rect)
         else:
             self.screen.blit(self.play_music_button, self.play_music_button_rect)
-        
         # bouton afficher / cacher les erreurs
         if self.display_errors_button_rect.collidepoint(mouse_pos):
             self.screen.blit(self.display_errors_selected_button, self.display_errors_button_rect)
