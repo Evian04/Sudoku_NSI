@@ -17,7 +17,7 @@ game = Game(screen)
 # boucle permettant au jeu de fonctionner, boucle infinie sous condition
 while not game.do_quit:
     
-    # Limitation du nombre d'image par secondes
+    # Limitation à 60 images par seconde
     pygame.time.Clock().tick(60)
     
     # Mettre à jour le jeu

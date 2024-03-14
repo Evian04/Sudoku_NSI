@@ -117,10 +117,14 @@ class Game:
         
         # met en pause la lecture de la musique ou la reprend en fonction du focus
         if self.is_window_focused is not pygame.key.get_focused():
-            self.is_window_focused = pygame.key.get_focused()
+            self.is_window_focused:bool  = pygame.key.get_focused()
             print("focus", "in" if self.is_window_focused else "out")
             # joue ou arrete la lecture du son
             self.graphism.pause_audio(pause=not self.is_window_focused)
+        
+        # si la fenetre n'a pas le focus, n'affiche pas les élements (économie ressources)
+        if not self.is_window_focused:
+            do_display = False
         
         # si le menu options est ouvert
         if self.is_options_open:
@@ -133,7 +137,8 @@ class Game:
         # sii le menu normal (grille) est ouvert
         elif self.current_menu == "game":
             self.update_game(do_display)
-    
+
+
     def update_start(self, do_display: bool):
         """
         Met à jour l'état du jeu lorsque le menu de démarrage est ouvert
