@@ -144,10 +144,6 @@ class Game:
         Met à jour l'état du jeu lorsque le menu de démarrage est ouvert
         """
         
-        # si on souahite afficher
-        if do_display:
-            self.graphism.display_start_elements()
-        
         # récupère les evenements en cours
         all_events = pygame.event.get()
         
@@ -159,11 +155,13 @@ class Game:
             
             # Si la fenètre est redimensionnée
             if event.type == pygame.WINDOWRESIZED:
+                do_display = True
                 # Mettre à jour la position / dimensions des éléments de la fenêtre
                 self.graphism.update_rect()
                 pygame.display.flip()
             
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+                do_display = True
                 # si l'evenement est de type appui de bouton souris
                 mouse_pos = pygame.mouse.get_pos()
                 
@@ -182,14 +180,15 @@ class Game:
                 elif self.graphism.quit_button_rect.collidepoint(mouse_pos):
                     self.do_quit = True
                     return
-    
+
+        # si on souahite afficher
+        if do_display:
+            self.graphism.display_start_elements()
+
     def update_game(self, do_display: bool):
         """
         Met à jour l'état du jeu lorsque le menu de jeu est affiché
         """
-        
-        if do_display:
-            self.graphism.display_game_elements()
         
         all_events = pygame.event.get()
         # boolean qui indique si une touche controle est pressé
@@ -204,6 +203,7 @@ class Game:
             
             # Si la fenètre est redimensionnée
             elif event.type == pygame.WINDOWRESIZED:
+                do_display = True
                 # Mettre à jour la position / dimensions des éléments de la fenêtre
                 self.graphism.update_rect()
                 pygame.display.flip()
@@ -214,7 +214,7 @@ class Game:
             
             # Si l'utilisateur clique sur l'écran
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                
+                do_display = True
                 mouse_pos = pygame.mouse.get_pos()
                 
                 # S'il s'agit d'un clique gauche
@@ -287,6 +287,7 @@ class Game:
             
             # si une touche est pressée
             if event.type == pygame.KEYDOWN:
+                do_display = True
                 # touche Echap
                 if event.key == pygame.K_ESCAPE:
                     if self.is_options_open:
@@ -341,14 +342,15 @@ class Game:
                     
                     # vérifie si cette valeur entre en conflit avec d'autres valeurs de la grille
                     self.sudoku.verify_grid()
-    
+
+        if do_display:
+            self.graphism.display_game_elements()
+
     def update_options(self, do_display: bool):
         """
         Met à jour l'état du jeu lorsque le menu d'options est ouvert
         """
         
-        if do_display:
-            self.graphism.display_options_elements()
         all_events = pygame.event.get()
         
         # balayer dans les evenements
@@ -359,13 +361,14 @@ class Game:
             
             # Si la fenètre est redimensionnée
             if event.type == pygame.WINDOWRESIZED:
+                do_display = True
                 # Mettre à jour la position / dimensions des éléments de la fenêtre
                 self.graphism.update_rect()
                 pygame.display.flip()
             
             # clic gauche
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
-                
+                do_display = True
                 mouse_pos = pygame.mouse.get_pos()
                 
                 # croix pour quitter le menu options
@@ -433,9 +436,12 @@ class Game:
                     self.set_config_value("do_display_during_solving", self.do_display_during_solving)
             
             elif event.type == pygame.KEYDOWN:
-                
                 if event.key == pygame.K_ESCAPE:
+                    do_display = True
                     self.is_options_open = False
+                    
+        if do_display:
+            self.graphism.display_options_elements()
         
     def cell_update(self, coordinates: tuple[int, int], do_display: bool = True):
         """
@@ -443,9 +449,6 @@ class Game:
         """
         
         test_errors(self.sudoku.grid.size, coordinates=coordinates)
-        
-        if do_display:
-            self.graphism.display_cell_elements(coordinates)
         
         all_events = pygame.event.get()
         
@@ -455,8 +458,13 @@ class Game:
                 return False
             
             if event.type == pygame.WINDOWRESIZED:
+                do_display = True
                 self.graphism.update_rect()
                 self.graphism.display_game_elements()
+                
+
+        if do_display:
+            self.graphism.display_cell_elements(coordinates)
     
     def open_file(self, filepath: str) -> bool:
         """
