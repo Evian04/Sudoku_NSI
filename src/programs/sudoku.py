@@ -317,7 +317,7 @@ class Sudoku:
         Fonction utilisée lors du chargement / génération d'une nouvelle grille / ouverture d'une nouvelle grille
         """
         
-        self.history = [self.grid.copy()]
+        self.history = [(self.grid.copy(), (-1, -1))]
         self.history_index = 0
     
     def new_empty_grid(self, grid_size: int):
@@ -682,6 +682,9 @@ class Sudoku:
         else:
             print("Cannot solve the sudoku")
             print(f'Solving executing time: {round(time.time() - starting_time, 2)}s')
+        
+        # Enregistrer la grille dans l'historique
+        self.save_grid_in_history()
         
         # met à jour le titre
         self.game.update_title()

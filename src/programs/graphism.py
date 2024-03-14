@@ -813,4 +813,4 @@ class Graphism:
         # rectangle quitter
         self.cross_options_button_rect = self.cross_options_button.get_rect()
         self.cross_options_button_rect.x = self.screen.get_width() / 2 - self.cross_options_button.get_width() / 2
-        self.cross_options_button_rect.y = ref_coordinates_left[1]
+        self.cross_options_button_rect.y = ref_coordinates_left[1] + self.options_buttons_dimensions[1] / 2 - self.cross_options_button.get_height() / 2
