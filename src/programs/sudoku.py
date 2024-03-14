@@ -333,7 +333,7 @@ class Sudoku:
         if not self.is_grid_saved and not self.grid.is_empty():
             do_save = askyesnocancel(
                 "Sauvegarder la grille",
-                f"Une nouvelle grille vierge de taille {grid_size}x{grid_size} va être générer et les données de la grille actuelle seront définitivement perdues.\nVoulez-vous sauvegarder la grille ?"
+                f"Une nouvelle grille de taille {grid_size}x{grid_size} va être générer et les données de la grille actuelle seront définitivement perdues.\nVoulez-vous sauvegarder la grille ?"
             )
             
             # si l'utilisateur a cliqué sur cancel, sur la croix ou sur non
@@ -527,33 +527,15 @@ class Sudoku:
         # Test préconditions
         test_errors(frequency=cell_frequency)
         
-        # demande si l'utilisateur veut sauvegarder la grille
-        if not self.is_grid_saved and len(
-                self.grid.get_all_empty_cells()) < self.grid.cells_count:  # verifie si la grille contient des données
-            do_save = askyesnocancel(
-                "Sauvegarde",
-                "Voulez vous générer une nouvelle grille sans sauvegarder ?\nLes données non sauvegardées seront perdues"
-            )
-            
-            # Boutton annuler, croix ou non
-            if do_save is None:
-                return
-            
-            # Boutton oui
-            if do_save:
-                self.save_grid()
-        
         print("generating...")
-        # quitter le menu options
-        self.game.is_options_open = False
-        self.game.update()
         
         # met à jour le titre de la fenêtre
         self.game.update_title("Génération ...")
         starting_time = time.time()
         
-        # Génère une nouvelle grille vide
-        self.new_empty_grid(self.grid.size)
+        # Génère une nouvelle grille vide, ne fait rien si l'action a été annulée
+        if not self.new_empty_grid(self.grid.size):
+            return False
         
         # génère une grille complète et valide aléatoirement
         self.backtracking_solving(False, do_choice_randomly=True)
@@ -629,7 +611,7 @@ class Sudoku:
         # met à jour le titre de la fenêtre
         self.game.update_title()
         # met à jour l'affichage
-        self.game.update()
+        #self.game.update()
         
         # calcul temps d'execution - informatif
         executing_time = round(time.time() - starting_time, 2)
@@ -648,6 +630,9 @@ class Sudoku:
                 f"{' ' * 20}cases restantes: {remaining_cells} cases ({percentage}%)\n"
                 f"{' ' * 100}"
             )
+        
+        # Sauvegarde de la grille dans l'historique
+        self.save_grid_in_history()
     
     def solve_grid(self, do_display: bool = True):
         """

@@ -387,6 +387,12 @@ class Game:
                 
                 # bouton générer
                 elif self.graphism.generate_button_rect.collidepoint(mouse_pos):
+                    
+                    # quitter le menu options
+                    self.is_options_open = False
+                    self.current_menu = "game"
+                    self.graphism.display_game_elements()
+                    
                     self.sudoku.generate_grid(0.5)
                     self.sudoku.verify_grid()
                 
