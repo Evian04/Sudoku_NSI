@@ -110,10 +110,16 @@ class Game:
             # défini le nom à partir de l'argument
             pygame.display.set_caption(title)
     
-    def update(self, do_display: bool = True):
+    def update(self):
         """
         Met à jour l'affichage du jeu
         """
+    
+        # si la souris est immobile, ne met pas à jour l'affichage du jeu
+        if pygame.mouse.get_rel() == (0, 0):
+            do_display = False
+            
+        else: do_display = True
         
         # met en pause la lecture de la musique ou la reprend en fonction du focus
         if self.is_window_focused is not pygame.key.get_focused():

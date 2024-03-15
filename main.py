@@ -20,15 +20,9 @@ while not game.do_quit:
     
     # Limitation à 60 images par seconde
     pygame.time.Clock().tick(60)
-    
-    
-    # si la souris est immobile, ne met pas à jour l'afifchage du jeu'
-    if pygame.mouse.get_rel() == (0, 0):
-        do_display = False
-    else: do_display = True
 
     # Mettre à jour le jeu
-    game.update(do_display)
+    game.update()
 
 pygame.quit()
 print("Program closed")
