@@ -96,7 +96,7 @@ class Graphism:
         pygame.mixer.music.play(-1)
 
         # régler le volume (echelle de 0 à 1)
-        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.set_volume(0.2)
         
         # met en pasue la musique (réactivation de la lecture en fonction du focus de la fenêtre)
         self.pause_audio(False)

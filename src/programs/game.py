@@ -110,20 +110,14 @@ class Game:
             # défini le nom à partir de l'argument
             pygame.display.set_caption(title)
     
-    def update(self):
+    def update(self, do_display:bool=True):
         """
         Met à jour l'affichage du jeu
         """
-    
-        # si la souris est immobile, ne met pas à jour l'affichage du jeu
-        if pygame.mouse.get_rel() == (0, 0):
-            do_display = False
-            
-        else: do_display = True
         
         # met en pause la lecture de la musique ou la reprend en fonction du focus
         if self.is_window_focused is not pygame.key.get_focused():
-            self.is_window_focused:bool  = pygame.key.get_focused()
+            self.is_window_focused: bool = pygame.key.get_focused()
             print("focus", "in" if self.is_window_focused else "out")
             # joue ou arrete la lecture du son
             self.graphism.pause_audio(pause=not self.is_window_focused)
@@ -143,8 +137,7 @@ class Game:
         # sii le menu normal (grille) est ouvert
         elif self.current_menu == "game":
             self.update_game(do_display)
-
-
+    
     def update_start(self, do_display: bool):
         """
         Met à jour l'état du jeu lorsque le menu de démarrage est ouvert
@@ -186,11 +179,11 @@ class Game:
                 elif self.graphism.quit_button_rect.collidepoint(mouse_pos):
                     self.do_quit = True
                     return
-
+        
         # si on souahite afficher
         if do_display:
             self.graphism.display_start_elements()
-
+    
     def update_game(self, do_display: bool):
         """
         Met à jour l'état du jeu lorsque le menu de jeu est affiché
@@ -251,7 +244,7 @@ class Game:
                             mouse_pos) and self.sudoku.is_history_move_possible("backward"):
                         self.sudoku.move_index_history("backward")
                         print("Action canceled")
-
+                    
                     # bouton retablir la dernière action
                     elif self.graphism.arrow_right_button_rect.collidepoint(
                             mouse_pos) and self.sudoku.is_history_move_possible("forward"):
@@ -348,10 +341,10 @@ class Game:
                     
                     # vérifie si cette valeur entre en conflit avec d'autres valeurs de la grille
                     self.sudoku.verify_grid()
-
+        
         if do_display:
             self.graphism.display_game_elements()
-
+    
     def update_options(self, do_display: bool):
         """
         Met à jour l'état du jeu lorsque le menu d'options est ouvert
@@ -445,10 +438,10 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     do_display = True
                     self.is_options_open = False
-                    
+        
         if do_display:
             self.graphism.display_options_elements()
-        
+    
     def cell_update(self, coordinates: tuple[int, int], do_display: bool = True):
         """
         Met à jour une case uniquement (gain de performance), utilisée lors de la résolution
@@ -467,8 +460,7 @@ class Game:
                 do_display = True
                 self.graphism.update_rect()
                 self.graphism.display_game_elements()
-                
-
+        
         if do_display:
             self.graphism.display_cell_elements(coordinates)
     
