@@ -518,7 +518,7 @@ class Sudoku:
                 # indique si la case est en conflit // "(x, y) in self.conflicting_cells" retourne un boolean
                 self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
     
-    def generate_grid(self, frequency_cell_removed: float=0.03, do_show_messagebox: bool = True):
+    def generate_grid(self, frequency_cell_removed: float, do_show_messagebox: bool = True):
         """
         Génère une grille de sudoku
         :param frequency_cell_removed: fréquence / proportion des cases a retirer à chaque boucle ne donnant pas de résultat
@@ -527,14 +527,13 @@ class Sudoku:
         """
         
         # Test préconditions
-        test_errors(frequency=self.game.generation_difficulty)
-        test_errors(frequency=frequency_to_append)
+        test_errors(frequency = frequency_cell_removed)
         print("generating...")
         
         # met à jour le titre de la fenêtre
         self.game.update_title("Génération ...")
         starting_time = time.time()
-        cell_frequency = self.game.generation_difficulty
+        cell_frequency = frequency_cell_removed
 
         # Génère une nouvelle grille vide, ne fait rien si l'action a été annulée
         if not self.new_empty_grid(self.grid.size):
@@ -866,9 +865,12 @@ class Sudoku:
         # retourner le nombre de solutions
         return encountered_solutions
     
-    def backtracking_solving(self, do_display: bool, do_choice_randomly: bool = False,
-                             last_cell_coordinates: tuple[int, int] = None,
-                             grid_possibilities: list[list[list, tuple[int, int]]] = None) -> bool:
+    def backtracking_solving(
+        self, do_display: bool,
+        do_choice_randomly: bool = False,
+        last_cell_coordinates: tuple[int, int] = None,
+        grid_possibilities: list[list[list, tuple[int, int]]] = None
+    ) -> bool:
         """
         Fonction récursive qui résout le Sudoku en testant toutes les possibilités
         Renvoi True si la grille courante est possible à résoudre, et False si elle ne l'est pas
