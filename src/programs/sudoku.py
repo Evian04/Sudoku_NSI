@@ -358,7 +358,7 @@ class Sudoku:
         # Ouvre une fenêtre de dialogue permettant à l'utilisateur de choisir le fichier à charger
         file_path = askopenfilename(
             initialdir="src/save_folder",
-            initialfile="model_2.sdk",
+            initialfile="Grille_moyenne.sdk",
             title="Ouvrir",
             filetypes=[("Sudoku file", "*.sdk"), ("All files", "*")]
         )
