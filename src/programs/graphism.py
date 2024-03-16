@@ -784,7 +784,7 @@ class Graphism:
         
         # rectangle curseur
         self.cursor_button_rect = self.cursor_selected_button.get_rect()
-        self.cursor_button_rect.x = ref_coordinates_left[0] + (self.options_buttons_dimensions[0] - self.options_buttons_dimensions[1]) * self.game.generation_difficulty
+        self.cursor_button_rect.x = ref_coordinates_left[0] + (self.options_buttons_dimensions[0] - self.cursor_button.get_width()) * (self.game.generation_difficulty - 0.3) * 2.5
         self.cursor_button_rect.y = ref_coordinates_left[1] + buttons_gap * 4
         
         # image du fond du curseur
