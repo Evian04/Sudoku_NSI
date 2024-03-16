@@ -532,6 +532,10 @@ class Sudoku:
         
         # met à jour le titre de la fenêtre
         self.game.update_title("Génération ...")
+        
+        # indique que la génération est en cours
+        self.game.is_processing = True
+        
         starting_time = time.time()
         cell_frequency = frequency_cell_removed
 
@@ -610,14 +614,15 @@ class Sudoku:
         
         # defini le mode de jeu à joueur
         self.set_game_mode("playing")
-        
         # met à jour le boutton "mode de jeu"
         self.game.graphism.update_game_mode_button()
-        
         # met à jour le titre de la fenêtre
         self.game.update_title()
         # met à jour l'affichage
-        # self.game.update()
+        self.game.graphism.display_game_elements()
+        
+        # indique que la génération est finie
+        self.game.is_processing = False
         
         # calcul temps d'execution - informatif
         executing_time = round(time.time() - starting_time, 2)
@@ -646,7 +651,7 @@ class Sudoku:
         """
         
         # Test préconditions
-        test_errors(boolean=do_display)
+        test_errors(boolean = do_display)
         
         # enregistrmeent du temps de départ
         starting_time = time.time()
@@ -686,16 +691,21 @@ class Sudoku:
         """
         Résout le Sudoku, ne tient pas compte des valeurs entrées pas l'utilisateur, seulement les cases présentes originalement
         """
-        # indique si la grille est valide
+        
+        # renvois False si la grille contient des erreurs
         if not self.is_valid():
             return False
         
-        # démaarre la résolution (méthode récursive)
-        if self.backtracking_solving(False):
-            return True
+        # indique que la résolution est en cours
+        self.game.is_processing = True
         
-        else:
-            return False
+        # démarre la résolution (méthode récursive)
+        result = self.backtracking_solving(False)
+        
+        # indique que la résolution est finie
+        self.game.is_processing = False
+        
+        return result
     
     def clear(self):
         """

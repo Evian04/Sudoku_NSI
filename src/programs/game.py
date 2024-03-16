@@ -27,8 +27,9 @@ class Game:
         self.current_menu = "start"
         # inidque si le menu options est ouvert
         self.is_options_open = False
-        # indique si unue résolution est en cours
-        self.is_solving = False
+        
+        # indique si une résolution / génération est en cours
+        self.is_processing = False
         
         # indique si la fenetre a le focus
         self.is_window_focused = False
@@ -197,7 +198,7 @@ class Game:
                 pygame.display.flip()
             
             # Ne pas vérifier les autres event si la résolution est en cours (économie performance)
-            if self.is_solving:
+            if self.is_processing:
                 continue
             
             # Si l'utilisateur clique sur l'écran
@@ -390,7 +391,8 @@ class Game:
                     self.current_menu = "game"
                     self.graphism.display_game_elements()
                     
-                    self.sudoku.generate_grid()
+                    # Génération de la grill
+                    self.sudoku.generate_grid(self.generation_difficulty)
                     self.sudoku.verify_grid()
                 
                 # bouton curseur
