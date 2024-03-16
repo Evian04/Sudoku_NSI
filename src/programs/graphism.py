@@ -297,7 +297,7 @@ class Graphism:
         # boutton curseur
         self.screen.blit(self.cursor_background_button, self.cursor_background_button_rect)
         
-        if self.cursor_background_button_rect.collidepoint(mouse_pos):
+        if self.cursor_background_button_rect.collidepoint(mouse_pos) or self.is_cursor_selected:
             self.screen.blit(self.cursor_selected_button, self.cursor_button_rect)
         else:
             self.screen.blit(self.cursor_button, self.cursor_button_rect)
