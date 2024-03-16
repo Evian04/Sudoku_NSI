@@ -14,8 +14,10 @@ class Game:
     """
     
     def __init__(self, screen: pygame.Surface):
+        # variable indiquant si la fenêtre doit être fermée
         self.do_quit = False
-        # enregistre l'écran
+        
+        # récupère la variable contenant la fenêtre
         self.screen: pygame.Surface = screen
         
         # chemin du fichier à ouvrir pour le bouton aide (Notice)
@@ -33,6 +35,10 @@ class Game:
         
         # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.load_config_file()
+        
+        # difficulté des grilles générées
+        self.generation_difficulty = self.get_config_value("generation_difficulty")
+        
         # indique si l'affichage doit être fait pendant la résoltion // récupèrre ce paramètre dans config file
         self.do_display_during_solving = self.get_config_value("do_display_during_solving")
         
@@ -57,24 +63,24 @@ class Game:
         
         # mapping des touches du clavier pour ajouter/modifier la valeur d'une case // remplace une touche par une valeur
         self.key_mapping: dict[str] = {
-            pygame.K_1:         '1',
-            pygame.K_KP_1:      '1',
-            pygame.K_2:         '2',
-            pygame.K_KP_2:      '2',
-            pygame.K_3:         '3',
-            pygame.K_KP_3:      '3',
-            pygame.K_4:         '4',
-            pygame.K_KP_4:      '4',
-            pygame.K_5:         '5',
-            pygame.K_KP_5:      '5',
-            pygame.K_6:         '6',
-            pygame.K_KP_6:      '6',
-            pygame.K_7:         '7',
-            pygame.K_KP_7:      '7',
-            pygame.K_8:         '8',
-            pygame.K_KP_8:      '8',
-            pygame.K_9:         '9',
-            pygame.K_KP_9:      '9',
+            pygame.K_1:         "1",
+            pygame.K_KP_1:      "1",
+            pygame.K_2:         "2",
+            pygame.K_KP_2:      "2",
+            pygame.K_3:         "3",
+            pygame.K_KP_3:      "3",
+            pygame.K_4:         "4",
+            pygame.K_KP_4:      "4",
+            pygame.K_5:         "5",
+            pygame.K_KP_5:      "5",
+            pygame.K_6:         "6",
+            pygame.K_KP_6:      "6",
+            pygame.K_7:         "7",
+            pygame.K_KP_7:      "7",
+            pygame.K_8:         "8",
+            pygame.K_KP_8:      "8",
+            pygame.K_9:         "9",
+            pygame.K_KP_9:      "9",
             pygame.K_a:         "A",
             pygame.K_b:         "B",
             pygame.K_c:         "C",
@@ -93,34 +99,25 @@ class Game:
         # met à jour la taille des images // pas d'affichage
         self.graphism.update_rect()
     
-    def update_title(self, title: str = ""):
-        """
-        defini le titre de la fenetre
-        :param title: nouveau titre de la fenetre, si non spécifié utilise self.title
-        """
-        
-        if title == "":
-            # redefini le titre à partir du nom du jeu, de la taille et du mode de jeu
-            pygame.display.set_caption(
-                self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + (
-                    "joueur" if self.sudoku.game_mode == "playing" else "éditeur")
-            )
-        
-        else:
-            # défini le nom à partir de l'argument
-            pygame.display.set_caption(title)
     
-    def update(self, do_display:bool=True):
+    def update(self, do_display = True):
         """
         Met à jour l'affichage du jeu
         """
         
+        # Si la souris est immobile ou que  ne met pas à jour l'affichage du jeu
+        if not do_display or pygame.mouse.get_rel() == (0, 0):
+            do_display = False
+            
+        else:
+            do_display = True
+        
         # met en pause la lecture de la musique ou la reprend en fonction du focus
-        if self.is_window_focused is not pygame.key.get_focused():
-            self.is_window_focused: bool = pygame.key.get_focused()
+        if self.is_window_focused != pygame.key.get_focused():
+            self.is_window_focused = pygame.key.get_focused()
             print("focus", "in" if self.is_window_focused else "out")
             # joue ou arrete la lecture du son
-            self.graphism.pause_audio(pause=not self.is_window_focused)
+            self.graphism.set_music_state(do_play = self.is_window_focused)
         
         # si la fenetre n'a pas le focus, n'affiche pas les élements (économie ressources)
         if not self.is_window_focused:
@@ -350,6 +347,7 @@ class Game:
         Met à jour l'état du jeu lorsque le menu d'options est ouvert
         """
         
+        mouse_pos = pygame.mouse.get_pos()
         all_events = pygame.event.get()
         
         # balayer dans les evenements
@@ -368,7 +366,6 @@ class Game:
             # clic gauche
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
                 do_display = True
-                mouse_pos = pygame.mouse.get_pos()
                 
                 # croix pour quitter le menu options
                 if self.graphism.cross_options_button_rect.collidepoint(mouse_pos):
@@ -391,6 +388,7 @@ class Game:
                     
                     if is_action_successful:
                         self.graphism.update_grid_attributes(self.sudoku.grid.size)
+                        self.graphism.update_dimensions_button()
                 
                 # bouton générer
                 elif self.graphism.generate_button_rect.collidepoint(mouse_pos):
@@ -400,14 +398,20 @@ class Game:
                     self.current_menu = "game"
                     self.graphism.display_game_elements()
                     
-                    self.sudoku.generate_grid(0.5)
+                    self.sudoku.generate_grid(self.generation_difficulty)
                     self.sudoku.verify_grid()
+                
+                # bouton curseur
+                elif self.graphism.cursor_background_button_rect.collidepoint(mouse_pos):
+                    
+                    # indiquer que ce bouton a été sélectionné
+                    self.graphism.is_cursor_selected = True
                 
                 # bouton mode de jeu (joueur / éditeur)
                 elif self.graphism.game_mode_button_rect.collidepoint(mouse_pos):
                     self.sudoku.reverse_game_mode()
                     self.update_title()
-                    self.graphism.update_game_mode_button_rect()
+                    self.graphism.update_game_mode_button()
                 
                 # bouotn changer de textures
                 elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
@@ -416,31 +420,54 @@ class Game:
                 
                 # bouton activer / desactiver la musique
                 elif self.graphism.play_music_button_rect.collidepoint(mouse_pos):
-                    # actions a faire
+                    # lance la musique
                     self.graphism.reverse_play_music()
-                    self.graphism.update_play_music_buton_rect()
+                    self.graphism.set_music_state(self.graphism.do_play_music)
+                    
+                    # met à jour le boutton "play music"
+                    self.graphism.update_play_music_buton()
+                    
+                    # enregistre le paramètre dans le fichier "config.json"
                     self.set_config_value("do_play_music", self.graphism.do_play_music)
-                    self.graphism.pause_audio(not self.graphism.do_play_music)
                 
                 # bouton afficher / cacher les erreurs
                 elif self.graphism.display_errors_button_rect.collidepoint(mouse_pos):
                     self.graphism.reverse_display_conflicts()
-                    self.graphism.update_display_errors_button_rect()
+                    self.graphism.update_display_errors_button()
                     self.set_config_value("do_display_conflicts", self.graphism.do_display_conflicts)
                 
                 # bouton afficher / cacher les cases durant la résolution
                 elif self.graphism.display_solving_button_rect.collidepoint(mouse_pos):
                     self.do_display_during_solving = not self.do_display_during_solving
-                    self.graphism.update_display_solving_button_rect()
+                    self.graphism.update_display_solving_button()
                     self.set_config_value("do_display_during_solving", self.do_display_during_solving)
+            
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.graphism.is_cursor_selected = False
+                self.update_generation_difficulty()
             
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     do_display = True
                     self.is_options_open = False
         
+        if pygame.mouse.get_pressed()[0] and self.graphism.is_cursor_selected:
+            cursor_new_x = mouse_pos[0] - self.graphism.cursor_button.get_width() / 2
+            
+            self.graphism.cursor_button_rect.x = cursor_new_x
+            
+            lower_bound = self.graphism.cursor_background_button_rect.x
+            upper_bound = self.graphism.cursor_background_button_rect.x + self.graphism.cursor_background_button.get_width() - self.graphism.cursor_button.get_width()
+            
+            if cursor_new_x < lower_bound:
+                self.graphism.cursor_button_rect.x = lower_bound
+            
+            elif cursor_new_x > upper_bound:
+                self.graphism.cursor_button_rect.x = upper_bound
+        
         if do_display:
             self.graphism.display_options_elements()
+    
     
     def cell_update(self, coordinates: tuple[int, int], do_display: bool = True):
         """
@@ -464,17 +491,59 @@ class Game:
         if do_display:
             self.graphism.display_cell_elements(coordinates)
     
+    def update_title(self, title: str = ""):
+        """
+        defini le titre de la fenetre
+        :param title: nouveau titre de la fenetre, si non spécifié utilise self.title
+        """
+        
+        if title == "":
+            # redefini le titre à partir du nom du jeu, de la taille et du mode de jeu
+            pygame.display.set_caption(
+                self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + (
+                    "joueur" if self.sudoku.game_mode == "playing" else "éditeur")
+            )
+        
+        else:
+            # défini le nom à partir de l'argument
+            pygame.display.set_caption(title)
+    
+    def update_generation_difficulty(self):
+        """
+        Met à jour la difficulté de la grille générée en fonction de la position du curseur du menu options
+        """
+        
+        cursor_pos = self.graphism.cursor_button_rect.x
+        
+        # convertie la position du curseur en une valeur entre 0.3 et 0.7
+        
+        input_lower_bound = self.graphism.cursor_background_button_rect.x
+        input_upper_bound = self.graphism.cursor_background_button_rect.x + self.graphism.cursor_background_button.get_width() - self.graphism.cursor_button.get_width()
+        
+        output_lower_bound = 0.7
+        output_upper_bound = 0.3
+        
+        difficulty = (cursor_pos - input_lower_bound) / (input_upper_bound - input_lower_bound) * (output_upper_bound - output_lower_bound) + output_lower_bound
+        difficulty = round(difficulty, 2)
+
+        self.generation_difficulty = difficulty
+        self.set_config_value("generation_difficulty", difficulty)
+    
+    
     def open_file(self, filepath: str) -> bool:
         """
         Ouvre le fichier spécifié grâce à une application externe (non python)
         :param filepath: chemin d'accès absolu ou relatif
         :return: boolean indiquant la réusiste ou non de l'ouverture du fichier
         """
+        
         # ouvre le fichier spécifié grâce à une commande cmd
         result = os.system(f'start "" "{filepath}"')
+        
         # opération réussi - fichier ouvert
         if result == 0:
             return True
+        
         # échec opération - fichier non ouvert
         else:
             return False
@@ -486,7 +555,7 @@ class Game:
         """
         
         with open("src/config.json") as file:
-            self.config_file = json.load(fp=file)
+            self.config_file = json.load(fp = file)
     
     def get_config_value(self, key: str):
         """
@@ -495,7 +564,7 @@ class Game:
         :return: valeur obtenue (différents types int, bool, etc)
         """
         
-        test_errors(config_file=self.config_file, config_key=key)
+        test_errors(config_file = self.config_file, config_key = key)
         
         return self.config_file[key]
     

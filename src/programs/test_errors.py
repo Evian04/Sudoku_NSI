@@ -11,7 +11,7 @@ def test_errors(sudoku_size = 0, **arguments):
     # liste des valeurs possibles pour les sudokus (valeurs maximales)
     possible_values = "123456789ABCDEFG"
     # listes de toutes les clés possible pour le fichier de configuration
-    all_config_keys = ["texture_pack", "do_play_music", "do_display_conflicts", "do_display_during_solving"]
+    all_config_keys = ["texture_pack", "generation_difficulty", "do_play_music", "do_display_conflicts", "do_display_during_solving"]
 
     # test taille sudoku
     assert type(sudoku_size) == int, f'The "sudoku_size" argument must be an integer (type : {type(sudoku_size)})'
@@ -25,7 +25,7 @@ def test_errors(sudoku_size = 0, **arguments):
         
         assert type(boolean) == bool, f"This argument must be a boolean (type : {type(boolean)})"
     
-    # test validité coordonnées - nécessite arguments `sudoku_size`
+    # test validité coordonnées - nécessite arguments "sudoku_size"
     if "coordinates" in arguments:
         assert sudoku_size != 0, 'You must pass a value for "sudoku_size" argument in order to verify "coordinates"'
         
@@ -37,7 +37,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert 0 <= coordinates[0] < sudoku_size and 0 <= coordinates[1] < sudoku_size, \
             f'The "coordinates" argument must be contains integers between 0 and grid_size - 1 (value : {coordinates})'
     
-    # test validité valeur passée - nécessite `sudoku_size`
+    # test validité valeur passée - nécessite "sudoku_size"
     if "value" in arguments:
         assert sudoku_size != 0, 'You must pass a value for the "sudoku_size" argument in order to verify "value"'
         
@@ -101,7 +101,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert game_mode in ["editing", "playing"], f'The "game_mode" argument must be "editing" or "playing" (value : {game_mode})'
     
     # test validité list de valeurs, correpsond à une liste sous format [colonne, colonne, ...] (colonne est une liste de valeurs)
-    # nécessite `sudoku_size`
+    # nécessite "sudoku_size"
     if "list_values" in arguments:
         assert sudoku_size, 'You must pass a value for the "sudoku_size" argument in order to verify "list_values"'
         
@@ -120,7 +120,7 @@ def test_errors(sudoku_size = 0, **arguments):
                 test_errors(sudoku_size, value=value)
     
     # test validité liste états, correpsond à une liste sous format [colonne, colonne, ...] (colonne est une liste d'états)
-    # nécessite `sudoku_size`
+    # nécessite "sudoku_size"
     if "list_states" in arguments:
         assert sudoku_size != 0, 'You must pass a value for the "sudoku_size" argument in order to verify "list_states"'
         
@@ -139,7 +139,7 @@ def test_errors(sudoku_size = 0, **arguments):
                 test_errors(state=state)
     
     # test validité liste coordonnées, correpsond à une liste sous format [colonne, colonne, ...] (colonne est une liste de coordonnées)
-    # nécessite `sudoku_size`
+    # nécessite "sudoku_size"
     if "list_coordinates" in arguments:
         assert sudoku_size != 0, 'You must pass a value for the "sudoku_size" argument in order to verify "list_coordinates"'
         
@@ -169,7 +169,7 @@ def test_errors(sudoku_size = 0, **arguments):
         assert config_key in all_config_keys, \
             f'The "config_key" argument must be "texture_pack", "do_play_music", "do_display_conflicts" or "do_display_during_solvings" (value : {config_key})'
 
-    # test validité valeur du fichier de configuration - nécessite `config_key`
+    # test validité valeur du fichier de configuration - nécessite "config_key"
     if "config_value" in arguments:
         assert "config_key" in arguments, 'You must pass a value for the "config_key" argument in order to verify "config_value"'
         
@@ -183,11 +183,22 @@ def test_errors(sudoku_size = 0, **arguments):
                     f'The "texture_pack" value of the config_file must be a string (type : {type(config_value)})'
                 assert config_value in os.listdir("src/graphics"), \
                     f'The "texture_pack" value of the config_file must be in {os.listdir("src/graphics")} (value : {config_value})'
-                    
+            
+            case "generation_difficulty":
+                assert type(config_value) == float, \
+                    f'The "generation_difficulty" value of the configuration file must be a float (type : {type(config_value)})'
+                
+                assert 0.3 <= config_value <= 0.7, \
+                    f'The "generation_difficulty" value of the configuration file must be between 0.3 and 0.7 (value : {config_value})'
+            
+            case "do_play_music":
+                assert type(config_value) == bool, \
+                    f'The "do_play_music" value of the configuration file must be a boolean (type: {type(config_value)})'
+            
             case "do_display_conflicts":
                 assert type(config_value) == bool, \
-                    f'The "do_display_conflicts" value of the config_file must be a boolean (type : {type(config_value)})'
+                    f'The "do_display_conflicts" value of the configuration file must be a boolean (type : {type(config_value)})'
                 
             case "do_display_during_solvings":
                 assert type(config_value) == bool, \
-                    f'The "do_display_during_solvings" value of the config_file must be a boolean (type : {type(config_value)})'
+                    f'The "do_display_during_solvings" value of the configuration file must be a boolean (type : {type(config_value)})'
