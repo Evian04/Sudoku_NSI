@@ -26,7 +26,7 @@ class Sudoku:
         # défini le mode entre 'editing' et 'playing'
         self.game_mode = "editing"
         
-        # contient la grille avec les cellules
+        # contient la grille avec les cases
         self.grid = Grid(grid_size)
         
         # Coordonnées de la case sélectionnée, (-1, -1) si aucune case
@@ -42,8 +42,8 @@ class Sudoku:
         # dictionnaire permettant de convertir un chiffre entre 0 et 2 pour l'ouverture d'un fichier
         self.load_state_conversion = {"0": "unlocked", "1": "locked", "2": "superlocked"}
         
-        self.conflicting_cells: list[tuple[
-            int, int]] = list()  # liste des celeules en conflit, c'est à dire dont au moins une ligne, une colonne ou un carré admet deux valeurs identiques
+        # liste des cases en conflit, c'est à dire dont au moins une ligne, une colonne ou un carré admet deux valeurs identiques
+        self.conflicting_cells: list[tuple[int, int]] = list()
     
     def reverse_game_mode(self):
         """
@@ -309,7 +309,7 @@ class Sudoku:
         self.grid = self.history[self.history_index][0].copy()
         self.selected_cell = self.history[self.history_index][1]
         
-        # effectue la verification des cellules en conflit
+        # effectue la verification des cases en conflit
         self.verify_grid()
         self.update_cells_conflicting_state()
     
@@ -505,7 +505,7 @@ class Sudoku:
                 if (x, y) in tmp_conflicting_cells and not (x, y) in self.conflicting_cells:
                     self.conflicting_cells.append((x, y))
         
-        # met à jour les cellules en conflit
+        # met à jour les cases en conflit
         self.update_cells_conflicting_state()
     
     def update_cells_conflicting_state(self):
@@ -552,23 +552,23 @@ class Sudoku:
         resolved = False
         # boucle qui attend la résolution de la grille
         while not resolved:
-            # liste des cellules modifiées
+            # liste des cases modifiées
             cells_to_remove_list = list()
             cell = (0, 0)
             start = True
-            # balaye sur le nombre de cellules à balayer
+            # balaye sur le nombre de cases à balayer
             for _ in range(number_of_cells_to_remove):
                 # start est la conditon pour démarrer le while, test si la case est déjà utilisée
                 while self.grid.get_cell_value(cell) == "0" or start:
                     start = False
-                    # créé une cellule
+                    # créé une case
                     cell = (random.randint(0, self.grid.size - 1), random.randint(0, self.grid.size - 1))
                 
                 # place la valeur
                 self.grid.set_cell_value(cell, "0")
                 # met à jour l'affichage et la mise à jour de la fenêtre // empeche le gel de la fenêtre
                 self.game.cell_update(cell, False)
-                # ajoute la case à la liste des cellules modifiées
+                # ajoute la case à la liste des cases modifiées
                 cells_to_remove_list.append(cell)
             
             # verifie l'existance d'une seule solution
@@ -580,7 +580,7 @@ class Sudoku:
             if solutions_numbers == 1:
                 # balaye sur toutes les solutions
                 for cell in self.grid.get_all_coordinates_simple_list():
-                    # si la cellule est dans la liste des cellules moddifiées
+                    # si la case est dans la liste des cases moddifiées
                     if cell in cells_to_remove_list:
                         # mettre la valeur à 0
                         self.grid.set_cell_value(cell, "0")
@@ -605,7 +605,7 @@ class Sudoku:
                 # définir les cases à laisser
                 # augmente de 3% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
                 cell_frequency += 0.03
-                # calcul le nombre de cellule à supprimer
+                # calcul le nombre de case à supprimer
                 number_of_cells_to_remove = round((1 - cell_frequency) * self.grid.cells_count)
         
         # defini le mode de jeu à joueur
@@ -621,7 +621,7 @@ class Sudoku:
         
         # calcul temps d'execution - informatif
         executing_time = round(time.time() - starting_time, 2)
-        # nombre de cellules / cases restantes
+        # nombre de cases / cases restantes
         remaining_cells = self.grid.cells_count - number_of_cells_to_remove
         # pourcentaage de cases restantes
         percentage = round(100 - ((number_of_cells_to_remove / self.grid.cells_count) * 100), 2)
@@ -763,19 +763,19 @@ class Sudoku:
         Renvoi la liste des coordonnées des cases modifiées
         """
         
-        #liste des cellules modifiées
+        #liste des cases modifiées
         modified_cells = list()
         # boucle infinie (arrêt par break)
         while True:
             # indique l'arret de l'algorithme
             is_algorithm_finished = True
             
-            #liste des cellules à vérifier
+            #liste des cases à vérifier
             cells_to_check = self.grid.get_all_empty_cells()
             
-            # balaye dans les cellules à veéifier
+            # balaye dans les cases à veéifier
             for cell_coordinates in cells_to_check:
-                # récupère les valeurs possibles la cellule
+                # récupère les valeurs possibles la case
                 cell_possible_values = self.grid.get_possible_values(cell_coordinates)
                 # test si lil n'y a qu'une solution
                 if len(cell_possible_values) == 1:
@@ -783,7 +783,7 @@ class Sudoku:
                     self.grid.set_cell_value(cell_coordinates, cell_possible_values[0])
                     # met à jour l'affichage // anti-gel de la fenêtre
                     self.game.cell_update(cell_coordinates, do_display=do_display)
-                    # ajoute les coordonnées à la liste des cellules modifiées
+                    # ajoute les coordonnées à la liste des cases modifiées
                     modified_cells.append(cell_coordinates)
                     # inidque que l'algorithme n'est pas fini
                     is_algorithm_finished = False
@@ -872,8 +872,8 @@ class Sudoku:
         Fonction récursive qui résout le Sudoku en testant toutes les possibilités
         Renvoi True si la grille courante est possible à résoudre, et False si elle ne l'est pas
         :param do_choice_randomly: choisi les valeurs de mannnière aléatoire parmi les cases ayant le moins de possibilité et les valeurs de manière aléatoire, ne ralenti pas la résolutionn
-        :param last_cell_coordinates: coordonnées de la dernière cellule modifiée
-        :param grid_possibilities: copie formatée de la grille pour avoir les possibilitées pour chaque cellule
+        :param last_cell_coordinates: coordonnées de la dernière case modifiée
+        :param grid_possibilities: copie formatée de la grille pour avoir les possibilitées pour chaque case
         """
         
         # Si l'utilisateur ferme la fenêtre
@@ -904,15 +904,15 @@ class Sudoku:
             # récupère les valeurs possibles de toutes les cases qui sont sur la même ligne, colonne ou carré que la dernière case modifiée et/ou sur la même ligne, colonne, carrée que la dernière case modifiée (last_cell_coordinates)
             # défini grid_possibilities
             grid_possibilities = grid_possibilities.copy()
-            # liste des cellules en cours de modification/ déjà modifiée par cette fonction
+            # liste des cases en cours de modification/ déjà modifiée par cette fonction
             coordinates_list: list[tuple[int, int]] = list()
-            # balaye dans la dernière cellule + les cellules modifiées par put_obvious_solutions
+            # balaye dans la dernière case + les cases modifiées par put_obvious_solutions
             for actual_coordinates in [last_cell_coordinates] + modified_cells_coordinates:
                 # balaye dans les diférents formats, les lignes, les colonnes et les carrés
                 for format in ["columns", "lines", "squares"]:
                     # ballaye dans les coordonnées des cases de ces formats
                     for coordinates in self.grid.get_group_coordinates(actual_coordinates, format):
-                        # test si la coordonnée n'est PAS dans la liste des cellules en cours de modification/ déjà modifiée
+                        # test si la coordonnée n'est PAS dans la liste des cases en cours de modification/ déjà modifiée
                         if coordinates not in coordinates_list:
                             # ajouter les coordonnées à cette lliste
                             coordinates_list.append(coordinates)
@@ -928,7 +928,7 @@ class Sudoku:
                                 # si la case est superverrouillé ou qu'elle contient déjà une valeur, aucune valeur n'est possible
                                 grid_possibilities[coordinates[1] * self.grid.size + coordinates[0]] = []
             
-            # indique que les cellules à rmeplir sont désormais les valeurs de grid_possibilities
+            # indique que les cases à rmeplir sont désormais les valeurs de grid_possibilities
             cells_to_fill = grid_possibilities
         
         # supprime tous les éléments [] = cases superlocked ou cases avec déjà des valeurs

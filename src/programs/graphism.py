@@ -440,7 +440,7 @@ class Graphism:
         self.grid_background_rect.x = self.screen.get_width() * (1 / 2) - self.rect_ref_distance * (1 / 4)
         self.grid_background_rect.y = self.screen.get_height() * (1 / 2) - self.rect_ref_distance * (1 / 2)
         
-        # Charge toutes les images possibles pour chaque cellule
+        # Charge toutes les images possibles pour chaque case
         self.update_cells()
         self.update_digits()
     
@@ -449,20 +449,20 @@ class Graphism:
         Charge les images des cases de la grille
         """
         
-        # calcul la taille de chaque cellule
+        # calcul la taille de chaque case
         self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
         
-        # image d'une cellule déverrouillée
+        # image d'une case déverrouillée
         self.cell_image = self.load_image("cells/cell.png", self.cell_dimensions)
         
-        # image d'une cellule superverrouillée
+        # image d'une case superverrouillée
         self.superlocked_cell_image = self.load_image("cells/superlocked_cell.png", self.cell_dimensions)
         
-        # image d'une cellule sélectionnée
+        # image d'une case sélectionnée
         self.selected_cell_image = self.load_image("cells/selected_cell.png", self.cell_dimensions)
         self.selected_cell_image = pygame.transform.smoothscale(self.selected_cell_image, self.cell_dimensions)
         
-        # image d'une cellule superverrouillée et sélectionnée
+        # image d'une case superverrouillée et sélectionnée
         self.superlocked_selected_cell_image = self.load_image("cells/superlocked_selected_cell.png", self.cell_dimensions)
         
         # image du cadenas
@@ -781,7 +781,7 @@ class Graphism:
         
         # rectangle curseur
         self.cursor_button_rect = self.cursor_selected_button.get_rect()
-        self.cursor_button_rect.x = ref_coordinates_left[0] + self.options_buttons_dimensions[0] / 2 - self.options_buttons_dimensions[1] / 2
+        self.cursor_button_rect.x = ref_coordinates_left[0] + (self.options_buttons_dimensions[0] - self.options_buttons_dimensions[1]) * self.game.generation_difficulty
         self.cursor_button_rect.y = ref_coordinates_left[1] + buttons_gap * 4
         
         # image du fond du curseur

@@ -14,8 +14,10 @@ class Game:
     """
     
     def __init__(self, screen: pygame.Surface):
+        # variable indiquant si la fenêtre doit être fermée
         self.do_quit = False
-        # enregistre l'écran
+        
+        # récupère la variable contenant la fenêtre
         self.screen: pygame.Surface = screen
         
         # chemin du fichier à ouvrir pour le bouton aide (Notice)
@@ -33,6 +35,10 @@ class Game:
         
         # charge le fichier de configuration et met à jour l'attribut self.config_file
         self.load_config_file()
+        
+        # difficulté des grilles générées
+        self.generation_difficulty = self.get_config_value("generation_difficulty")
+        
         # indique si l'affichage doit être fait pendant la résoltion // récupèrre ce paramètre dans config file
         self.do_display_during_solving = self.get_config_value("do_display_during_solving")
         
@@ -57,24 +63,24 @@ class Game:
         
         # mapping des touches du clavier pour ajouter/modifier la valeur d'une case // remplace une touche par une valeur
         self.key_mapping: dict[str] = {
-            pygame.K_1:         '1',
-            pygame.K_KP_1:      '1',
-            pygame.K_2:         '2',
-            pygame.K_KP_2:      '2',
-            pygame.K_3:         '3',
-            pygame.K_KP_3:      '3',
-            pygame.K_4:         '4',
-            pygame.K_KP_4:      '4',
-            pygame.K_5:         '5',
-            pygame.K_KP_5:      '5',
-            pygame.K_6:         '6',
-            pygame.K_KP_6:      '6',
-            pygame.K_7:         '7',
-            pygame.K_KP_7:      '7',
-            pygame.K_8:         '8',
-            pygame.K_KP_8:      '8',
-            pygame.K_9:         '9',
-            pygame.K_KP_9:      '9',
+            pygame.K_1:         "1",
+            pygame.K_KP_1:      "1",
+            pygame.K_2:         "2",
+            pygame.K_KP_2:      "2",
+            pygame.K_3:         "3",
+            pygame.K_KP_3:      "3",
+            pygame.K_4:         "4",
+            pygame.K_KP_4:      "4",
+            pygame.K_5:         "5",
+            pygame.K_KP_5:      "5",
+            pygame.K_6:         "6",
+            pygame.K_KP_6:      "6",
+            pygame.K_7:         "7",
+            pygame.K_KP_7:      "7",
+            pygame.K_8:         "8",
+            pygame.K_KP_8:      "8",
+            pygame.K_9:         "9",
+            pygame.K_KP_9:      "9",
             pygame.K_a:         "A",
             pygame.K_b:         "B",
             pygame.K_c:         "C",
@@ -93,22 +99,6 @@ class Game:
         # met à jour la taille des images // pas d'affichage
         self.graphism.update_rect()
     
-    def update_title(self, title: str = ""):
-        """
-        defini le titre de la fenetre
-        :param title: nouveau titre de la fenetre, si non spécifié utilise self.title
-        """
-        
-        if title == "":
-            # redefini le titre à partir du nom du jeu, de la taille et du mode de jeu
-            pygame.display.set_caption(
-                self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + (
-                    "joueur" if self.sudoku.game_mode == "playing" else "éditeur")
-            )
-        
-        else:
-            # défini le nom à partir de l'argument
-            pygame.display.set_caption(title)
     
     def update(self, do_display = True):
         """
@@ -408,7 +398,7 @@ class Game:
                     self.current_menu = "game"
                     self.graphism.display_game_elements()
                     
-                    self.sudoku.generate_grid(0.5)
+                    self.sudoku.generate_grid(self.generation_difficulty)
                     self.sudoku.verify_grid()
                 
                 # bouton mode de jeu (joueur / éditeur)
@@ -446,6 +436,9 @@ class Game:
                     self.graphism.update_display_solving_button()
                     self.set_config_value("do_display_during_solving", self.do_display_during_solving)
             
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.update_generation_difficulty()
+            
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     do_display = True
@@ -467,6 +460,7 @@ class Game:
         
         if do_display:
             self.graphism.display_options_elements()
+    
     
     def cell_update(self, coordinates: tuple[int, int], do_display: bool = True):
         """
@@ -490,17 +484,58 @@ class Game:
         if do_display:
             self.graphism.display_cell_elements(coordinates)
     
+    def update_title(self, title: str = ""):
+        """
+        defini le titre de la fenetre
+        :param title: nouveau titre de la fenetre, si non spécifié utilise self.title
+        """
+        
+        if title == "":
+            # redefini le titre à partir du nom du jeu, de la taille et du mode de jeu
+            pygame.display.set_caption(
+                self.name + f" {self.sudoku.grid.size}x{self.sudoku.grid.size} - " + (
+                    "joueur" if self.sudoku.game_mode == "playing" else "éditeur")
+            )
+        
+        else:
+            # défini le nom à partir de l'argument
+            pygame.display.set_caption(title)
+    
+    def update_generation_difficulty(self):
+        """
+        Met à jour la difficulté de la grille générée en fonction de la position du curseur du menu options
+        """
+        
+        cursor_pos = self.graphism.cursor_button_rect.x
+        
+        # convertie la position du curseur en une valeur entre 0.3 et 0.7
+        
+        input_lower_bound = self.graphism.cursor_background_button_rect.x
+        input_upper_bound = self.graphism.cursor_background_button_rect.x + self.graphism.cursor_background_button.get_width() - self.graphism.cursor_button.get_width()
+        
+        output_lower_bound = 0.7
+        output_upper_bound = 0.3
+        
+        difficulty = (cursor_pos - input_lower_bound) / (input_upper_bound - input_lower_bound) * (output_upper_bound - output_lower_bound) + output_lower_bound
+
+        self.generation_difficulty = difficulty
+        self.set_config_value("generation_difficulty", difficulty)
+    
+    
     def open_file(self, filepath: str) -> bool:
         """
         Ouvre le fichier spécifié grâce à une application externe (non python)
         :param filepath: chemin d'accès absolu ou relatif
         :return: boolean indiquant la réusiste ou non de l'ouverture du fichier
         """
+        
         # ouvre le fichier spécifié grâce à une commande cmd
         result = os.system(f'start "" "{filepath}"')
+        
         # opération réussi - fichier ouvert
         if result == 0:
             return True
+        
         # échec opération - fichier non ouvert
         else:
             return False
@@ -512,7 +547,7 @@ class Game:
         """
         
         with open("src/config.json") as file:
-            self.config_file = json.load(fp=file)
+            self.config_file = json.load(fp = file)
     
     def get_config_value(self, key: str):
         """
@@ -521,7 +556,7 @@ class Game:
         :return: valeur obtenue (différents types int, bool, etc)
         """
         
-        test_errors(config_file=self.config_file, config_key=key)
+        test_errors(config_file = self.config_file, config_key = key)
         
         return self.config_file[key]
     
