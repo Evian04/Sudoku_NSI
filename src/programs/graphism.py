@@ -29,7 +29,9 @@ class Graphism:
         """
         self.grid_size = size
         self.square_size = int(self.grid_size ** 0.5)
-        self.update_rect()
+        
+        self.update_cells()
+        self.update_digits()
 
     def reverse_display_conflicts(self):
         """
@@ -99,7 +101,7 @@ class Graphism:
         pygame.mixer.music.set_volume(0.2)
         
         # met en pasue la musique (réactivation de la lecture en fonction du focus de la fenêtre)
-        self.pause_audio(False)
+        self.set_music_state(False)
     
     def play_audio(self, repetitions: int = -1):
         """
@@ -108,13 +110,18 @@ class Graphism:
         """
         pygame.mixer.music.play(repetitions)
     
-    def pause_audio(self, pause: bool):
+    def set_music_state(self, do_play: bool):
         """
         Mettre en pause ou enlever la pause
         :param pause: True, met en pause, False, remet la lecture
         """
-        if not pause and self.do_play_music:
+        
+        # Test préconditions
+        test_errors(boolean = do_play)
+        
+        if do_play and self.do_play_music:
             pygame.mixer.music.unpause()
+        
         else:
             pygame.mixer.music.pause()
 
@@ -371,6 +378,7 @@ class Graphism:
         """
         Calcule des dimensions et des coordonnées des éléments de la fenêtre
         """
+        
         # défini l'icone du jeu
         self.icon = pygame.image.load(f"src/graphics/{self.texture_pack}/icon.png")
         pygame.display.set_icon(self.icon)
@@ -394,17 +402,12 @@ class Graphism:
         # Ratio entre la longueur du grand carré et de la marge
         self.outline_thickness = self.rect_ref_distance / 30
         
-        # calcul la taille de chaque cellule
-        self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
-        
         # Calcule les dimensions et les coordonnées des boutons du menu de démarrage
         self.update_start_buttons_rect()
         # Calcule les dimensions et les coordonnées des boutons du menu principal
         self.update_game_buttons_rect()
         # Calcule les dimensions et les coordonnées des boutons du menu options
         self.update_options_buttons_rect()
-        # Charge toutes les images possibles pour chaque cellule
-        self.update_digits_rect()
         
         # chargemement et lecture du son d'ambiance
         self.load_audio("audio/background_music.mp3")
@@ -428,6 +431,18 @@ class Graphism:
         self.grid_background_rect = self.grid_background.get_rect()
         self.grid_background_rect.x = self.screen.get_width() * (1 / 2) - self.rect_ref_distance * (1 / 4)
         self.grid_background_rect.y = self.screen.get_height() * (1 / 2) - self.rect_ref_distance * (1 / 2)
+        
+        # Charge toutes les images possibles pour chaque cellule
+        self.update_cells()
+        self.update_digits()
+    
+    def update_cells(self):
+        """
+        Charge les images des cases de la grille
+        """
+        
+        # calcul la taille de chaque cellule
+        self.cell_dimensions = [(self.rect_ref_distance - (self.square_size + 1) * self.outline_thickness) * (1 / self.grid_size)] * 2
         
         # image d'une cellule déverrouillée
         self.cell_image = self.load_image("cells/cell.png", self.cell_dimensions)
@@ -455,58 +470,58 @@ class Graphism:
             ])
         for y in range(self.grid_size)] for x in range(self.grid_size)]
     
-    def update_digits_rect(self):
+    def update_digits(self):
         """
-        Charge toutes les images possibles pour chaque cellule
+        Charge les images des chiffres et / ou lettres 
         """
+        
         self.all_digits_image: list[pygame.Surface] = []
         
-        # balaye parmi les valeurs possibles pour ce sudoku `i`, et parmi les deux types d'imaage, les `regular`et les `wrong`
+        # balaye parmi les valeurs possibles pour ce sudoku "value", et parmi les deux types d'image,
+        # les "regular" (normales) et les "wrong" (mal placées)
         for color in ["regular", "wrong"]:
-            for i in self.game.possible_values:
-                digit_image = pygame.image.load(f"src/graphics/{self.texture_pack}/digits/{i}_{color}.png")
-                digit_image = pygame.transform.smoothscale(digit_image, self.cell_dimensions)
+            for value in self.game.possible_values:
+                digit_image = self.load_image(f"digits/{value}_{color}.png", self.cell_dimensions)
                 self.all_digits_image.append(digit_image)
     
-    def update_dimensions_button_rect(self):
+    def update_dimensions_button(self):
         """
         Mettre à jour le bouton dimensions uniquement
         """
-        self.dimensions_button = self.load_image("/buttons/options/dimensions_{self.grid_size}.png", self.options_buttons_dimensions)
         
-        self.dimensions_selected_button = self.load_image("buttons/options/dimensions_{self.grid_size}_selected.png", self.options_buttons_dimensions)
+        self.dimensions_button = self.load_image(f"buttons/options/dimensions_{self.grid_size}.png", self.options_buttons_dimensions)
+        self.dimensions_selected_button = self.load_image(f"buttons/options/dimensions_{self.grid_size}_selected.png", self.options_buttons_dimensions)
     
-    def update_game_mode_button_rect(self):
+    def update_game_mode_button(self):
         """
         Mettre à jour le bouton mode de jeu uniquement
         """
-        self.game_mode_button = self.load_image(f"/buttons/options/game_mode_{self.game.sudoku.game_mode}.png", self.options_buttons_dimensions)
         
+        self.game_mode_button = self.load_image(f"/buttons/options/game_mode_{self.game.sudoku.game_mode}.png", self.options_buttons_dimensions)
         self.game_mode_selected_button = self.load_image(f"buttons/options/game_mode_{self.game.sudoku.game_mode}_selected.png", self.options_buttons_dimensions)
     
-    def update_play_music_buton_rect(self):
+    def update_play_music_buton(self):
         """
         Mettre à jour le bouton activer / désactiver la musique uniquement
         """
+
         self.play_music_button = self.load_image(f"buttons/options/play_music_{'on' if self.do_play_music else 'off'}.png", self.options_buttons_dimensions)
-    
         self.play_music_selected_button = self.load_image(f"buttons/options/play_music_{'on' if self.do_play_music else 'off'}_selected.png", self.options_buttons_dimensions)
     
-    def update_display_errors_button_rect(self):
+    def update_display_errors_button(self):
         """
         Mettre à jour le bouton afficher / cacher les erreurs uniquement
         """
         
         self.display_errors_button = self.load_image(f"buttons/options/display_errors_{'on' if self.do_display_conflicts else 'off'}.png", self.options_buttons_dimensions)
-        
         self.display_errors_selected_button = self.load_image(f"buttons/options/display_errors_{'on' if self.do_display_conflicts else 'off'}_selected.png", self.options_buttons_dimensions)
     
-    def update_display_solving_button_rect(self):
+    def update_display_solving_button(self):
         """
         Mettre à jour le bouton afficher / cacher l'affichage durant la résolution uniquement
         """
-        self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
         
+        self.display_solving_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}.png", self.options_buttons_dimensions)
         self.display_solving_selected_button = self.load_image(f"buttons/options/display_solving_{'on' if self.game.do_display_during_solving else 'off'}_selected.png", self.options_buttons_dimensions)
     
     def update_start_buttons_rect(self):

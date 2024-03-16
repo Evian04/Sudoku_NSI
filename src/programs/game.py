@@ -110,17 +110,24 @@ class Game:
             # défini le nom à partir de l'argument
             pygame.display.set_caption(title)
     
-    def update(self, do_display:bool=True):
+    def update(self, do_display = True):
         """
         Met à jour l'affichage du jeu
         """
         
+        # Si la souris est immobile ou que  ne met pas à jour l'affichage du jeu
+        if not do_display or pygame.mouse.get_rel() == (0, 0):
+            do_display = False
+            
+        else:
+            do_display = True
+        
         # met en pause la lecture de la musique ou la reprend en fonction du focus
-        if self.is_window_focused is not pygame.key.get_focused():
-            self.is_window_focused: bool = pygame.key.get_focused()
+        if self.is_window_focused != pygame.key.get_focused():
+            self.is_window_focused = pygame.key.get_focused()
             print("focus", "in" if self.is_window_focused else "out")
             # joue ou arrete la lecture du son
-            self.graphism.pause_audio(pause=not self.is_window_focused)
+            self.graphism.set_music_state(do_play = self.is_window_focused)
         
         # si la fenetre n'a pas le focus, n'affiche pas les élements (économie ressources)
         if not self.is_window_focused:
@@ -391,6 +398,7 @@ class Game:
                     
                     if is_action_successful:
                         self.graphism.update_grid_attributes(self.sudoku.grid.size)
+                        self.graphism.update_dimensions_button()
                 
                 # bouton générer
                 elif self.graphism.generate_button_rect.collidepoint(mouse_pos):
@@ -407,7 +415,7 @@ class Game:
                 elif self.graphism.game_mode_button_rect.collidepoint(mouse_pos):
                     self.sudoku.reverse_game_mode()
                     self.update_title()
-                    self.graphism.update_game_mode_button_rect()
+                    self.graphism.update_game_mode_button()
                 
                 # bouotn changer de textures
                 elif self.graphism.change_textures_button_rect.collidepoint(mouse_pos):
@@ -416,22 +424,26 @@ class Game:
                 
                 # bouton activer / desactiver la musique
                 elif self.graphism.play_music_button_rect.collidepoint(mouse_pos):
-                    # actions a faire
+                    # lance la musique
                     self.graphism.reverse_play_music()
-                    self.graphism.update_play_music_buton_rect()
+                    self.graphism.set_music_state(self.graphism.do_play_music)
+                    
+                    # met à jour le boutton "play music"
+                    self.graphism.update_play_music_buton()
+                    
+                    # enregistre le paramètre dans le fichier "config.json"
                     self.set_config_value("do_play_music", self.graphism.do_play_music)
-                    self.graphism.pause_audio(not self.graphism.do_play_music)
                 
                 # bouton afficher / cacher les erreurs
                 elif self.graphism.display_errors_button_rect.collidepoint(mouse_pos):
                     self.graphism.reverse_display_conflicts()
-                    self.graphism.update_display_errors_button_rect()
+                    self.graphism.update_display_errors_button()
                     self.set_config_value("do_display_conflicts", self.graphism.do_display_conflicts)
                 
                 # bouton afficher / cacher les cases durant la résolution
                 elif self.graphism.display_solving_button_rect.collidepoint(mouse_pos):
                     self.do_display_during_solving = not self.do_display_during_solving
-                    self.graphism.update_display_solving_button_rect()
+                    self.graphism.update_display_solving_button()
                     self.set_config_value("do_display_during_solving", self.do_display_during_solving)
             
             elif event.type == pygame.KEYDOWN:
