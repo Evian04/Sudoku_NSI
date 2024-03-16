@@ -104,14 +104,6 @@ class Game:
         """
         Met à jour l'affichage du jeu
         """
-        
-        # Si la souris est immobile ou que  ne met pas à jour l'affichage du jeu
-        if not do_display or pygame.mouse.get_rel() == (0, 0):
-            do_display = False
-            
-        else:
-            do_display = True
-        
         # met en pause la lecture de la musique ou la reprend en fonction du focus
         if self.is_window_focused != pygame.key.get_focused():
             self.is_window_focused = pygame.key.get_focused()

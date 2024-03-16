@@ -1,4 +1,4 @@
-#import des libraires
+# import des libraires
 import random
 import time
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -201,7 +201,8 @@ class Sudoku:
                         self.grid.set_cell_state(coordinates, "locked")
                         print(f"The cell {coordinates} was locked")
                         is_grid_changed = True  # indique un changement de la grille
-                    else: print(f'The cell {coordinates} was NOT locked: empty cell')
+                    else:
+                        print(f'The cell {coordinates} was NOT locked: empty cell')
                 
                 # Si la case est verrouillée
                 case "locked":
@@ -230,7 +231,6 @@ class Sudoku:
                         is_grid_changed = True
                     else:
                         print(f"The cell {coordinates} was NOT superlocked: empty cell")
-
                 
                 # Si la case est verrouillée
                 case "locked":
@@ -518,7 +518,7 @@ class Sudoku:
                 # indique si la case est en conflit // "(x, y) in self.conflicting_cells" retourne un boolean
                 self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
     
-    def generate_grid(self, frequency_cell_removed: float=0.03, do_show_messagebox: bool = True):
+    def generate_grid(self, frequency_cell_removed: float = 0.03, do_show_messagebox: bool = True):
         """
         Génère une grille de sudoku
         :param frequency_cell_removed: fréquence / proportion des cases a retirer à chaque boucle ne donnant pas de résultat
@@ -528,14 +528,14 @@ class Sudoku:
         
         # Test préconditions
         test_errors(frequency=self.game.generation_difficulty)
-        test_errors(frequency=frequency_to_append)
+        test_errors(frequency=frequency_cell_removed)
         print("generating...")
         
         # met à jour le titre de la fenêtre
         self.game.update_title("Génération ...")
         starting_time = time.time()
         cell_frequency = self.game.generation_difficulty
-
+        
         # Génère une nouvelle grille vide, ne fait rien si l'action a été annulée
         if not self.new_empty_grid(self.grid.size):
             return False
@@ -618,7 +618,7 @@ class Sudoku:
         # met à jour le titre de la fenêtre
         self.game.update_title()
         # met à jour l'affichage
-        #self.game.update()
+        # self.game.update()
         
         # calcul temps d'execution - informatif
         executing_time = round(time.time() - starting_time, 2)
@@ -763,15 +763,15 @@ class Sudoku:
         Met dans la grille les chiffres évidentes (les case où il n'y a qu'une valeur possible)
         Renvoi la liste des coordonnées des cases modifiées
         """
-        
-        #liste des cases modifiées
+
+        # liste des cases modifiées
         modified_cells = list()
         # boucle infinie (arrêt par break)
         while True:
             # indique l'arret de l'algorithme
             is_algorithm_finished = True
-            
-            #liste des cases à vérifier
+
+            # liste des cases à vérifier
             cells_to_check = self.grid.get_all_empty_cells()
             
             # balaye dans les cases à veéifier
@@ -888,7 +888,7 @@ class Sudoku:
         
         # met les valeurs évidentes des cases
         modified_cells_coordinates = self.put_obvious_solutions(do_display)
-
+        
         # test si il s'agit du premier appel de la méthode OU que la grille fait neuf ou moins, si ce n'est pas le cas, utilise une méthode de résolution alternative (trop longue en 9x9
         if not last_cell_coordinates or self.grid.size <= 9:
             # récupère les valeurs possibles de toutes les cases [liste des valeurs possibles, coordonnées] si c'est la première itération
@@ -943,14 +943,14 @@ class Sudoku:
         # tri les cases de la liste en fonction du nombre de valeurs possibles
         minimum = min([len(element[0]) for element in cells_to_fill])
         cells_to_fill = list(filter(lambda x: len(x[0]) == minimum, cells_to_fill))
-
+        
         # arrangement des cases aléatoires dans le nombre de solution minimales // n'impacte pas la vitesse de  résolution
         if do_choice_randomly:
             random.shuffle(cells_to_fill)
         
         # Récupère les coordonnées et valeurs possibles de la cases ayant le moins de valeurs possibles
         cell_possible_values, cell_coordinates = cells_to_fill[0]
-
+        
         # arrangement des valeurs aléatoires dans les valeurs possibles // n'impact pas la vitesse de résolution
         if do_choice_randomly:
             random.shuffle(cell_possible_values)
