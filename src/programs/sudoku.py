@@ -518,23 +518,24 @@ class Sudoku:
                 # indique si la case est en conflit // "(x, y) in self.conflicting_cells" retourne un boolean
                 self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
     
-    def generate_grid(self, cell_frequency: float, do_show_messagebox: bool = True):
+    def generate_grid(self, frequency_cell_removed: float=0.03, do_show_messagebox: bool = True):
         """
         Génère une grille de sudoku
-        :param cell_frequency: proportion de cases à laisser (= difficulté)
+        :param frequency_cell_removed: fréquence / proportion des cases a retirer à chaque boucle ne donnant pas de résultat
         :param do_show_messagebox: afficher ou non un message à la fin pour indiquer et résumr la génération
         met à jour self.grid
         """
         
         # Test préconditions
-        test_errors(frequency=cell_frequency)
-        
+        test_errors(frequency=self.game.generation_difficulty)
+        test_errors(frequency=frequency_to_append)
         print("generating...")
         
         # met à jour le titre de la fenêtre
         self.game.update_title("Génération ...")
         starting_time = time.time()
-        
+        cell_frequency = self.game.generation_difficulty
+
         # Génère une nouvelle grille vide, ne fait rien si l'action a été annulée
         if not self.new_empty_grid(self.grid.size):
             return False
@@ -548,7 +549,7 @@ class Sudoku:
         # Pochoir (test plusieurs configurattion jusqu'a en trouver une correct)
         backup_grid = self.grid.get_all_values()  # copie la grille (sauvegarde)
         # définir les cases à laisser
-        number_of_cells_to_remove = round((1 - cell_frequency) * self.grid.cells_count)
+        number_of_cells_to_remove = round((cell_frequency) * self.grid.cells_count)
         resolved = False
         # boucle qui attend la résolution de la grille
         while not resolved:
@@ -603,10 +604,10 @@ class Sudoku:
                 )
                 self.game.update(False)
                 # définir les cases à laisser
-                # augmente de 3% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
-                cell_frequency += 0.03
+                # augmente de X% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
+                cell_frequency -= frequency_cell_removed
                 # calcul le nombre de case à supprimer
-                number_of_cells_to_remove = round((1 - cell_frequency) * self.grid.cells_count)
+                number_of_cells_to_remove = round((cell_frequency) * self.grid.cells_count)
         
         # defini le mode de jeu à joueur
         self.set_game_mode("playing")

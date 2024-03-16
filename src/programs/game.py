@@ -398,7 +398,7 @@ class Game:
                     self.current_menu = "game"
                     self.graphism.display_game_elements()
                     
-                    self.sudoku.generate_grid(self.generation_difficulty)
+                    self.sudoku.generate_grid()
                     self.sudoku.verify_grid()
                 
                 # bouton curseur
@@ -520,8 +520,8 @@ class Game:
         input_lower_bound = self.graphism.cursor_background_button_rect.x
         input_upper_bound = self.graphism.cursor_background_button_rect.x + self.graphism.cursor_background_button.get_width() - self.graphism.cursor_button.get_width()
         
-        output_lower_bound = 0.7
-        output_upper_bound = 0.3
+        output_lower_bound = 0.3
+        output_upper_bound = 0.7
         
         difficulty = (cursor_pos - input_lower_bound) / (input_upper_bound - input_lower_bound) * (output_upper_bound - output_lower_bound) + output_lower_bound
         difficulty = round(difficulty, 2)
