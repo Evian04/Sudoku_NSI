@@ -22,6 +22,9 @@ class Graphism:
         self.do_play_music = do_play_music
         self.do_display_conflicts = do_display_conflicts
         
+        # variable indiquant si le curseur a été sélectionné par un clique gauche
+        self.is_cursor_selected = False
+        
 
     def update_grid_attributes(self, size: int):
         """

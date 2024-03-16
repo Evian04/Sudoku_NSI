@@ -401,6 +401,12 @@ class Game:
                     self.sudoku.generate_grid(self.generation_difficulty)
                     self.sudoku.verify_grid()
                 
+                # bouton curseur
+                elif self.graphism.cursor_background_button_rect.collidepoint(mouse_pos):
+                    
+                    # indiquer que ce bouton a été sélectionné
+                    self.graphism.is_cursor_selected = True
+                
                 # bouton mode de jeu (joueur / éditeur)
                 elif self.graphism.game_mode_button_rect.collidepoint(mouse_pos):
                     self.sudoku.reverse_game_mode()
@@ -437,6 +443,7 @@ class Game:
                     self.set_config_value("do_display_during_solving", self.do_display_during_solving)
             
             elif event.type == pygame.MOUSEBUTTONUP:
+                self.graphism.is_cursor_selected = False
                 self.update_generation_difficulty()
             
             elif event.type == pygame.KEYDOWN:
@@ -444,7 +451,7 @@ class Game:
                     do_display = True
                     self.is_options_open = False
         
-        if pygame.mouse.get_pressed()[0] and self.graphism.cursor_background_button_rect.collidepoint(mouse_pos):
+        if pygame.mouse.get_pressed()[0] and self.graphism.is_cursor_selected:
             cursor_new_x = mouse_pos[0] - self.graphism.cursor_button.get_width() / 2
             
             self.graphism.cursor_button_rect.x = cursor_new_x
@@ -517,6 +524,7 @@ class Game:
         output_upper_bound = 0.3
         
         difficulty = (cursor_pos - input_lower_bound) / (input_upper_bound - input_lower_bound) * (output_upper_bound - output_lower_bound) + output_lower_bound
+        difficulty = round(difficulty, 2)
 
         self.generation_difficulty = difficulty
         self.set_config_value("generation_difficulty", difficulty)
