@@ -357,6 +357,7 @@ class Game:
         Met à jour l'état du jeu lorsque le menu d'options est ouvert
         """
         
+        mouse_pos = pygame.mouse.get_pos()
         all_events = pygame.event.get()
         
         # balayer dans les evenements
@@ -375,7 +376,6 @@ class Game:
             # clic gauche
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
                 do_display = True
-                mouse_pos = pygame.mouse.get_pos()
                 
                 # croix pour quitter le menu options
                 if self.graphism.cross_options_button_rect.collidepoint(mouse_pos):
@@ -450,6 +450,20 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     do_display = True
                     self.is_options_open = False
+        
+        if pygame.mouse.get_pressed()[0] and self.graphism.cursor_background_button_rect.collidepoint(mouse_pos):
+            cursor_new_x = mouse_pos[0] - self.graphism.cursor_button.get_width() / 2
+            
+            self.graphism.cursor_button_rect.x = cursor_new_x
+            
+            lower_bound = self.graphism.cursor_background_button_rect.x
+            upper_bound = self.graphism.cursor_background_button_rect.x + self.graphism.cursor_background_button.get_width() - self.graphism.cursor_button.get_width()
+            
+            if cursor_new_x < lower_bound:
+                self.graphism.cursor_button_rect.x = lower_bound
+            
+            elif cursor_new_x > upper_bound:
+                self.graphism.cursor_button_rect.x = upper_bound
         
         if do_display:
             self.graphism.display_options_elements()

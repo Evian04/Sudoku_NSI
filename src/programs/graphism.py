@@ -264,7 +264,7 @@ class Graphism:
         """
         Permet d'afficher les élément du menu d'options à l'écran
         """
-        pass
+        
         # Affichage du fond d'écran
         self.screen.blit(self.background, self.background_rect)
         
@@ -290,6 +290,14 @@ class Graphism:
             self.screen.blit(self.generate_selected_button, self.generate_button_rect)
         else:
             self.screen.blit(self.generate_button, self.generate_button_rect)
+        
+        # boutton curseur
+        self.screen.blit(self.cursor_background_button, self.cursor_background_button_rect)
+        
+        if self.cursor_background_button_rect.collidepoint(mouse_pos):
+            self.screen.blit(self.cursor_selected_button, self.cursor_button_rect)
+        else:
+            self.screen.blit(self.cursor_button, self.cursor_button_rect)
             
         # bouton mode de jeu (joueur ou éditeur)
         if self.game_mode_button_rect.collidepoint(mouse_pos):
@@ -743,10 +751,10 @@ class Graphism:
         self.dimensions_button_rect.x = ref_coordinates_left[0]
         self.dimensions_button_rect.y = ref_coordinates_left[1] + buttons_gap
         
-        # image textures pack
+        # image du boutton textures pack
         self.change_textures_button = self.load_image("buttons/options/change_textures.png", self.options_buttons_dimensions)
         
-        #image textures pack sélectionnée
+        # image du boutton textures pack sélectionnée
         self.change_textures_selected_button = self.load_image("buttons/options/change_textures_selected.png", self.options_buttons_dimensions)
         
         # rectangle textures pack
@@ -754,16 +762,35 @@ class Graphism:
         self.change_textures_button_rect.x = ref_coordinates_left[0]
         self.change_textures_button_rect.y = ref_coordinates_left[1] + buttons_gap * 2
         
-        # image bouton générer
+        # image du bouton générer
         self.generate_button = self.load_image("buttons/options/generate.png", self.options_buttons_dimensions)
         
-        # image bouton générer sélectionnée
+        # image du bouton générer sélectionnée
         self.generate_selected_button = self.load_image("buttons/options/generate_selected.png", self.options_buttons_dimensions)
         
         # rectangle bouton générer
         self.generate_button_rect = self.generate_button.get_rect()
         self.generate_button_rect.x = ref_coordinates_left[0]
         self.generate_button_rect.y = ref_coordinates_left[1] + buttons_gap * 3
+        
+        # image du curseur
+        self.cursor_button = self.load_image("buttons/options/cursor.png", [self.options_buttons_dimensions[1]] * 2)
+        
+        # image curseur sélectionné
+        self.cursor_selected_button = self.load_image("buttons/options/cursor_selected.png", [self.options_buttons_dimensions[1]] * 2)
+        
+        # rectangle curseur
+        self.cursor_button_rect = self.cursor_selected_button.get_rect()
+        self.cursor_button_rect.x = ref_coordinates_left[0] + self.options_buttons_dimensions[0] / 2 - self.options_buttons_dimensions[1] / 2
+        self.cursor_button_rect.y = ref_coordinates_left[1] + buttons_gap * 4
+        
+        # image du fond du curseur
+        self.cursor_background_button = self.load_image("buttons/options/cursor_background.png", self.options_buttons_dimensions)
+        
+        # rectangle fond du curseur
+        self.cursor_background_button_rect = self.cursor_background_button.get_rect()
+        self.cursor_background_button_rect.x = ref_coordinates_left[0]
+        self.cursor_background_button_rect.y = ref_coordinates_left[1] + buttons_gap * 4
         
         
         # coordonnées de référence des boutons de la colonne de droite
