@@ -240,14 +240,24 @@ class Game:
                     # bouton annuler dernière action
                     elif self.graphism.arrow_left_button_rect.collidepoint(
                             mouse_pos) and self.sudoku.is_history_move_possible("backward"):
-                        self.sudoku.move_index_history("backward")
-                        print("Action canceled")
+                        if is_ctrl_pressed:
+                            # annule toutes les actions
+                            self.sudoku.move_to_history_index(0)
+                        else:
+                            # annule la dernière action
+                            self.sudoku.move_index_history("backward")
+                            print("Action canceled")
                     
                     # bouton retablir la dernière action
                     elif self.graphism.arrow_right_button_rect.collidepoint(
                             mouse_pos) and self.sudoku.is_history_move_possible("forward"):
-                        self.sudoku.move_index_history("forward")
-                        print('Action restored')
+                        if is_ctrl_pressed:
+                            # rétablie toutes les actions
+                            self.sudoku.move_to_history_index(-1)
+                        else:
+                            # rétablie la dernière action
+                            self.sudoku.move_index_history("forward")
+                            print('Action restored')
                     
                     # bouton ouvrir
                     elif self.graphism.open_button_rect.collidepoint(mouse_pos):

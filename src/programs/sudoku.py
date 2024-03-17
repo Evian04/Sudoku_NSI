@@ -313,6 +313,27 @@ class Sudoku:
         self.verify_grid()
         self.update_cells_conflicting_state()
     
+    def move_to_history_index(self, index:int):
+        """
+        Mettre la grille stocké dans l'historique à `index`
+        index = -1 corrspond au dernier élément
+        """
+        
+        assert type(index) is int
+        assert -1 <= index < len(self.history)
+        
+        if index == -1:
+            self.history_index = len(self.history) - 1
+        else:
+            self.history_index = index
+        # remplace la grille actuelle par la grille de l'historique
+        self.grid = self.history[self.history_index][0].copy()
+        self.selected_cell = self.history[self.history_index][1]
+
+        # effectue la verification des cases en conflit
+        self.verify_grid()
+        self.update_cells_conflicting_state()
+    
     def clear_history(self):
         """
         Vide l'historique.
