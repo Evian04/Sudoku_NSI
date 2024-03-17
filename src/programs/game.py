@@ -157,10 +157,18 @@ class Game:
                 # si le bouton play est selectionnée
                 if self.graphism.play_button_rect.collidepoint(mouse_pos):
                     self.current_menu = "game"
+                    # ne pas afficher le menu démarrer...
+                    do_display = False
+                    # ... mais plutot le menu de jeu
+                    self.update_game(True)
                 
                 # si le bouton options est selectionnée
                 elif self.graphism.options_start_button_rect.collidepoint(mouse_pos):
                     self.is_options_open = True
+                    # ne pas afficher le menu démarrer...
+                    do_display = False
+                    # ... mais plutôt le menu options
+                    self.update_options(True)
                 
                 elif self.graphism.help_button_rect.collidepoint(mouse_pos):
                     self.open_file(self.help_filepath)
@@ -258,10 +266,18 @@ class Game:
                     # bouton options
                     elif self.graphism.options_button_rect.collidepoint(mouse_pos):
                         self.is_options_open = True
+                        # ne pas afficher le menu de jeu...
+                        do_display = False
+                        # ... mais plutôt le menu options
+                        self.update_options(True)
                     
                     # bouton retour (au menu démarrer)
                     elif self.graphism.return_button_rect.collidepoint(mouse_pos):
                         self.current_menu = "start"
+                        # ne pas afficher le menu  de jeu...
+                        do_display = False
+                        # ... mais plutôt le menu démarrer
+                        self.update_start(True)
                 
                 # Si l'utilisateur effectue un clique droit
                 elif event.button == pygame.BUTTON_RIGHT:
@@ -363,6 +379,15 @@ class Game:
                 # croix pour quitter le menu options
                 if self.graphism.cross_options_button_rect.collidepoint(mouse_pos):
                     self.is_options_open = False
+                    
+                    # ne pas afficher le menu options...
+                    do_display = False
+                    if self.current_menu == "start":
+                        # ... mais plutôt le menu démarrer
+                        self.update_start(True)
+                    else:
+                        # ... mais plutôt le menu de jeu
+                        self.update_game(True)
                 
                 # bouton dimensions
                 if self.graphism.dimensions_button_rect.collidepoint(mouse_pos):
