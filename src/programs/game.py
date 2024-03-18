@@ -2,7 +2,8 @@
 import os
 import pygame
 import json
-# nos modules
+
+# import de nos modules
 from src.programs.sudoku import Sudoku
 from src.programs.graphism import Graphism
 from src.programs.test_errors import test_errors
@@ -105,6 +106,7 @@ class Game:
         """
         Met à jour l'affichage du jeu
         """
+        
         # met en pause la lecture de la musique ou la reprend en fonction du focus
         if self.is_window_focused != pygame.key.get_focused():
             self.is_window_focused = pygame.key.get_focused()
