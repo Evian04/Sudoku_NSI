@@ -22,8 +22,7 @@ while not game.do_quit:
     pygame.time.Clock().tick(60)
 
     # Si la souris est immobile ne met pas à jour l'affichage du jeu
-    do_display = pygame.mouse.get_rel() == (0, 0)
-
+    do_display = pygame.mouse.get_rel() != (0, 0)
     # Mettre à jour le jeu
     game.update(do_display)
 
