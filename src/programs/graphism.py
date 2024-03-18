@@ -296,11 +296,7 @@ class Graphism:
         
         # boutton curseur
         self.screen.blit(self.cursor_background_button, self.cursor_background_button_rect)
-        
-        if self.cursor_background_button_rect.collidepoint(mouse_pos) or self.is_cursor_selected:
-            self.screen.blit(self.cursor_selected_button, self.cursor_button_rect)
-        else:
-            self.screen.blit(self.cursor_button, self.cursor_button_rect)
+        self.screen.blit(self.cursor_button, self.cursor_button_rect)
             
         # bouton mode de jeu (joueur ou éditeur)
         if self.game_mode_button_rect.collidepoint(mouse_pos):
@@ -316,7 +312,7 @@ class Graphism:
         
         # bouton activer / désactiver la musique
         if self.play_music_button_rect.collidepoint(mouse_pos):
-            self.screen.blit(self.play_music_button, self.play_music_button_rect)
+            self.screen.blit(self.play_music_selected_button, self.play_music_button_rect)
         else:
             self.screen.blit(self.play_music_button, self.play_music_button_rect)
         # bouton afficher / cacher les erreurs
@@ -779,11 +775,8 @@ class Graphism:
         # image du curseur
         self.cursor_button = self.load_image("buttons/options/cursor.png", [self.options_buttons_dimensions[1]] * 2)
         
-        # image curseur sélectionné
-        self.cursor_selected_button = self.load_image("buttons/options/cursor_selected.png", [self.options_buttons_dimensions[1]] * 2)
-        
         # rectangle curseur
-        self.cursor_button_rect = self.cursor_selected_button.get_rect()
+        self.cursor_button_rect = self.cursor_button.get_rect()
         self.cursor_button_rect.x = ref_coordinates_left[0] + (self.options_buttons_dimensions[0] - self.cursor_button.get_width()) * (self.game.generation_difficulty - 0.3) * 2.5
         self.cursor_button_rect.y = ref_coordinates_left[1] + buttons_gap * 4
         
