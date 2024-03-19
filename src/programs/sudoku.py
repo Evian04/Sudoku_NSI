@@ -549,9 +549,11 @@ class Sudoku:
         
         # Test préconditions
         test_errors(frequency = frequency_cell_removed)
+        
+        # message console
         print("generating...")
         
-        # met à jour le titre de la fenêtre
+        # mise à jour le titre de la fenêtre
         self.game.update_title("Génération ...")
         
         # indique que la génération est en cours
@@ -629,7 +631,7 @@ class Sudoku:
                 self.game.update(False)
                 # définir les cases à laisser
                 # augmente de X% le taux de cases laissées (diminue le nombre de boucle nécessaire, accélère la génération)
-                cell_frequency -= frequency_cell_removed
+                cell_frequency -= 0.05
                 # calcul le nombre de case à supprimer
                 number_of_cells_to_remove = round((cell_frequency) * self.grid.cells_count)
         
