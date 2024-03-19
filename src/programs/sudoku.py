@@ -422,7 +422,7 @@ class Sudoku:
         self.verify_grid()
         # supprime l'historique
         self.clear_history()
-        # défini le mode a `joueur`
+        # défini le mode a "joueur"
         self.set_game_mode("playing")
         # met à jour le titre
         self.game.update_title()
@@ -536,8 +536,12 @@ class Sudoku:
         
         for x in range(self.grid.size):
             for y in range(self.grid.size):
-                # indique si la case est en conflit // "(x, y) in self.conflicting_cells" retourne un boolean
-                self.grid.set_cell_conflicting_state((x, y), (x, y) in self.conflicting_cells)
+                # indique si la case est en conflit
+                is_in_conflict = (x, y) in self.conflicting_cells and self.grid.get_cell_value((x, y)) != "0"
+                self.grid.set_cell_conflicting_state(
+                    (x, y),
+                    is_in_conflict
+                )
     
     def generate_grid(self, frequency_cell_removed: float, do_show_messagebox: bool = True):
         """
@@ -692,17 +696,36 @@ class Sudoku:
         # reset la grille
         self.clear_inputs(False)
         
+        # met à jour les cases contradictoires
+        self.verify_grid()
+        self.update_cells_conflicting_state()
+        
         # indique si le sudoku est resolvable par un message dans la console
         if not self.is_valid():
             print("Invalid input, cannot solve the sudoku")
+            return
         
-        elif self.backtracking_solving(do_display):
+        solving_result = self.backtracking_solving(do_display)
+        processing_time = time.time() - starting_time
+        
+        if solving_result and do_display:
             print("Sudoku solved successfully")
-            print(f'Solving executing time: {round(time.time() - starting_time, 2)}s')
+            print(f'Solving executing time: {round(processing_time, 2)}s')
+            
+            showinfo(
+                "Résolution terminée",
+                "La grille a bien été résolue\n"
+                f"Temps d'exécution : {round(processing_time, 2)}s"
+            )
         
         else:
             print("Cannot solve the sudoku")
             print(f'Solving executing time: {round(time.time() - starting_time, 2)}s')
+            
+            showinfo(
+                "Résolution échouée",
+                "La grille n'a pas pu être résolue, veuillez vérifier la validité de la grille"
+            )
         
         # Enregistrer la grille dans l'historique
         self.save_grid_in_history()
@@ -763,7 +786,7 @@ class Sudoku:
         """
         
         # Test préconditions
-        test_errors(boolean=do_save_in_history)
+        test_errors(boolean = do_save_in_history)
         
         # indique si la grille a été modifiée
         is_grid_changed = False
