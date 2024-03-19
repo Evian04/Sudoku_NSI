@@ -576,7 +576,7 @@ class Sudoku:
         if self.game.do_quit:
             return
         
-        # Pochoir (test plusieurs configurattion jusqu'a en trouver une correct)
+        # Pochoir (test plusieurs configuration jusqu'a en trouver une correct)
         backup_grid = self.grid.get_all_values()  # copie la grille (sauvegarde)
         # définir les cases à laisser
         number_of_cells_to_remove = round((cell_frequency) * self.grid.cells_count)
@@ -641,10 +641,10 @@ class Sudoku:
         
         # defini le mode de jeu à joueur
         self.set_game_mode("playing")
-        # met à jour le boutton "mode de jeu"
-        self.game.graphism.update_game_mode_button()
         # met à jour le titre de la fenêtre
         self.game.update_title()
+        # met à jour le boutton "mode de jeu"
+        self.game.graphism.update_game_mode_button()
         # met à jour l'affichage
         self.game.graphism.display_game_elements()
         
@@ -658,7 +658,7 @@ class Sudoku:
         # pourcentaage de cases restantes
         percentage = round(100 - ((number_of_cells_to_remove / self.grid.cells_count) * 100), 2)
         # affichage console
-        print(f'Temps de génération: {executing_time}s - {remaining_cells} cases restantes ({percentage}%)')
+        print(f"Temps de génération: {executing_time}s - {remaining_cells} cases restantes ({percentage}%)")
         # affichage d'un message indiquant la fin de la génération
         if do_show_messagebox:
             showinfo(
