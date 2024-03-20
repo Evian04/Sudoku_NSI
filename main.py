@@ -27,5 +27,7 @@ while not game.do_quit:
     # Mettre à jour le jeu
     game.update(do_display)
 
+# fermeture de la fenêtre
 pygame.quit()
+# message console indiquant la fermeture de la fenêtre
 print("Program closed")
