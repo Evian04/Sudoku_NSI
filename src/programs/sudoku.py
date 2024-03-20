@@ -718,7 +718,7 @@ class Sudoku:
                 f"Temps d'exécution : {round(processing_time, 2)}s"
             )
         
-        else:
+        elif do_display:
             print("Cannot solve the sudoku")
             print(f'Solving executing time: {round(time.time() - starting_time, 2)}s')
             
